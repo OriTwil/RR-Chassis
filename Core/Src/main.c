@@ -73,7 +73,7 @@ void calculate(double * moter_speed,
                double v_w)
 {
     moter_speed[0] = (- v_x * sin(30 * DEC) - v_y * cos(30 * DEC)  + v_w * r_underpan)/(2 * pi * r_wheel);
-    moter_speed[1] = (+ v_x * sin(30 * DEC)                        + v_w * r_underpan)/(2 * pi * r_wheel);
+    moter_speed[1] = (+ v_x                        + v_w * r_underpan)/(2 * pi * r_wheel);
     moter_speed[2] = (- v_x * sin(30 * DEC) + v_y * cos(30 * DEC)  + v_w * r_underpan)/(2 * pi * r_wheel);
 }
 
