@@ -44,7 +44,7 @@ void UART1Decode(){
     switch(Raw_Data.right)
     {
         case 1:
-            vw = (float ) (Raw_Data.ch3 - CH3_BIAS)/CH_RANGE * 1000;
+            vw = (float ) (Raw_Data.ch3 - CH3_BIAS)/CH_RANGE * 2000;
             /* right choice 1 */
             break;
         case 3:
