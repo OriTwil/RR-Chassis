@@ -32,8 +32,8 @@
 #include <math.h>
 #define pi 3.1415926535898
 #define DEC (pi/180)
-#define r_underpan 0.17
-#define r_wheel 0.075
+#define r_underpan 0.1934
+#define r_wheel 0.076
 // DJI_t hDJI[8];
 double moter_speed [3];
 /* USER CODE END Includes */
