@@ -21,9 +21,20 @@ typedef struct
 	int16_t wheel;
 }Remote_t;
 
+typedef struct 
+{
+	/* data */
+	float vx;
+	float vy;
+	float vw;
+
+}underpan_speed;
+
+
 extern Remote_t Raw_Data;
 extern void UART1Decode();
 extern uint8_t JoyStickReceiveData[18];
 extern double posRef;
 extern float vx,vy,vw;
+extern underpan_speed crl_speed;
 #endif

@@ -5,6 +5,7 @@
 #include "usart.h"
 
 Remote_t Raw_Data;
+underpan_speed crl_speed;
 uint8_t JoyStickReceiveData[18];
 
 double angMax = 360;
@@ -25,8 +26,8 @@ void UART1Decode(){
     {
         case 1:
             //speed = (float ) (Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 200;
-            vx = (float ) (-(Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 1000);
-            vy = (float ) (Raw_Data.ch1 - CH1_BIAS)/CH_RANGE * 1000;
+            crl_speed.vx = (float ) (-(Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 1000);
+            crl_speed.vy = (float ) (Raw_Data.ch1 - CH1_BIAS)/CH_RANGE * 1000;
             /* left choice 1 */
             break;
         case 3:
@@ -44,7 +45,7 @@ void UART1Decode(){
     switch(Raw_Data.right)
     {
         case 1:
-            vw = (float ) (Raw_Data.ch3 - CH3_BIAS)/CH_RANGE * 5000;
+            crl_speed.vw = (float ) (Raw_Data.ch2 - CH2_BIAS)/CH_RANGE * 5000;
             /* right choice 1 */
             break;
         case 3:

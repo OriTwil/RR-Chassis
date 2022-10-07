@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "cmsis_os.h"
 #include "can.h"
 #include "dma.h"
 #include "usart.h"
@@ -25,17 +26,17 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include "Caculate.h"
-#include "wtr_can.h"
-#include "DJI.h"
-#include "wtr_uart.h"
-#include <math.h>
-#define pi 3.1415926535898
-#define DEC (pi/180)
-#define r_underpan 0.1934
-#define r_wheel 0.076
+// #include "Caculate.h"
+// #include "wtr_can.h"
+// #include "DJI.h"
+// #include "wtr_uart.h"
+// #include <math.h>
+// #define pi 3.1415926535898
+// #define DEC (pi/180)
+// #define r_underpan 0.1934
+// #define r_wheel 0.076
 // DJI_t hDJI[8];
-double moter_speed [3];
+// double moter_speed [3];
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -60,6 +61,7 @@ double moter_speed [3];
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
+void MX_FREERTOS_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -67,15 +69,15 @@ void SystemClock_Config(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-void calculate(double * moter_speed,
-               double v_x,
-               double v_y,
-               double v_w)
-{
-    moter_speed[0] = (- v_x * sin(30 * DEC) - v_y * cos(30 * DEC)  + v_w * r_underpan)/(2 * pi * r_wheel);
-    moter_speed[1] = (+ v_x                        + v_w * r_underpan)/(2 * pi * r_wheel);
-    moter_speed[2] = (- v_x * sin(30 * DEC) + v_y * cos(30 * DEC)  + v_w * r_underpan)/(2 * pi * r_wheel);
-}
+// void calculate(double * moter_speed,
+//                double v_x,
+//                double v_y,
+//                double v_w)
+// {
+//     moter_speed[0] = (- v_x * sin(30 * DEC) - v_y * cos(30 * DEC)  + v_w * r_underpan)/(2 * pi * r_wheel);
+//     moter_speed[1] = (+ v_x                        + v_w * r_underpan)/(2 * pi * r_wheel);
+//     moter_speed[2] = (- v_x * sin(30 * DEC) + v_y * cos(30 * DEC)  + v_w * r_underpan)/(2 * pi * r_wheel);
+// }
 
 /* USER CODE END 0 */
 
@@ -112,30 +114,37 @@ int main(void)
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
-  CANFilterInit(&hcan1);//过滤器设�???
-  hDJI[0].motorType = M3508;
-  hDJI[1].motorType = M3508;
-  hDJI[2].motorType = M3508;//电机类型设置
-  DJI_Init();
+  // CANFilterInit(&hcan1);//过滤器设�???
+  // hDJI[0].motorType = M3508;
+  // hDJI[1].motorType = M3508;
+  // hDJI[2].motorType = M3508;//电机类型设置
+  // DJI_Init();
   
-  HAL_UART_Receive_DMA(&huart1,JoyStickReceiveData,18);
-	HAL_Delay(100);
+  // HAL_UART_Receive_DMA(&huart1,JoyStickReceiveData,18);
+	// HAL_Delay(100);
 
   /* USER CODE END 2 */
 
+  /* Call init function for freertos objects (in freertos.c) */
+  MX_FREERTOS_Init();
+
+  /* Start scheduler */
+  osKernelStart();
+
+  /* We should never get here as control is now taken by the scheduler */
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-    calculate(moter_speed,vx,vy,vw);
-    speedServo(moter_speed[0],&hDJI[0]);
-    speedServo(moter_speed[1],&hDJI[1]);
-    speedServo(moter_speed[2],&hDJI[2]);
+    // calculate(moter_speed,vx,vy,vw);
+    // speedServo(moter_speed[0],&hDJI[0]);
+    // speedServo(moter_speed[1],&hDJI[1]);
+    // speedServo(moter_speed[2],&hDJI[2]);
 
-    CanTransmit_DJI_1234(&hcan1,hDJI[0].speedPID.output,
-                                hDJI[1].speedPID.output,
-                                hDJI[2].speedPID.output,
-                                0);
+    // CanTransmit_DJI_1234(&hcan1,hDJI[0].speedPID.output,
+    //                             hDJI[1].speedPID.output,
+    //                             hDJI[2].speedPID.output,
+    //                             0);
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -197,27 +206,48 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
-{
-    UART1Decode();
-}
+// void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+// {
+//     UART1Decode();
+// }
 
 /**
   * @brief  UART error callback.
   * @param  huart UART handle.
   * @retval None
   */
-void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
-{
-  /* Prevent unused argument(s) compilation warning */
-		// __HAL_UART_CLEAR_OREFLAG(huart);
-    huart->ErrorCode = 0;
-  /* NOTE : This function should not be modified, when the callback is needed,
-            the HAL_UART_ErrorCallback can be implemented in the user file.
-   */
-}
+// void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart)
+// {
+//   /* Prevent unused argument(s) compilation warning */
+// 		// __HAL_UART_CLEAR_OREFLAG(huart);
+//     huart->ErrorCode = 0;
+//   /* NOTE : This function should not be modified, when the callback is needed,
+//             the HAL_UART_ErrorCallback can be implemented in the user file.
+//    */
+// }
 
 /* USER CODE END 4 */
+
+/**
+  * @brief  Period elapsed callback in non blocking mode
+  * @note   This function is called  when TIM7 interrupt took place, inside
+  * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
+  * a global variable "uwTick" used as application time base.
+  * @param  htim : TIM handle
+  * @retval None
+  */
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM7) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.
