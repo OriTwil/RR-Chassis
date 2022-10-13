@@ -34,10 +34,10 @@ void calculate_4(double * moter_speed,
                double v_y,
                double v_w)
 {
-    moter_speed[0] =  v_y + v_w * r_underpan_4;
-    moter_speed[1] = -v_x + v_w * r_underpan_4;
-    moter_speed[0] = -v_y + v_w * r_underpan_4;
-    moter_speed[0] =  v_x + v_w * r_underpan_4;
+    moter_speed[0] = ( v_y + v_w * r_underpan_4)/(2 * pi * r_wheel);
+    moter_speed[1] = (-v_x + v_w * r_underpan_4)/(2 * pi * r_wheel);
+    moter_speed[2] = (-v_y + v_w * r_underpan_4)/(2 * pi * r_wheel);
+    moter_speed[3] = ( v_x + v_w * r_underpan_4)/(2 * pi * r_wheel);
 }//四轮全向
 
 //线程一：底盘控制
@@ -67,6 +67,12 @@ void thread_1(void const * argument)
                                 hDJI[1].speedPID.output,
                                 hDJI[2].speedPID.output,
                                 hDJI[3].speedPID.output);
+
+    // CanTransmit_DJI_5678(&hcan1,hDJI[0].speedPID.output,
+    //                             hDJI[1].speedPID.output,
+    //                             hDJI[2].speedPID.output,
+    //                             hDJI[3].speedPID.output);  
+
     osDelay(1);
     }
 
