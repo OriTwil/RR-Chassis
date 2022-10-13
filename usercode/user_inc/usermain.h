@@ -16,7 +16,7 @@
 #define pi 3.1415926535898
 #define DEC (pi/180)
 #define r_underpan_3 0.1934
-#define r_underpan_4 0
+#define r_underpan_4 0.25
 #define r_wheel 0.076
 
 //声明运动学逆解函数
