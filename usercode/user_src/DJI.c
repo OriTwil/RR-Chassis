@@ -2,7 +2,6 @@
 
 #include "DJI.h"
 
-
 DJI_t hDJI[8];
 //使用DJI init前需要指定motorType
 void DJI_Init(){

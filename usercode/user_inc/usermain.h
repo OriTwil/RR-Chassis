@@ -12,16 +12,25 @@
 #include "wtr_uart.h"
 #include <math.h>
 #include "main.h"
-
+//宏定义计算中常数及底盘数据
 #define pi 3.1415926535898
 #define DEC (pi/180)
-#define r_underpan 0.1934
+#define r_underpan_3 0.1934
+#define r_underpan_4 0
 #define r_wheel 0.076
 
-void calculate(double * moter_speed,
+//声明运动学逆解函数
+void calculate_4(double * moter_speed,
                double v_x,
                double v_y,
                double v_w);
 
-extern double moter_speed [3];
+void calculate_3(double * moter_speed,
+               double v_x,
+               double v_y,
+               double v_w);
+
+//定义数组，分别存放四个轮子对应电机的速度
+double moter_speed [4];
+
 #endif

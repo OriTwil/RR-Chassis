@@ -9,17 +9,14 @@
 #include "wtr_uart.h"
 #include <math.h>
 #include "main.h"
+#include "usermain.h"
 #define pi 3.1415926535898
 #define DEC (pi/180)
 #define r_underpan 0.1934
 #define r_wheel 0.076
 
-void calculate(double * moter_speed,
-               double v_x,
-               double v_y,
-               double v_w);
-
-double moter_speed [4];
+// //
+// double moter_speed [4];
 
 //将底盘速度解算到电机速度
 void calculate_3(double * moter_speed,
@@ -27,9 +24,9 @@ void calculate_3(double * moter_speed,
                double v_y,
                double v_w)
 {
-    moter_speed[0] = (- v_x * sin(30 * DEC) - v_y * cos(30 * DEC)  + v_w * r_underpan)/(2 * pi * r_wheel);
-    moter_speed[1] = (+ v_x                        + v_w * r_underpan)/(2 * pi * r_wheel);
-    moter_speed[2] = (- v_x * sin(30 * DEC) + v_y * cos(30 * DEC)  + v_w * r_underpan)/(2 * pi * r_wheel);
+    moter_speed[0] = (- v_x * sin(30 * DEC) - v_y * cos(30 * DEC)  + v_w * r_underpan_3)/(2 * pi * r_wheel);
+    moter_speed[1] = (+ v_x                                        + v_w * r_underpan_3)/(2 * pi * r_wheel);
+    moter_speed[2] = (- v_x * sin(30 * DEC) + v_y * cos(30 * DEC)  + v_w * r_underpan_3)/(2 * pi * r_wheel);
 }//三轮全向
 
 void calculate_4(double * moter_speed,
@@ -37,10 +34,10 @@ void calculate_4(double * moter_speed,
                double v_y,
                double v_w)
 {
-    moter_speed[0] =  v_y + v_w;
-    moter_speed[1] = -v_x + v_w;
-    moter_speed[0] = -v_y + v_w;
-    moter_speed[0] =  v_x + v_w;
+    moter_speed[0] =  v_y + v_w * r_underpan_4;
+    moter_speed[1] = -v_x + v_w * r_underpan_4;
+    moter_speed[0] = -v_y + v_w * r_underpan_4;
+    moter_speed[0] =  v_x + v_w * r_underpan_4;
 }//四轮全向
 
 //线程一：底盘控制
