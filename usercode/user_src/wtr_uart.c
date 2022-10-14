@@ -26,8 +26,8 @@ void UART1Decode(){
     {
         case 1:
             //speed = (float ) (Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 200;
-            crl_speed.vx = (float ) ((Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 1000);
-            crl_speed.vy = (float ) (Raw_Data.ch1 - CH1_BIAS)/CH_RANGE * 1000;
+            crl_speed.vx = (float ) ((Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 1500);
+            crl_speed.vy = (float ) (Raw_Data.ch1 - CH1_BIAS)/CH_RANGE * 1500;
             /* left choice 1 */
             break;
         case 3:
