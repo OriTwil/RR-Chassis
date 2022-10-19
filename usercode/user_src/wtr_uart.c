@@ -64,7 +64,12 @@ void UART1Decode(){
 }
 
 //void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-
+void mavlink_msg_decode(msg, &StructReceived)
+{
+    crl_speed.vx = 0;
+    crl_speed.vy = 0;
+    crl_speed.vw = 0;
+}
 
 //    
 //}

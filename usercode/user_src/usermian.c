@@ -53,8 +53,10 @@ void thread_1(void const * argument)
     wtrMavlink_BindChannel(&huart1, MAVLINK_COMM_0);
     //串口接收信息
 
-    HAL_UART_Receive_DMA(&huart1,JoyStickReceiveData,18);
+    // HAL_UART_Receive_DMA(&huart1,JoyStickReceiveData,18);//DMA接收AS69
+    wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);//以mavlink接收
 	osDelay(100);
+
     //解算，速度伺服
     for(;;){
 
@@ -96,5 +98,28 @@ void StartDefaultTask(void const * argument)
 //串口回调函数，解码
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    UART1Decode();
+    // UART1Decode();//AS69解码
+    wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);//进入mavlink回调
+}
+
+/**
+ * @brief 接收到完整消息且校验通过后会调用这个函数。在这个函数里调用解码函数就可以向结构体写入收到的数据
+ *
+ * @param msg 接收到的消息
+ * @return
+ */
+void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
+{
+    switch (msg->msgid) {
+        case 1:
+            // id = 1 的消息对应的解码函数(mavlink_msg_xxx_decode)
+            mavlink_msg_decode(msg, &StructReceived);
+            break;
+        case 2:
+            // id = 2 的消息对应的解码函数(mavlink_msg_xxx_decode)
+            break;
+        // ......
+        default:
+            break;
+    }
 }
