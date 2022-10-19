@@ -10,13 +10,13 @@
 #include <math.h>
 #include "main.h"
 #include "usermain.h"
+#include "wtr_mavlink.h"
+
 #define pi 3.1415926535898
 #define DEC (pi/180)
 #define r_underpan 0.1934
 #define r_wheel 0.076
 
-// //
-// double moter_speed [4];
 
 //将底盘速度解算到电机速度
 void calculate_3(double * moter_speed,
@@ -50,6 +50,7 @@ void thread_1(void const * argument)
     hDJI[2].motorType = M3508;//ç”µæœºç±»åž‹è®¾ç½®
     hDJI[3].motorType = M3508;
     DJI_Init();
+    wtrMavlink_BindChannel(&huart1, MAVLINK_COMM_0);
     //串口接收信息
 
     HAL_UART_Receive_DMA(&huart1,JoyStickReceiveData,18);
