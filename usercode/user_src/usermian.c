@@ -131,8 +131,8 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
 {
     switch (msg->msgid) {
-        case 1:
-            // id = 1 的消息对应的解码函数(mavlink_msg_xxx_decode)
+        case 9:
+            // id = 9 的消息对应的解码函数(mavlink_msg_xxx_decode)
             mavlink_msg_speed_decode(msg, &msg_receive);
             break;
         case 2:
