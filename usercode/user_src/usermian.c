@@ -18,7 +18,7 @@
 #define r_wheel 0.076
 
 
-//将底盘速度解算到电机速度
+//将三轮底盘速度解算到电机速度
 void calculate_3(double * moter_speed,
                double v_x,
                double v_y,
@@ -27,9 +27,9 @@ void calculate_3(double * moter_speed,
     moter_speed[0] = (- v_x * sin(30 * DEC) - v_y * cos(30 * DEC)  + v_w * r_underpan_3)/(2 * pi * r_wheel);
     moter_speed[1] = (+ v_x                                        + v_w * r_underpan_3)/(2 * pi * r_wheel);
     moter_speed[2] = (- v_x * sin(30 * DEC) + v_y * cos(30 * DEC)  + v_w * r_underpan_3)/(2 * pi * r_wheel);
-}//三轮全向
+}
 
-
+//将四轮底盘速度解算到电机速度
 void calculate_4(double * moter_speed,
                double v_x,
                double v_y,
@@ -39,16 +39,16 @@ void calculate_4(double * moter_speed,
     moter_speed[1] = (-v_x + v_w * r_underpan_4)/(2 * pi * r_wheel);
     moter_speed[2] = (-v_y + v_w * r_underpan_4)/(2 * pi * r_wheel);
     moter_speed[3] = ( v_x + v_w * r_underpan_4)/(2 * pi * r_wheel);
-}//四轮全向
+}
 
 //线程一：底盘控制
 void thread_1(void const * argument)
 {
     //初始化设置
-    CANFilterInit(&hcan1);//è¿‡æ»¤å™¨è®¾ï¿???
+    CANFilterInit(&hcan1);
     hDJI[0].motorType = M3508;
     hDJI[1].motorType = M3508;
-    hDJI[2].motorType = M3508;//ç”µæœºç±»åž‹è®¾ç½®
+    hDJI[2].motorType = M3508;
     hDJI[3].motorType = M3508;
     DJI_Init();
     wtrMavlink_BindChannel(&huart8, MAVLINK_COMM_0);
@@ -62,7 +62,7 @@ void thread_1(void const * argument)
     for(;;){
 
     // calculate_3(moter_speed,crl_speed.vx,crl_speed.vy,crl_speed.vw);
-    calculate_3(moter_speed,msg_receive.vx,msg_receive.vy,msg_receive.vw);//mavlink
+    calculate_3(moter_speed,v_set.vx_set,v_set.vy_set,v_set.vw_set);//mavlink
 
     speedServo(moter_speed[0],&hDJI[0]);
     speedServo(moter_speed[1],&hDJI[1]);
@@ -74,18 +74,18 @@ void thread_1(void const * argument)
                                 hDJI[2].speedPID.output,
                                 hDJI[3].speedPID.output);
 
-    mavlink_speed_t speed_t;
+    mavlink_speed_control_status_t speed_t;
     static int cnt = 0;
     if(cnt++ > 49){
         cnt = 0;
-        speed_t.vx = hDJI[0].FdbData.rpm;
-        speed_t.vy = hDJI[1].FdbData.rpm;
-        speed_t.vw = hDJI[2].FdbData.rpm;
+        speed_t.vx_state = hDJI[0].FdbData.rpm;
+        speed_t.vy_state = hDJI[1].FdbData.rpm;
+        speed_t.vw_state = hDJI[2].FdbData.rpm;
 
         // char ch[] = "123456\n";
         // HAL_UART_Transmit(&huart8, (uint8_t*)&ch,7,100);
 
-        mavlink_msg_speed_send_struct(MAVLINK_COMM_0, &speed_t);
+        mavlink_msg_speed_control_status_decode(MAVLINK_COMM_0, &speed_t);
         HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
     }
     
@@ -133,7 +133,7 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
     switch (msg->msgid) {
         case 9:
             // id = 9 的消息对应的解码函数(mavlink_msg_xxx_decode)
-            mavlink_msg_speed_decode(msg, &msg_receive);
+            mavlink_msg_speed_control_set_decode(msg, &v_set);
             break;
         case 2:
             // id = 2 的消息对应的解码函数(mavlink_msg_xxx_decode)
