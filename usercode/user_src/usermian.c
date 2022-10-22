@@ -29,6 +29,7 @@ void calculate_3(double * moter_speed,
     moter_speed[2] = (- v_x * sin(30 * DEC) + v_y * cos(30 * DEC)  + v_w * r_underpan_3)/(2 * pi * r_wheel);
 }//三轮全向
 
+
 void calculate_4(double * moter_speed,
                double v_x,
                double v_y,
@@ -50,7 +51,7 @@ void thread_1(void const * argument)
     hDJI[2].motorType = M3508;//ç”µæœºç±»åž‹è®¾ç½®
     hDJI[3].motorType = M3508;
     DJI_Init();
-    wtrMavlink_BindChannel(&huart1, MAVLINK_COMM_0);
+    wtrMavlink_BindChannel(&huart8, MAVLINK_COMM_0);
     //串口接收信息
 
     // HAL_UART_Receive_DMA(&huart1,JoyStickReceiveData,18);//DMA接收AS69
@@ -60,16 +61,34 @@ void thread_1(void const * argument)
     //解算，速度伺服
     for(;;){
 
-    calculate_4(moter_speed,crl_speed.vx,crl_speed.vy,crl_speed.vw);
+    // calculate_3(moter_speed,crl_speed.vx,crl_speed.vy,crl_speed.vw);
+    calculate_3(moter_speed,msg_receive.vx,msg_receive.vy,msg_receive.vw);//mavlink
+
     speedServo(moter_speed[0],&hDJI[0]);
     speedServo(moter_speed[1],&hDJI[1]);
     speedServo(moter_speed[2],&hDJI[2]);
     speedServo(moter_speed[3],&hDJI[3]);
 
     CanTransmit_DJI_1234(&hcan1,hDJI[0].speedPID.output,
-                                hDJI[1].speedPID.output,
+                                0,
                                 hDJI[2].speedPID.output,
                                 hDJI[3].speedPID.output);
+
+    mavlink_speed_t speed_t;
+    static int cnt = 0;
+    if(cnt++ > 49){
+        cnt = 0;
+        speed_t.vx = hDJI[0].FdbData.rpm;
+        speed_t.vy = hDJI[1].FdbData.rpm;
+        speed_t.vw = hDJI[2].FdbData.rpm;
+
+        // char ch[] = "123456\n";
+        // HAL_UART_Transmit(&huart8, (uint8_t*)&ch,7,100);
+
+        mavlink_msg_speed_send_struct(MAVLINK_COMM_0, &speed_t);
+        HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
+    }
+    
 
     // CanTransmit_DJI_5678(&hcan1,hDJI[0].speedPID.output,
     //                             hDJI[1].speedPID.output,
@@ -108,12 +127,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
  * @param msg 接收到的消息
  * @return
  */
+
 void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
 {
     switch (msg->msgid) {
         case 1:
             // id = 1 的消息对应的解码函数(mavlink_msg_xxx_decode)
-            mavlink_msg_decode(msg, &StructReceived);
+            mavlink_msg_speed_decode(msg, &msg_receive);
             break;
         case 2:
             // id = 2 的消息对应的解码函数(mavlink_msg_xxx_decode)

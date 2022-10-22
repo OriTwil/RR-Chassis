@@ -1,13 +1,13 @@
 #pragma once
 // MESSAGE SPEED PACKING
 
-#define MAVLINK_MSG_ID_SPEED 1
+#define MAVLINK_MSG_ID_SPEED 10
 
 
 typedef struct __mavlink_speed_t {
- double vx; /*<  x ·½ÏòËÙ¶È*/
- double vy; /*<  y ·½ÏòËÙ¶È*/
- double vw; /*<  z ·½Ïò½ÇËÙ¶È*/
+ float vx; /*<  x ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½*/
+ float vy; /*<  y ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½*/
+ float vw; /*<  z ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½*/
 } mavlink_speed_t;
 
 #define MAVLINK_MSG_ID_SPEED_LEN 24
@@ -47,9 +47,9 @@ typedef struct __mavlink_speed_t {
  * @param component_id ID of this component (e.g. 200 for IMU)
  * @param msg The MAVLink message to compress the data into
  *
- * @param vx  x ·½ÏòËÙ¶È
- * @param vy  y ·½ÏòËÙ¶È
- * @param vw  z ·½Ïò½ÇËÙ¶È
+ * @param vx  x ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+ * @param vy  y ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+ * @param vw  z ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_speed_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
@@ -81,9 +81,9 @@ static inline uint16_t mavlink_msg_speed_pack(uint8_t system_id, uint8_t compone
  * @param component_id ID of this component (e.g. 200 for IMU)
  * @param chan The MAVLink channel this message will be sent over
  * @param msg The MAVLink message to compress the data into
- * @param vx  x ·½ÏòËÙ¶È
- * @param vy  y ·½ÏòËÙ¶È
- * @param vw  z ·½Ïò½ÇËÙ¶È
+ * @param vx  x ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+ * @param vy  y ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+ * @param vw  z ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_speed_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
@@ -141,9 +141,9 @@ static inline uint16_t mavlink_msg_speed_encode_chan(uint8_t system_id, uint8_t 
  * @brief Send a speed message
  * @param chan MAVLink channel to send the message
  *
- * @param vx  x ·½ÏòËÙ¶È
- * @param vy  y ·½ÏòËÙ¶È
- * @param vw  z ·½Ïò½ÇËÙ¶È
+ * @param vx  x ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+ * @param vy  y ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
+ * @param vw  z ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
  */
 #ifdef MAVLINK_USE_CONVENIENCE_FUNCTIONS
 
@@ -216,7 +216,7 @@ static inline void mavlink_msg_speed_send_buf(mavlink_message_t *msgbuf, mavlink
 /**
  * @brief Get field vx from speed message
  *
- * @return  x ·½ÏòËÙ¶È
+ * @return  x ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
  */
 static inline double mavlink_msg_speed_get_vx(const mavlink_message_t* msg)
 {
@@ -226,7 +226,7 @@ static inline double mavlink_msg_speed_get_vx(const mavlink_message_t* msg)
 /**
  * @brief Get field vy from speed message
  *
- * @return  y ·½ÏòËÙ¶È
+ * @return  y ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
  */
 static inline double mavlink_msg_speed_get_vy(const mavlink_message_t* msg)
 {
@@ -236,7 +236,7 @@ static inline double mavlink_msg_speed_get_vy(const mavlink_message_t* msg)
 /**
  * @brief Get field vw from speed message
  *
- * @return  z ·½Ïò½ÇËÙ¶È
+ * @return  z ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ù¶ï¿½
  */
 static inline double mavlink_msg_speed_get_vw(const mavlink_message_t* msg)
 {

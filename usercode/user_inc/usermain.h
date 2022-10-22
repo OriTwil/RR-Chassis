@@ -12,6 +12,9 @@
 #include "wtr_uart.h"
 #include <math.h>
 #include "main.h"
+#include "wtr_mavlink.h"
+#include "mavlink_msg_speed.h"
+
 //宏定义计算中常数及底盘数据
 #define pi 3.1415926535898
 #define DEC (pi/180)
@@ -32,5 +35,7 @@ void calculate_3(double * moter_speed,
 
 //定义数组，分别存放四个轮子对应电机的速度
 double moter_speed [4];
+//定义一个接收消息
+mavlink_speed_t msg_receive;
 
 #endif
