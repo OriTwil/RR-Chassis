@@ -85,7 +85,7 @@ void thread_1(void const * argument)
         // char ch[] = "123456\n";
         // HAL_UART_Transmit(&huart8, (uint8_t*)&ch,7,100);
 
-        mavlink_msg_speed_control_status_decode(MAVLINK_COMM_0, &speed_t);
+        mavlink_msg_speed_control_status_send_struct(MAVLINK_COMM_0, &speed_t);
         HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
     }
     

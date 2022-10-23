@@ -26,7 +26,7 @@ extern "C" {
 // 系统 ID 和 组件 ID
 static mavlink_system_t mavlink_system = {
     1, // System ID (1-255)
-    1  // Component ID (1-255)
+    2  // Component ID (1-255)
 };
 
 // MavLink 能使用的最大通道数
