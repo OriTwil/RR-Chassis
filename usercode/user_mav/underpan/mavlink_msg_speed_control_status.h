@@ -5,9 +5,9 @@
 
 
 typedef struct __mavlink_speed_control_status_t {
- float vx_state; /*<  x ·½ÏòËÙ¶È*/
- float vy_state; /*<  y ·½ÏòËÙ¶È*/
- float vw_state; /*<  z ·½Ïò½ÇËÙ¶È*/
+ float vx_state; /*<  x æ–¹å‘é€Ÿåº¦*/
+ float vy_state; /*<  y æ–¹å‘é€Ÿåº¦*/
+ float vw_state; /*<  z æ–¹å‘è§’é€Ÿåº¦*/
 } mavlink_speed_control_status_t;
 
 #define MAVLINK_MSG_ID_SPEED_CONTROL_STATUS_LEN 12
@@ -47,9 +47,9 @@ typedef struct __mavlink_speed_control_status_t {
  * @param component_id ID of this component (e.g. 200 for IMU)
  * @param msg The MAVLink message to compress the data into
  *
- * @param vx_state  x ·½ÏòËÙ¶È
- * @param vy_state  y ·½ÏòËÙ¶È
- * @param vw_state  z ·½Ïò½ÇËÙ¶È
+ * @param vx_state  x æ–¹å‘é€Ÿåº¦
+ * @param vy_state  y æ–¹å‘é€Ÿåº¦
+ * @param vw_state  z æ–¹å‘è§’é€Ÿåº¦
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_speed_control_status_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
@@ -81,9 +81,9 @@ static inline uint16_t mavlink_msg_speed_control_status_pack(uint8_t system_id, 
  * @param component_id ID of this component (e.g. 200 for IMU)
  * @param chan The MAVLink channel this message will be sent over
  * @param msg The MAVLink message to compress the data into
- * @param vx_state  x ·½ÏòËÙ¶È
- * @param vy_state  y ·½ÏòËÙ¶È
- * @param vw_state  z ·½Ïò½ÇËÙ¶È
+ * @param vx_state  x æ–¹å‘é€Ÿåº¦
+ * @param vy_state  y æ–¹å‘é€Ÿåº¦
+ * @param vw_state  z æ–¹å‘è§’é€Ÿåº¦
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_speed_control_status_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
@@ -141,9 +141,9 @@ static inline uint16_t mavlink_msg_speed_control_status_encode_chan(uint8_t syst
  * @brief Send a speed_control_status message
  * @param chan MAVLink channel to send the message
  *
- * @param vx_state  x ·½ÏòËÙ¶È
- * @param vy_state  y ·½ÏòËÙ¶È
- * @param vw_state  z ·½Ïò½ÇËÙ¶È
+ * @param vx_state  x æ–¹å‘é€Ÿåº¦
+ * @param vy_state  y æ–¹å‘é€Ÿåº¦
+ * @param vw_state  z æ–¹å‘è§’é€Ÿåº¦
  */
 #ifdef MAVLINK_USE_CONVENIENCE_FUNCTIONS
 
@@ -216,7 +216,7 @@ static inline void mavlink_msg_speed_control_status_send_buf(mavlink_message_t *
 /**
  * @brief Get field vx_state from speed_control_status message
  *
- * @return  x ·½ÏòËÙ¶È
+ * @return  x æ–¹å‘é€Ÿåº¦
  */
 static inline float mavlink_msg_speed_control_status_get_vx_state(const mavlink_message_t* msg)
 {
@@ -226,7 +226,7 @@ static inline float mavlink_msg_speed_control_status_get_vx_state(const mavlink_
 /**
  * @brief Get field vy_state from speed_control_status message
  *
- * @return  y ·½ÏòËÙ¶È
+ * @return  y æ–¹å‘é€Ÿåº¦
  */
 static inline float mavlink_msg_speed_control_status_get_vy_state(const mavlink_message_t* msg)
 {
@@ -236,7 +236,7 @@ static inline float mavlink_msg_speed_control_status_get_vy_state(const mavlink_
 /**
  * @brief Get field vw_state from speed_control_status message
  *
- * @return  z ·½Ïò½ÇËÙ¶È
+ * @return  z æ–¹å‘è§’é€Ÿåº¦
  */
 static inline float mavlink_msg_speed_control_status_get_vw_state(const mavlink_message_t* msg)
 {

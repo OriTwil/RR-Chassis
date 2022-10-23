@@ -164,6 +164,7 @@ static inline HAL_StatusTypeDef WTR_UART_Receive_IT(UART_HandleTypeDef *huart, u
 static inline void wtrMavlink_UARTRxCpltCallback(UART_HandleTypeDef *huart, mavlink_channel_t chan)
 {
     if (huart == hMAVLink[chan].huart) {
+        
         if (mavlink_parse_char(chan, hMAVLink[chan].rx_buffer, &(hMAVLink[chan].msg), &(hMAVLink[chan].status))) {
             wtrMavlink_MsgRxCpltCallback(&(hMAVLink[chan].msg));
         }

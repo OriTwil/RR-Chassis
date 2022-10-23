@@ -5,9 +5,9 @@
 
 
 typedef struct __mavlink_speed_control_set_t {
- float vx_set; /*<  x ·½ÏòËÙ¶È*/
- float vy_set; /*<  y ·½ÏòËÙ¶È*/
- float vw_set; /*<  z ·½Ïò½ÇËÙ¶È*/
+ float vx_set; /*<  x æ–¹å‘é€Ÿåº¦*/
+ float vy_set; /*<  y æ–¹å‘é€Ÿåº¦*/
+ float vw_set; /*<  z æ–¹å‘è§’é€Ÿåº¦*/
 } mavlink_speed_control_set_t;
 
 #define MAVLINK_MSG_ID_SPEED_CONTROL_SET_LEN 12
@@ -47,9 +47,9 @@ typedef struct __mavlink_speed_control_set_t {
  * @param component_id ID of this component (e.g. 200 for IMU)
  * @param msg The MAVLink message to compress the data into
  *
- * @param vx_set  x ·½ÏòËÙ¶È
- * @param vy_set  y ·½ÏòËÙ¶È
- * @param vw_set  z ·½Ïò½ÇËÙ¶È
+ * @param vx_set  x æ–¹å‘é€Ÿåº¦
+ * @param vy_set  y æ–¹å‘é€Ÿåº¦
+ * @param vw_set  z æ–¹å‘è§’é€Ÿåº¦
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_speed_control_set_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
@@ -81,9 +81,9 @@ static inline uint16_t mavlink_msg_speed_control_set_pack(uint8_t system_id, uin
  * @param component_id ID of this component (e.g. 200 for IMU)
  * @param chan The MAVLink channel this message will be sent over
  * @param msg The MAVLink message to compress the data into
- * @param vx_set  x ·½ÏòËÙ¶È
- * @param vy_set  y ·½ÏòËÙ¶È
- * @param vw_set  z ·½Ïò½ÇËÙ¶È
+ * @param vx_set  x æ–¹å‘é€Ÿåº¦
+ * @param vy_set  y æ–¹å‘é€Ÿåº¦
+ * @param vw_set  z æ–¹å‘è§’é€Ÿåº¦
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_speed_control_set_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
@@ -141,9 +141,9 @@ static inline uint16_t mavlink_msg_speed_control_set_encode_chan(uint8_t system_
  * @brief Send a speed_control_set message
  * @param chan MAVLink channel to send the message
  *
- * @param vx_set  x ·½ÏòËÙ¶È
- * @param vy_set  y ·½ÏòËÙ¶È
- * @param vw_set  z ·½Ïò½ÇËÙ¶È
+ * @param vx_set  x æ–¹å‘é€Ÿåº¦
+ * @param vy_set  y æ–¹å‘é€Ÿåº¦
+ * @param vw_set  z æ–¹å‘è§’é€Ÿåº¦
  */
 #ifdef MAVLINK_USE_CONVENIENCE_FUNCTIONS
 
@@ -216,7 +216,7 @@ static inline void mavlink_msg_speed_control_set_send_buf(mavlink_message_t *msg
 /**
  * @brief Get field vx_set from speed_control_set message
  *
- * @return  x ·½ÏòËÙ¶È
+ * @return  x æ–¹å‘é€Ÿåº¦
  */
 static inline float mavlink_msg_speed_control_set_get_vx_set(const mavlink_message_t* msg)
 {
@@ -226,7 +226,7 @@ static inline float mavlink_msg_speed_control_set_get_vx_set(const mavlink_messa
 /**
  * @brief Get field vy_set from speed_control_set message
  *
- * @return  y ·½ÏòËÙ¶È
+ * @return  y æ–¹å‘é€Ÿåº¦
  */
 static inline float mavlink_msg_speed_control_set_get_vy_set(const mavlink_message_t* msg)
 {
@@ -236,7 +236,7 @@ static inline float mavlink_msg_speed_control_set_get_vy_set(const mavlink_messa
 /**
  * @brief Get field vw_set from speed_control_set message
  *
- * @return  z ·½Ïò½ÇËÙ¶È
+ * @return  z æ–¹å‘è§’é€Ÿåº¦
  */
 static inline float mavlink_msg_speed_control_set_get_vw_set(const mavlink_message_t* msg)
 {
