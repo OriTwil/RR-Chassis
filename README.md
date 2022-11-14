@@ -26,4 +26,5 @@
 - .NC文件（切割碳板）
 
 #### 代码部分
-- 从usercode文件夹可方便移植
+- usercode文件夹，可轻松移植
+- 在usermain.c和usermain.h中根据需求修改代码即可
