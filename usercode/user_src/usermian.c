@@ -12,12 +12,6 @@
 #include "usermain.h"
 #include "wtr_mavlink.h"
 
-#define pi 3.1415926535898
-#define DEC (pi/180)
-#define r_underpan 0.1934
-#define r_wheel 0.076
-
-
 //将三轮底盘速度解算到电机速度
 void calculate_3(double * moter_speed,
                double v_x,
