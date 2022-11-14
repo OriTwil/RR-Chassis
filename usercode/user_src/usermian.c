@@ -66,7 +66,6 @@ void thread_1(void const * argument)
     //解算，速度伺服
     for(;;){
 
-    // calculate_3(moter_speed,crl_speed.vx,crl_speed.vy,crl_speed.vw);
     calculate_3_2(moter_speed,v_set.vx_set,v_set.vy_set,v_set.vw_set);//mavlink
 
     speedServo(moter_speed[0],&hDJI[0]);
@@ -79,19 +78,7 @@ void thread_1(void const * argument)
                                 hDJI[2].speedPID.output,
                                 hDJI[3].speedPID.output);
 
-    mavlink_speed_control_status_t speed_t;
-    static int cnt = 0;
-    if(cnt++ > 49){
-        cnt = 0;
-        speed_t.vx_state = hDJI[0].FdbData.rpm;
-        speed_t.vy_state = hDJI[1].FdbData.rpm;
-        speed_t.vw_state = hDJI[2].FdbData.rpm;
-
-        // char ch[] = "123456\n";
-        // HAL_UART_Transmit(&huart8, (uint8_t*)&ch,7,100);
-
-        mavlink_msg_speed_control_status_send_struct(MAVLINK_COMM_0, &speed_t);
-        HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
+    HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
     }
     
 
@@ -101,11 +88,11 @@ void thread_1(void const * argument)
     //                             hDJI[3].speedPID.output);  
 
     osDelay(1);
-    }
+}
 
     
 
-}
+
 
 //创建线程
 void StartDefaultTask(void const * argument)
@@ -122,7 +109,6 @@ void StartDefaultTask(void const * argument)
 //串口回调函数，解码
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    test++;
     // UART1Decode();//AS69解码
     wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);//进入mavlink回调
 }
@@ -136,7 +122,6 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
 {
-    test2++;
     switch (msg->msgid) {
         case 9:
             // id = 9 的消息对应的解码函数(mavlink_msg_xxx_decode)

@@ -13,7 +13,6 @@
 #include <math.h>
 #include "main.h"
 #include "wtr_mavlink.h"
-// #include "mavlink_msg_speed.h"
 #include "mavlink_msg_speed_control_set.h"
 #include "mavlink_msg_speed_control_status.h"
 
@@ -34,12 +33,12 @@ void calculate_3(double * moter_speed,
                double v_x,
                double v_y,
                double v_w);
-
+void calculate_3_2(double * moter_speed,
+               double v_x,
+               double v_y,
+               double v_w);
 //定义数组，分别存放四个轮子对应电机的速度
 double moter_speed [4];
-int test = 0;
-int test2 = 0;
-//定义一个接收消息
 // mavlink_speed_t msg_receive;
 mavlink_speed_control_set_t v_set;
 mavlink_speed_control_status_t v_state;
