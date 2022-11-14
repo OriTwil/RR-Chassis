@@ -13,7 +13,11 @@
 #include "wtr_mavlink.h"
 
 
-//线程一：底盘控制
+/**
+ * @brief 线程一：底盘控制
+ * 
+ * @param argument 
+ */
 void thread_1(void const * argument)
 {
     //初始化设置

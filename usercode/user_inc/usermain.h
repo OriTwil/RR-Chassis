@@ -37,6 +37,7 @@ void calculate_3_2(double * moter_speed,
                double v_x,
                double v_y,
                double v_w);
+
 //定义数组，分别存放四个轮子对应电机的速度
 double moter_speed [4];
 // mavlink_speed_t msg_receive;
