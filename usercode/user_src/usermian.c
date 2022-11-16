@@ -12,12 +12,47 @@
 #include "usermain.h"
 #include "wtr_mavlink.h"
 
+#define pi 3.1415926535898
+#define DEC (pi/180)
+#define r_underpan 0.1934
+#define r_wheel 0.076
 
-/**
- * @brief 线程一：底盘控制
- * 
- * @param argument 
- */
+
+//将三轮底盘速度解算到电机速度
+void calculate_3(double * moter_speed,
+               double v_x,
+               double v_y,
+               double v_w)
+{
+    moter_speed[0] = (- v_x * sin(30 * DEC) - v_y * cos(30 * DEC)  + v_w * r_underpan_3)/(2 * pi * r_wheel);
+    moter_speed[1] = (+ v_x                                        + v_w * r_underpan_3)/(2 * pi * r_wheel);
+    moter_speed[2] = (- v_x * sin(30 * DEC) + v_y * cos(30 * DEC)  + v_w * r_underpan_3)/(2 * pi * r_wheel);
+}
+//三轮解算 另一种坐标方向
+void calculate_3_2(double * moter_speed,
+               double v_x,
+               double v_y,
+               double v_w)
+{
+    moter_speed[2] = (- v_y * sin(30 * DEC) + v_x * cos(30 * DEC)  + v_w * r_underpan_3)*60/(2 * pi * r_wheel)*19;
+    moter_speed[1] = (+ v_y                                        + v_w * r_underpan_3)*60/(2 * pi * r_wheel)*19;
+    moter_speed[0] = (- v_y * sin(30 * DEC) - v_x * cos(30 * DEC)  + v_w * r_underpan_3)*60/(2 * pi * r_wheel)*19;
+}
+
+
+//将四轮底盘速度解算到电机速度
+void calculate_4(double * moter_speed,
+               double v_x,
+               double v_y,
+               double v_w)
+{
+    moter_speed[0] = ( v_y + v_w * r_underpan_4)/(2 * pi * r_wheel);
+    moter_speed[1] = (-v_x + v_w * r_underpan_4)/(2 * pi * r_wheel);
+    moter_speed[2] = (-v_y + v_w * r_underpan_4)/(2 * pi * r_wheel);
+    moter_speed[3] = ( v_x + v_w * r_underpan_4)/(2 * pi * r_wheel);
+}
+
+//线程一：底盘控制
 void thread_1(void const * argument)
 {
     //初始化设置
@@ -37,6 +72,7 @@ void thread_1(void const * argument)
     //解算，速度伺服
     for(;;){
 
+    // calculate_3(moter_speed,crl_speed.vx,crl_speed.vy,crl_speed.vw);
     calculate_3_2(moter_speed,v_set.vx_set,v_set.vy_set,v_set.vw_set);//mavlink
 
     speedServo(moter_speed[0],&hDJI[0]);
@@ -49,21 +85,35 @@ void thread_1(void const * argument)
                                 hDJI[2].speedPID.output,
                                 hDJI[3].speedPID.output);
 
-    HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
+    mavlink_speed_control_status_t speed_t;
+    static int cnt = 0;
+    if(cnt++ > 49){
+        cnt = 0;
+        speed_t.vx_state = hDJI[0].FdbData.rpm;
+        speed_t.vy_state = hDJI[1].FdbData.rpm;
+        speed_t.vw_state = hDJI[2].FdbData.rpm;
+
+        // char ch[] = "123456\n";
+        // HAL_UART_Transmit(&huart8, (uint8_t*)&ch,7,100);
+
+        mavlink_msg_speed_control_status_send_struct(MAVLINK_COMM_0, &speed_t);
+        HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
     }
+    
+
+    // CanTransmit_DJI_5678(&hcan1,hDJI[0].speedPID.output,
+    //                             hDJI[1].speedPID.output,
+    //                             hDJI[2].speedPID.output,
+    //                             hDJI[3].speedPID.output);  
 
     osDelay(1);
-}
+    }
 
     
 
+}
 
-
-/**
- * @brief 创建线程
- * 
- * @param argument 
- */
+//创建线程
 void StartDefaultTask(void const * argument)
 {
     osThreadDef(underpan, thread_1, osPriorityNormal, 0, 512);
@@ -75,15 +125,10 @@ void StartDefaultTask(void const * argument)
         osDelay(1);
     }
 }
-
-/**
- * @brief 串口回调函数
- * 
- * @param huart 
- */
-
+//串口回调函数，解码
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
+    test++;
     // UART1Decode();//AS69解码
     wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);//进入mavlink回调
 }
@@ -97,6 +142,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
 {
+    test2++;
     switch (msg->msgid) {
         case 9:
             // id = 9 的消息对应的解码函数(mavlink_msg_xxx_decode)
@@ -110,42 +156,4 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
             break;
     }
 }
-
-//将三轮底盘速度解算到电机速度
-
-void calculate_3(double * moter_speed,
-               double v_x,
-               double v_y,
-               double v_w)
-{
-    moter_speed[0] = (- v_x * sin(30 * DEC) - v_y * cos(30 * DEC)  + v_w * r_underpan_3)/(2 * pi * r_wheel);
-    moter_speed[1] = (+ v_x                                        + v_w * r_underpan_3)/(2 * pi * r_wheel);
-    moter_speed[2] = (- v_x * sin(30 * DEC) + v_y * cos(30 * DEC)  + v_w * r_underpan_3)/(2 * pi * r_wheel);
-}
-//三轮解算 另一种坐标方向
-
-void calculate_3_2(double * moter_speed,
-               double v_x,
-               double v_y,
-               double v_w)
-{
-    moter_speed[2] = (- v_y * sin(30 * DEC) + v_x * cos(30 * DEC)  + v_w * r_underpan_3)*60/(2 * pi * r_wheel)*19;
-    moter_speed[1] = (+ v_y                                        + v_w * r_underpan_3)*60/(2 * pi * r_wheel)*19;
-    moter_speed[0] = (- v_y * sin(30 * DEC) - v_x * cos(30 * DEC)  + v_w * r_underpan_3)*60/(2 * pi * r_wheel)*19;
-}
-
-
-//将四轮底盘速度解算到电机速度
-
-void calculate_4(double * moter_speed,
-               double v_x,
-               double v_y,
-               double v_w)
-{
-    moter_speed[0] = ( v_y + v_w * r_underpan_4)/(2 * pi * r_wheel);
-    moter_speed[1] = (-v_x + v_w * r_underpan_4)/(2 * pi * r_wheel);
-    moter_speed[2] = (-v_y + v_w * r_underpan_4)/(2 * pi * r_wheel);
-    moter_speed[3] = ( v_x + v_w * r_underpan_4)/(2 * pi * r_wheel);
-}
-
 
