@@ -128,7 +128,7 @@ void StartDefaultTask(void const * argument)
 //串口回调函数，解码
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-    test++;
+
     // UART1Decode();//AS69解码
     wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);//进入mavlink回调
 }
@@ -142,7 +142,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
 void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
 {
-    test2++;
+
     switch (msg->msgid) {
         case 9:
             // id = 9 的消息对应的解码函数(mavlink_msg_xxx_decode)
