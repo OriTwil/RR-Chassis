@@ -16,7 +16,7 @@
 #define DEC (pi/180)
 #define r_underpan 0.1934
 #define r_wheel 0.076
-
+int test = 0;
 
 //将三轮底盘速度解算到电机速度
 void calculate_3(double * moter_speed,
@@ -96,11 +96,9 @@ void thread_1(void const * argument)
         // char ch[] = "123456\n";
         // HAL_UART_Transmit(&huart8, (uint8_t*)&ch,7,100);
 
-        mavlink_msg_speed_control_status_send_struct(MAVLINK_COMM_0, &speed_t);
+        // mavlink_msg_speed_control_status_send_struct(MAVLINK_COMM_0, &speed_t);
         HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
     }
-    
-
     osDelay(1);
     }
 
@@ -110,13 +108,15 @@ void thread_1(void const * argument)
 //线程二：定位
 void thread_2(void const * argument)
 {
-    for(;;)
-    {   
-        HAL_UART_Receive_DMA(&huart1,ch,1);//要在cube上配置相应的串口和DMA
-        // mavlink_msg_posture_send_struct(MAVLINK_COMM_0,&mav_posture);// 可能要调整延时
 
-        osDelay(1);
-    }
+        HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);//要在cube上配置相应的串口和DMA
+        // mavlink_msg_posture_send_struct(MAVLINK_COMM_0,&mav_posture);// 可能要调整延时
+        // HAL_UART_Transmit_IT(&huart8,(uint8_t *)&ch,1);
+        for(;;)
+        {
+          osDelay(100);
+        }
+
 
 }
 //创建线程
@@ -137,6 +137,8 @@ void StartDefaultTask(void const * argument)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 
+    test++;
+    HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);
     //上位机消息
     if(huart -> Instance == UART8)
     {
@@ -144,10 +146,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);//进入mavlink回调
     }
     //定位模块消息
-    else if(huart -> Instance == USART1)
+    else if(huart -> Instance == USART6)
     {
         // USART_ClearITPendingBit( USART1, USART_FLAG_RXNE);
-        HAL_UART_IRQHandler(&huart1);//该函数会清空中断标志，取消中断使能，并间接调用回调函数
+        HAL_UART_IRQHandler(&huart7);//该函数会清空中断标志，取消中断使能，并间接调用回调函数
         switch(count)//uint8_t隐转为int
         {
             case 0:

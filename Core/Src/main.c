@@ -114,6 +114,7 @@ int main(void)
   MX_USART1_UART_Init();
   MX_USART6_UART_Init();
   MX_UART8_Init();
+  MX_UART7_Init();
   /* USER CODE BEGIN 2 */
 
   // CANFilterInit(&hcan1);//过滤器设�???
