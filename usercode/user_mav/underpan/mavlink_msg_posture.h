@@ -1,7 +1,7 @@
 #pragma once
 // MESSAGE POSTURE PACKING
 
-#define MAVLINK_MSG_ID_POSTURE 11
+#define MAVLINK_MSG_ID_POSTURE 12
 
 
 typedef struct __mavlink_posture_t {
@@ -15,17 +15,17 @@ typedef struct __mavlink_posture_t {
 
 #define MAVLINK_MSG_ID_POSTURE_LEN 24
 #define MAVLINK_MSG_ID_POSTURE_MIN_LEN 24
-#define MAVLINK_MSG_ID_11_LEN 24
-#define MAVLINK_MSG_ID_11_MIN_LEN 24
+#define MAVLINK_MSG_ID_12_LEN 24
+#define MAVLINK_MSG_ID_12_MIN_LEN 24
 
 #define MAVLINK_MSG_ID_POSTURE_CRC 139
-#define MAVLINK_MSG_ID_11_CRC 139
+#define MAVLINK_MSG_ID_12_CRC 139
 
 
 
 #if MAVLINK_COMMAND_24BIT
 #define MAVLINK_MESSAGE_INFO_POSTURE { \
-    11, \
+    12, \
     "POSTURE", \
     6, \
     {  { "pos_x", NULL, MAVLINK_TYPE_FLOAT, 0, 0, offsetof(mavlink_posture_t, pos_x) }, \

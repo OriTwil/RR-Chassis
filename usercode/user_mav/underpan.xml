@@ -14,7 +14,7 @@
       <field type="float" name="vy_state">y 方向速度</field>
       <field type="float" name="vw_state">z 方向角速度</field>
     </message>
-    <message id="11" name="POSTURE">
+    <message id="12" name="POSTURE">
       <description>把轮式平面定位系统的数据发到上位机</description>
       <field type="float" name="pos_x">x 坐标</field>
       <field type="float" name="pos_y">y 位置</field>
