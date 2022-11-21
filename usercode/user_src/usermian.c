@@ -84,10 +84,10 @@ void thread_1(void const * argument)
                                 hDJI[1].speedPID.output,
                                 hDJI[2].speedPID.output,
                                 hDJI[3].speedPID.output);
-
+    //电机速度反馈，可以正向解算，传底盘的速度
     mavlink_speed_control_status_t speed_t;
     static int cnt = 0;
-    if(cnt++ > 49){
+    if(cnt++ > 50){
         cnt = 0;
         speed_t.vx_state = hDJI[0].FdbData.rpm;
         speed_t.vy_state = hDJI[1].FdbData.rpm;
@@ -101,24 +101,32 @@ void thread_1(void const * argument)
     }
     
 
-    // CanTransmit_DJI_5678(&hcan1,hDJI[0].speedPID.output,
-    //                             hDJI[1].speedPID.output,
-    //                             hDJI[2].speedPID.output,
-    //                             hDJI[3].speedPID.output);  
-
     osDelay(1);
     }
 
     
 
 }
+//线程二：定位
+void thread_2(void const * argument)
+{
+    for(;;)
+    {   
+        HAL_UART_Receive_DMA(&huart1,ch,1);//要在cube上配置相应的串口和DMA
+        mavlink_msg_posture_send_struct(MAVLINK_COMM_0,&mav_posture);// 可能要调整延时
 
+        osDelay(1);
+    }
+
+}
 //创建线程
 void StartDefaultTask(void const * argument)
 {
-    osThreadDef(underpan, thread_1, osPriorityNormal, 0, 512);
-    osThreadCreate(osThread(underpan), NULL);
+    osThreadDef(speedservo, thread_1, osPriorityNormal, 0, 512);
+    osThreadCreate(osThread(speedservo), NULL);
 
+    osThreadDef(position,thread_2,osPriorityNormal,0,512);
+    osThreadCreate(osThread(position),NULL);
 
     for(;;)
     {
@@ -129,8 +137,79 @@ void StartDefaultTask(void const * argument)
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 
-    // UART1Decode();//AS69解码
-    wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);//进入mavlink回调
+    //上位机消息
+    if(huart -> Instance == UART8)
+    {
+        // UART1Decode();//AS69解码
+        wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);//进入mavlink回调
+    }
+    //定位模块消息
+    else if(huart -> Instance == USART1)
+    {
+        // USART_ClearITPendingBit( USART1, USART_FLAG_RXNE);
+        HAL_UART_IRQHandler(&huart1);//该函数会清空中断标志，取消中断使能，并间接调用回调函数
+        switch(count)//uint8_t隐转为int
+        {
+            case 0:
+
+                if(ch[0]==0x0d)
+                    count++;
+                else
+                    count=0;       
+                break;
+
+            case 1:
+
+                if(ch[0]==0x0a)
+                {
+                    i=0;
+                    count++;
+                }
+                else if(ch[0]==0x0d);
+                else
+                    count=0;
+                break;
+
+            case 2:
+
+                posture.data[i]=ch[0];
+                i++;
+                if(i>=24)
+                {
+                    i=0;
+                    count++;
+                }
+                break;
+
+            case 3:
+
+                if(ch[0]==0x0a)
+                    count++;
+                else
+                    count=0;
+                break;
+
+            case 4:
+
+                if(ch[0]==0x0d)
+                {
+                    mav_posture.zangle=posture.ActVal[0];
+                    mav_posture.xangle=posture.ActVal[1];
+                    mav_posture.yangle=posture.ActVal[2];
+                    mav_posture.pos_x =posture.ActVal[3];
+                    mav_posture.pos_y =posture.ActVal[4];
+                    mav_posture.w_z =posture.ActVal[5];
+                }
+                count=0;
+                break;
+
+            default:
+
+                count=0;
+                break;
+        }
+    }
+
 }
 
 /**
@@ -143,17 +222,16 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
 {
 
-    switch (msg->msgid) {
-        case 9:
-            // id = 9 的消息对应的解码函数(mavlink_msg_xxx_decode)
-            mavlink_msg_speed_control_set_decode(msg, &v_set);
-            break;
-        case 2:
-            // id = 2 的消息对应的解码函数(mavlink_msg_xxx_decode)
-            break;
-        // ......
-        default:
-            break;
-    }
+switch (msg->msgid) {
+    case 9:
+        // id = 9 的消息对应的解码函数(mavlink_msg_xxx_decode)
+        mavlink_msg_speed_control_set_decode(msg, &v_set);
+        break;
+    case 2:
+        // id = 2 的消息对应的解码函数(mavlink_msg_xxx_decode)
+        break;
+    // ......
+    default:
+        break;
 }
-
+}

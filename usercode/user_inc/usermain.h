@@ -40,8 +40,18 @@ void calculate_3_2(double * moter_speed,
 
 //定义数组，分别存放四个轮子对应电机的速度
 double moter_speed [4];
+
+static uint8_t ch[1];
+static union
+{
+    uint8_t data[24];
+    float ActVal[6];
+}posture;
+static uint8_t count=0;
+static uint8_t i=0;
 // mavlink_speed_t msg_receive;
 mavlink_speed_control_set_t v_set;
 mavlink_speed_control_status_t v_state;
+mavlink_posture_t mav_posture;
 
 #endif

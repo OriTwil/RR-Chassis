@@ -10,8 +10,7 @@
     #error Wrong include order: MAVLINK_UNDERPAN.H MUST NOT BE DIRECTLY USED. Include mavlink.h from the same directory instead or set ALL AND EVERY defines from MAVLINK.H manually accordingly, including the #define MAVLINK_H call.
 #endif
 
-#undef MAVLINK_THIS_XML_HASH
-#define MAVLINK_THIS_XML_HASH -427164979288415712
+#define MAVLINK_UNDERPAN_XML_HASH 8960672818906874949
 
 #ifdef __cplusplus
 extern "C" {
@@ -24,7 +23,7 @@ extern "C" {
 #endif
 
 #ifndef MAVLINK_MESSAGE_CRCS
-#define MAVLINK_MESSAGE_CRCS {{9, 140, 12, 12, 0, 0, 0}, {10, 240, 12, 12, 0, 0, 0}}
+#define MAVLINK_MESSAGE_CRCS {{9, 140, 12, 12, 0, 0, 0}, {10, 240, 12, 12, 0, 0, 0}, {11, 139, 24, 24, 0, 0, 0}}
 #endif
 
 #include "../protocol.h"
@@ -49,16 +48,15 @@ extern "C" {
 // MESSAGE DEFINITIONS
 #include "./mavlink_msg_speed_control_set.h"
 #include "./mavlink_msg_speed_control_status.h"
+#include "./mavlink_msg_posture.h"
 
 // base include
 
 
-#undef MAVLINK_THIS_XML_HASH
-#define MAVLINK_THIS_XML_HASH -427164979288415712
 
-#if MAVLINK_THIS_XML_HASH == MAVLINK_PRIMARY_XML_HASH
-# define MAVLINK_MESSAGE_INFO {MAVLINK_MESSAGE_INFO_SPEED_CONTROL_SET, MAVLINK_MESSAGE_INFO_SPEED_CONTROL_STATUS}
-# define MAVLINK_MESSAGE_NAMES {{ "SPEED_CONTROL_SET", 9 }, { "SPEED_CONTROL_STATUS", 10 }}
+#if MAVLINK_UNDERPAN_XML_HASH == MAVLINK_PRIMARY_XML_HASH
+# define MAVLINK_MESSAGE_INFO {MAVLINK_MESSAGE_INFO_SPEED_CONTROL_SET, MAVLINK_MESSAGE_INFO_SPEED_CONTROL_STATUS, MAVLINK_MESSAGE_INFO_POSTURE}
+# define MAVLINK_MESSAGE_NAMES {{ "POSTURE", 11 }, { "SPEED_CONTROL_SET", 9 }, { "SPEED_CONTROL_STATUS", 10 }}
 # if MAVLINK_COMMAND_24BIT
 #  include "../mavlink_get_info.h"
 # endif
