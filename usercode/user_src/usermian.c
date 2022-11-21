@@ -113,7 +113,7 @@ void thread_2(void const * argument)
     for(;;)
     {   
         HAL_UART_Receive_DMA(&huart1,ch,1);//要在cube上配置相应的串口和DMA
-        mavlink_msg_posture_send_struct(MAVLINK_COMM_0,&mav_posture);// 可能要调整延时
+        // mavlink_msg_posture_send_struct(MAVLINK_COMM_0,&mav_posture);// 可能要调整延时
 
         osDelay(1);
     }
@@ -193,12 +193,14 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
                 if(ch[0]==0x0d)
                 {
-                    mav_posture.zangle=posture.ActVal[0];
-                    mav_posture.xangle=posture.ActVal[1];
-                    mav_posture.yangle=posture.ActVal[2];
-                    mav_posture.pos_x =posture.ActVal[3];
-                    mav_posture.pos_y =posture.ActVal[4];
-                    mav_posture.w_z =posture.ActVal[5];
+                    mav_posture.zangle = posture.ActVal[0];
+                    mav_posture.xangle = posture.ActVal[1];
+                    mav_posture.yangle = posture.ActVal[2];
+                    mav_posture.pos_x  = posture.ActVal[3];
+                    mav_posture.pos_y  = posture.ActVal[4];
+                    mav_posture.w_z    = posture.ActVal[5];
+                    mavlink_msg_posture_send_struct(MAVLINK_COMM_0,&mav_posture);// 可能要调整延时
+
                 }
                 count=0;
                 break;
