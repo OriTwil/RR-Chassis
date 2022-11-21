@@ -109,9 +109,8 @@ void thread_1(void const * argument)
 void thread_2(void const * argument)
 {
 
-        HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);//要在cube上配置相应的串口和DMA
-        // mavlink_msg_posture_send_struct(MAVLINK_COMM_0,&mav_posture);// 可能要调整延时
-        // HAL_UART_Transmit_IT(&huart8,(uint8_t *)&ch,1);
+        HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);
+
         for(;;)
         {
           osDelay(100);
