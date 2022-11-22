@@ -65,15 +65,15 @@ void thread_1(void const * argument)
     wtrMavlink_BindChannel(&huart8, MAVLINK_COMM_0);
     //串口接收信息
 
-    // HAL_UART_Receive_DMA(&huart1,JoyStickReceiveData,18);//DMA接收AS69
-    wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);//以mavlink接收
+    HAL_UART_Receive_DMA(&huart1,JoyStickReceiveData,18);//DMA接收AS69
+    // wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);//以mavlink接收
 	osDelay(100);
 
     //解算，速度伺服
     for(;;){
 
-    // calculate_3(moter_speed,crl_speed.vx,crl_speed.vy,crl_speed.vw);
-    calculate_3_2(moter_speed,v_set.vx_set,v_set.vy_set,v_set.vw_set);//mavlink
+    calculate_3(moter_speed,crl_speed.vx,crl_speed.vy,crl_speed.vw);
+    // calculate_3_2(moter_speed,v_set.vx_set,v_set.vy_set,v_set.vw_set);//mavlink
 
     speedServo(moter_speed[0],&hDJI[0]);
     speedServo(moter_speed[1],&hDJI[1]);
@@ -137,7 +137,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
 
     test++;
-    HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);
+
     //上位机消息
     if(huart -> Instance == UART8)
     {
@@ -147,8 +147,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     //定位模块消息
     else if(huart -> Instance == USART6)
     {
+        HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);
         // USART_ClearITPendingBit( USART1, USART_FLAG_RXNE);
-        HAL_UART_IRQHandler(&huart7);//该函数会清空中断标志，取消中断使能，并间接调用回调函数
+        HAL_UART_IRQHandler(&huart6);//该函数会清空中断标志，取消中断使能，并间接调用回调函数
         switch(count)//uint8_t隐转为int
         {
             case 0:
@@ -212,7 +213,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
                 break;
         }
     }
-
+    else
+    {
+        UART1Decode();//AS69解码
+    }
 }
 
 /**
