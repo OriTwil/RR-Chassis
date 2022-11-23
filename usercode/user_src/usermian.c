@@ -11,6 +11,7 @@
 #include "main.h"
 #include "usermain.h"
 #include "wtr_mavlink.h"
+#include "ADS1256.h"
 
 #define pi 3.1415926535898
 #define DEC (pi/180)
@@ -51,6 +52,17 @@ void calculate_4(double * moter_speed,
     moter_speed[2] = (-v_y + v_w * r_underpan_4)/(2 * pi * r_wheel);
     moter_speed[3] = ( v_x + v_w * r_underpan_4)/(2 * pi * r_wheel);
 }
+//第二种方位
+void calculate_4_2(double * moter_speed,
+               double v_x,
+               double v_y,
+               double v_w)
+{
+    moter_speed[0] = (  vx * sqrt(2) + vy * sqrt(2) + vw * r_underpan_4)/(2 * pi * r_wheel);
+    moter_speed[1] = (- vx * sqrt(2) + vy * sqrt(2) + vw * r_underpan_4)/(2 * pi * r_wheel);
+    moter_speed[2] = (- vx * sqrt(2) - vy * sqrt(2) + vw * r_underpan_4)/(2 * pi * r_wheel);
+    moter_speed[3] = (  vx * sqrt(2) - vy * sqrt(2) + vw * r_underpan_4)/(2 * pi * r_wheel);
+}
 
 //线程一：底盘控制
 void thread_1(void const * argument)
@@ -72,7 +84,7 @@ void thread_1(void const * argument)
     //解算，速度伺服
     for(;;){
 
-    calculate_3(moter_speed,crl_speed.vx,crl_speed.vy,crl_speed.vw);
+    calculate_4_2(moter_speed,crl_speed.vx,crl_speed.vy,crl_speed.vw);
     // calculate_3_2(moter_speed,v_set.vx_set,v_set.vy_set,v_set.vw_set);//mavlink
 
     speedServo(moter_speed[0],&hDJI[0]);
@@ -85,13 +97,13 @@ void thread_1(void const * argument)
                                 hDJI[2].speedPID.output,
                                 hDJI[3].speedPID.output);
     //电机速度反馈，可以正向解算，传底盘的速度
-    mavlink_speed_control_status_t speed_t;
+    // mavlink_speed_control_status_t speed_t;
     static int cnt = 0;
     if(cnt++ > 50){
         cnt = 0;
-        speed_t.vx_state = hDJI[0].FdbData.rpm;
-        speed_t.vy_state = hDJI[1].FdbData.rpm;
-        speed_t.vw_state = hDJI[2].FdbData.rpm;
+        // speed_t.vx_state = hDJI[0].FdbData.rpm;
+        // speed_t.vy_state = hDJI[1].FdbData.rpm;
+        // speed_t.vw_state = hDJI[2].FdbData.rpm;
 
         // char ch[] = "123456\n";
         // HAL_UART_Transmit(&huart8, (uint8_t*)&ch,7,100);
@@ -105,12 +117,15 @@ void thread_1(void const * argument)
     
 
 }
-//线程二：定位
+//线程二：定位系统
 void thread_2(void const * argument)
 {
-
+        //码盘定位系统通过串口6收发信息
         HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);
-
+        //DT35距离传感器
+        //初始化
+        ADS1256_Init;
+        ADS1256_UpdateDiffData;
         for(;;)
         {
           osDelay(100);
@@ -147,7 +162,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     //定位模块消息
     else if(huart -> Instance == USART6)
     {
-        HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);
+        // HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);
         // USART_ClearITPendingBit( USART1, USART_FLAG_RXNE);
         HAL_UART_IRQHandler(&huart6);//该函数会清空中断标志，取消中断使能，并间接调用回调函数
         switch(count)//uint8_t隐转为int
