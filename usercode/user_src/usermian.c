@@ -160,7 +160,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
         wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0);//进入mavlink回调
     }
     //定位模块消息
-    else if(huart -> Instance == USART6)
+    else if(huart -> Instance == USART6)//底盘定位系统的decode,可以换为DMA轮询,封装到祖传的串口库里s
     {
         // HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);
         // USART_ClearITPendingBit( USART1, USART_FLAG_RXNE);
@@ -230,7 +230,7 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     }
     else
     {
-        UART1Decode();//AS69解码
+        void AS69_Decode();//AS69解码
     }
 }
 

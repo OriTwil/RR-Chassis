@@ -11,7 +11,7 @@ uint8_t JoyStickReceiveData[18];
 double angMax = 360;
 double posRef ;//工程中也可调用需要参数来传值
 float vx,vy,vw;
-void UART1Decode(){
+void AS69_Decode(){
 
     Raw_Data.ch0 = ((int16_t)JoyStickReceiveData[0] | ((int16_t)JoyStickReceiveData[1] << 8)) & 0x07FF; 
     Raw_Data.ch1 = (((int16_t)JoyStickReceiveData[1] >> 3) | ((int16_t)JoyStickReceiveData[2] << 5)) & 0x07FF;
@@ -63,15 +63,6 @@ void UART1Decode(){
     /* UART1 callback decode function  */
 }
 
-//void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-// void mavlink_msg_decode(msg, &StructReceived)
-// {
-//     crl_speed.vx = 0;
-//     crl_speed.vy = 0;
-//     crl_speed.vw = 0;
-// }
 
-//    
-//}
 
 
