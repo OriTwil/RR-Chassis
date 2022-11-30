@@ -1,7 +1,7 @@
 /*
  * @Author: szf
  * @Date: 2022-10-22 13:54:44
- * @LastEditTime: 2022-11-27 22:17:16
+ * @LastEditTime: 2022-11-30 20:07:56
  * @LastEditors: szf
  * @Description:
  * @FilePath: \underpan_v3.1\usercode\user_src\usermian.c
@@ -112,7 +112,7 @@ void thread_1(void const *argument)
     // 串口接收信息
 
     HAL_UART_Receive_DMA(&huart1, JoyStickReceiveData, 18); // DMA接收AS69
-    // wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);//以mavlink接收
+    wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);//以mavlink接收
     osDelay(100);
 
     // 解算，速度伺服
