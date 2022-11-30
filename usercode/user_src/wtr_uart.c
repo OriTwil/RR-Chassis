@@ -1,3 +1,12 @@
+/*
+ * @Author: wtr电控组
+ * @Date: 2022-10-13 23:33:37
+ * @LastEditTime: 2022-11-30 20:13:56
+ * @LastEditors: szf
+ * @Description: 封装WTR曾经用过的解码函数，作为技术积累
+ * @FilePath: \underpan_v3.1\usercode\user_src\wtr_uart.c
+ * @WeChat:szf13373959031
+ */
 #include "wtr_uart.h"
 #include "DJI.h"
 #include "string.h"
