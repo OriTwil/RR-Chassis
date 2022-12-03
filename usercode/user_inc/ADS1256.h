@@ -4,15 +4,6 @@
  * @brief ADS1256的驱动程序，请include此文件
  * @version 1.1
  * @date 2022-01-11
-<<<<<<< HEAD
- * 
- * @copyright Copyright (c) 2022
- * 
-=======
- *
- * @copyright Copyright (c) 2022
- *
->>>>>>> 4b84313b340da237f4021acaf5f1efda636c46d5
  */
 
 #pragma once
@@ -21,7 +12,7 @@
 #include "gpio.h"
 #include "spi.h"
 
-<<<<<<< HEAD
+
 typedef struct ADS1256_register
 {
 	uint8_t STATUS;
@@ -34,7 +25,7 @@ typedef struct ADS1256_register
 extern int32_t ADS1256_diff_data[4];
 
 //ADS1256 初始化
-=======
+
 typedef struct ADS1256_register {
     uint8_t STATUS;
     uint8_t MUX;
@@ -46,26 +37,16 @@ typedef struct ADS1256_register {
 extern int32_t ADS1256_diff_data[4];
 
 // ADS1256 初始化
->>>>>>> 4b84313b340da237f4021acaf5f1efda636c46d5
 void ADS1256_Init(void);
 
 /**
  * @brief 读取指定通道的数据 (0-7 for AIN0-AIN7, 8 for AINCOM)
-<<<<<<< HEAD
- * 
-=======
- *
->>>>>>> 4b84313b340da237f4021acaf5f1efda636c46d5
  * @param pIChannel Positive Input Channel
  * @param nIChannel Negative Input Channel
  * @return uint32_t 读到的值，实际位数是24位
  */
 int32_t ADS1256ReadData(uint8_t pIChannel, uint8_t nIChannel);
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 4b84313b340da237f4021acaf5f1efda636c46d5
 uint8_t ADS1256_RREG(uint8_t regaddr);
 
 ADS1256_REG ADS1256_RREG_All(void);

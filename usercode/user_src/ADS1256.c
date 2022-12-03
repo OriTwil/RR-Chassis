@@ -33,11 +33,10 @@
 
 #include "ADS1256.h"
 #include "ADS1256_Config.h"
-<<<<<<< HEAD
+
 #include "TITH_time.h"
-=======
 #include "time.h"
->>>>>>> 4b84313b340da237f4021acaf5f1efda636c46d5
+
 
 
 // 一些命令
