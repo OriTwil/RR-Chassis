@@ -1,3 +1,12 @@
+/*** 
+ * @Author: szf
+ * @Date: 2022-10-13 23:33:37
+ * @LastEditTime: 2022-11-27 21:59:17
+ * @LastEditors: szf
+ * @Description: 
+ * @FilePath: \underpan_v3.1\usercode\user_inc\usermain.h
+ * @wtr
+ */
 #ifndef USERMAIN_H
 #define USERMAIN_H
 
@@ -16,39 +25,38 @@
 #include "mavlink_msg_speed_control_set.h"
 #include "mavlink_msg_speed_control_status.h"
 
-//宏定义计算中常数及底盘数据
-#define pi 3.1415926535898
-#define DEC (pi/180)
+// 宏定义计算中常数及底盘数据
+#define pi           3.1415926535898
+#define DEC          (pi / 180)
 #define r_underpan_3 0.1934
 #define r_underpan_4 0.25
-#define r_wheel 0.076
+#define r_wheel      0.076
 
-//声明运动学逆解函数
-void calculate_4(double * moter_speed,
-               double v_x,
-               double v_y,
-               double v_w);
+// 声明运动学逆解函数
+void calculate_4(double *moter_speed,
+                 double v_x,
+                 double v_y,
+                 double v_w);
 
-void calculate_3(double * moter_speed,
-               double v_x,
-               double v_y,
-               double v_w);
-void calculate_3_2(double * moter_speed,
-               double v_x,
-               double v_y,
-               double v_w);
+void calculate_3(double *moter_speed,
+                 double v_x,
+                 double v_y,
+                 double v_w);
+void calculate_3_2(double *moter_speed,
+                   double v_x,
+                   double v_y,
+                   double v_w);
 
-//定义数组，分别存放四个轮子对应电机的速度
-double moter_speed [4];
+// 定义数组，分别存放四个轮子对应电机的速度
+double moter_speed[4];
 
 static uint8_t ch[1];
-static union
-{
+static union {
     uint8_t data[24];
     float ActVal[6];
-}posture;
-static uint8_t count=0;
-static uint8_t i=0;
+} posture;
+static uint8_t count = 0;
+static uint8_t i = 0;
 // mavlink_speed_t msg_receive;
 mavlink_speed_control_set_t v_set;
 mavlink_speed_control_status_t v_state;
