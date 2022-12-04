@@ -1,7 +1,7 @@
 /*
  * @Author: szf
  * @Date: 2022-10-22 13:54:44
- * @LastEditTime: 2022-12-04 13:23:56
+ * @LastEditTime: 2022-12-05 03:23:57
  * @LastEditors: szf01 2176529058@qq.com
  * @Description:
  * @FilePath: \underpan_v3.1\usercode\user_src\usermian.c
@@ -137,15 +137,15 @@ void thread_1(void const *argument)
     wtrMavlink_BindChannel(&huart8, MAVLINK_COMM_0);
 
     // PID参数设置
-    pid_pos_x.Kp = 0;
+    pid_pos_x.Kp = 0.003;
     pid_pos_x.Ki = 0;
     pid_pos_x.Kd = 0;
 
-    pid_pos_y.Kp = 0;
+    pid_pos_y.Kp = 0.002;
     pid_pos_y.Ki = 0;
     pid_pos_y.Kd = 0;
 
-    pid_vel_w.Kp = 0;
+    pid_vel_w.Kp = -0.03;
     pid_vel_w.Ki = 0;
     pid_vel_w.Kd = 0;
 
@@ -159,7 +159,9 @@ void thread_1(void const *argument)
         // PID闭环控制
         pid_pos_x.setpoint = control.x_set;
         pid_pos_y.setpoint = control.y_set;
-        pid_vel_w.setpoint = control.vw_set;
+        // pid_vel_w.setpoint = control.vw_set;
+        pid_vel_w.setpoint = 0;
+
         PID_Incremental(&pid_pos_x, mav_posture.pos_x);
         PID_Incremental(&pid_pos_y, mav_posture.pos_y);
         PID_Incremental(&pid_vel_w, mav_posture.zangle);
@@ -169,6 +171,10 @@ void thread_1(void const *argument)
                       control.vx_set + pid_pos_x.result,
                       control.vy_set + pid_pos_y.result,
                       control.vw_set + pid_vel_w.result);
+       /*  calculate_3_2(moter_speed,
+                      pid_pos_x.result,
+                      pid_pos_y.result,
+                      pid_vel_w.result); */
         //速度伺服
         speedServo(moter_speed[0], &hDJI[0]);
         speedServo(moter_speed[1], &hDJI[1]);
@@ -180,6 +186,12 @@ void thread_1(void const *argument)
                              hDJI[2].speedPID.output,
                              hDJI[3].speedPID.output);
 
+        static int n_ = 0;
+        if(n_ ++ > 500)
+        {
+            n_ = 0;
+            HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14); // A板上的绿灯
+        }
         osDelay(1);
     }
 }
@@ -194,11 +206,13 @@ void thread_2(void const *argument)
 {
     // 码盘定位系统通过串口6收发信息
     HAL_UART_Receive_IT(&huart6, (uint8_t *)&ch, 1);
+    
+    // mavlink_msg_posture_send_struct(MAVLINK_COMM_0,mav_posture);
     // DT35距离传感器
     // 初始化
-    ADS1256_Init;
+    // ADS1256_Init;
     for (;;) {
-        ADS1256_UpdateDiffData;
+        // ADS1256_UpdateDiffData;
         osDelay(100);
     }
 }
@@ -207,7 +221,7 @@ void thread_2(void const *argument)
  * @description:反馈底盘速度
  * @return {*}
  */
-void thread_3(void const *argument)
+/* void thread_3(void const *argument)
 {
     // 电机速度反馈，可以正向解算，传底盘的速度
 
@@ -217,10 +231,11 @@ void thread_3(void const *argument)
         v_state.vw_state = hDJI[2].FdbData.rpm;
 
         mavlink_msg_speed_control_status_send_struct(MAVLINK_COMM_0, &v_state);
-        HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14); // A板上的绿灯
+        
+
         osDelay(100);
     }
-}
+} */
 
 /**
  * @description: 创建线程
@@ -236,8 +251,8 @@ void StartDefaultTask(void const *argument)
     osThreadDef(position, thread_2, osPriorityNormal, 0, 512);
     osThreadCreate(osThread(position), NULL);
 
-    osThreadDef(velocity, thread_3, osPriorityNormal, 0, 512);
-    osThreadCreate(osThread(velocity), NULL);
+/*     osThreadDef(velocity, thread_3, osPriorityNormal, 0, 512);
+    osThreadCreate(osThread(velocity), NULL); */
 
     for (;;) {
         osDelay(1);
@@ -264,9 +279,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     // 定位模块消息
     else if (huart->Instance == USART6) // 底盘定位系统的decode,可以换为DMA轮询,封装到祖传的串口库里s
     {
-        // HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);
+        HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);
         // USART_ClearITPendingBit( USART1, USART_FLAG_RXNE);
-        HAL_UART_IRQHandler(&huart6); // 该函数会清空中断标志，取消中断使能，并间接调用回调函数
+        // HAL_UART_IRQHandler(&huart6); // 该函数会清空中断标志，取消中断使能，并间接调用回调函数
         switch (count)                // uint8_t隐转为int
         {
             case 0:
