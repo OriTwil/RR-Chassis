@@ -2,13 +2,16 @@
 <mavlink>
   <version>3</version>
   <messages>
-    <message id="9" name="SPEED_CONTROL_SET">
+    <message id="9" name="CONTROL_SET">
       <description>接收来自上位机的消息</description>
       <field type="float" name="vx_set">x 方向速度</field>
       <field type="float" name="vy_set">y 方向速度</field>
       <field type="float" name="vw_set">z 方向角速度</field>
+      <field type="float" name="x_set">x 方向速度</field>
+      <field type="float" name="y_set">y 方向速度</field>
+      <field type="float" name="w_set">z 方向角速度</field>
     </message>
-    <message id="10" name="SPEED_CONTROL_STATUS">
+    <message id="10" name="SPEED_STATUS">
       <description>反馈机器人的速度到上位机</description>
       <field type="float" name="vx_state">x 方向速度</field>
       <field type="float" name="vy_state">y 方向速度</field>

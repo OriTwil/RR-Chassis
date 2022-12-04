@@ -1,3 +1,11 @@
+/*
+ * @Author: szf01 2176529058@qq.com
+ * @Date: 2022-12-03 20:06:20
+ * @LastEditors: szf01 2176529058@qq.com
+ * @LastEditTime: 2022-12-03 20:47:11
+ * @FilePath: /underpan/usercode/user_inc/ADS1256.h
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 /**
  * @file ADS1256.h
  * @author TITH (1023515576@qq.com)
@@ -11,17 +19,6 @@
 #include <stdio.h>
 #include "gpio.h"
 #include "spi.h"
-
-
-typedef struct ADS1256_register
-{
-	uint8_t STATUS;
-	uint8_t MUX;
-	uint8_t ADCON;
-	uint8_t DRATE;
-	uint8_t IO;
-}ADS1256_REG;
-
 extern int32_t ADS1256_diff_data[4];
 
 //ADS1256 初始化
