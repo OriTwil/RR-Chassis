@@ -1,7 +1,7 @@
 /*
  * @Author: szf
  * @Date: 2022-10-22 13:54:44
- * @LastEditTime: 2022-12-06 01:30:15
+ * @LastEditTime: 2022-12-06 02:28:29
  * @LastEditors: szf01 2176529058@qq.com
  * @Description:
  * @FilePath: \underpan_v3.1\usercode\user_src\usermian.c
@@ -215,7 +215,7 @@ void thread_1(void const *argument)
         pid_pos_y.setpoint = control.y_set;
         pid_vel_w.setpoint = control.vw_set;//增量
 
-        pid_pos_w_pos.target = 0;
+        pid_pos_w_pos.target = control.vw_set;
         pid_pos_w_pos.feedback = mav_posture.zangle;
         pid_pos_x_pos.target = control.x_set;
         pid_pos_x_pos.feedback = mav_posture.pos_x;
@@ -232,14 +232,15 @@ void thread_1(void const *argument)
                               control.vx_set + pid_pos_x.result,
                               control.vy_set + pid_pos_y.result,
                               control.vw_set + pid_vel_w.result); */
-/*         calculate_3_2(moter_speed,
+        calculate_3_2(moter_speed,
                       control.vx_set + PID_Position(&pid_pos_x_pos),
                       control.vy_set + PID_Position(&pid_pos_y_pos),
-                      PID_Position(&pid_pos_w_pos)); */
-        calculate_3_2(moter_speed,
+                      control.vw_set + PID_Position(&pid_pos_w_pos));
+/*         calculate_3_2(moter_speed,
                     control.vx_set ,
                     control.vy_set ,
-                    PID_Position(&pid_pos_w_pos));
+                    PID_Position(&pid_pos_w_pos)); */
+                    
         //速度伺服
         speedServo(moter_speed[0], &hDJI[0]);
         speedServo(moter_speed[1], &hDJI[1]);
