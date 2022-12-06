@@ -1,7 +1,7 @@
 /*
  * @Author: szf
  * @Date: 2022-10-22 13:54:44
- * @LastEditTime: 2022-12-06 20:05:47
+ * @LastEditTime: 2022-12-07 00:31:27
  * @LastEditors: szf_8d43 2176529058@qq.com
  * @Description:
  * @FilePath: \underpan_v3.1\usercode\user_src\usermian.c
@@ -192,17 +192,17 @@ void thread_1(void const *argument)
     pid_pos_w_pos.Kp = -120;
     pid_pos_w_pos.Ki = 0.0001;
     pid_pos_w_pos.Kd = 0;
-    pid_pos_w_pos.limit = 1.5;
+    pid_pos_w_pos.limit = 1;
 
     pid_pos_x_pos.Kp = 4;
     pid_pos_x_pos.Ki = 0.0001;
     pid_pos_x_pos.Kd = 0;
-    pid_pos_x_pos.limit = 0.6;
+    pid_pos_x_pos.limit = 1;
 
     pid_pos_y_pos.Kp = 4;
     pid_pos_y_pos.Ki = 0.0001;
     pid_pos_y_pos.Kd = 0;
-    pid_pos_y_pos.limit = 0.6;
+    pid_pos_y_pos.limit = 1;
 
     // 串口接收信息
     HAL_UART_Receive_DMA(&huart1, JoyStickReceiveData, 18); // DMA接收AS69
