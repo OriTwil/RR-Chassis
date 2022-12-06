@@ -1,8 +1,8 @@
 /*
  * @Author: szf
  * @Date: 2022-10-22 13:54:44
- * @LastEditTime: 2022-12-06 02:28:29
- * @LastEditors: szf01 2176529058@qq.com
+ * @LastEditTime: 2022-12-06 20:05:47
+ * @LastEditors: szf_8d43 2176529058@qq.com
  * @Description:
  * @FilePath: \underpan_v3.1\usercode\user_src\usermian.c
  * @WeChat:szf13373959031
@@ -21,6 +21,7 @@
 #include "usermain.h"
 #include "wtr_mavlink.h"
 #include "ADS1256.h"
+#include <math.h>
 int test = 0;
 
 /**
@@ -191,7 +192,7 @@ void thread_1(void const *argument)
     pid_pos_w_pos.Kp = -120;
     pid_pos_w_pos.Ki = 0.0001;
     pid_pos_w_pos.Kd = 0;
-    pid_pos_w_pos.limit = 1;
+    pid_pos_w_pos.limit = 1.5;
 
     pid_pos_x_pos.Kp = 4;
     pid_pos_x_pos.Ki = 0.0001;
@@ -390,13 +391,13 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
                 if (ch[0] == 0x0d) {
                     mav_posture.zangle = posture.ActVal[0] * 0.001;
-                    mav_posture.xangle = posture.ActVal[1] * 0.001;
+                    // mav_posture.xangle = posture.ActVal[1] * 0.001;
+                    mav_posture.xangle = control.x_set;
                     mav_posture.yangle = posture.ActVal[2] * 0.001;
                     mav_posture.pos_x = posture.ActVal[3] * 0.001;
                     mav_posture.pos_y = posture.ActVal[4] * 0.001;
                     // mav_posture.w_z = posture.ActVal[5] * 0.001;
                     mav_posture.w_z = control.vx_set;
-                    mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &mav_posture); // 可能要调整延时
                 }
                 count = 0;
                 break;
@@ -406,8 +407,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
                 count = 0;
                 break;
         }
-    } else {
-        void AS69_Decode(); // AS69解码
+    } 
+    else {
+        AS69_Decode(); // AS69解码
     }
 }
 
@@ -425,6 +427,7 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
         case 9:
             // id = 9 的消息对应的解码函数(mavlink_msg_xxx_decode)
             mavlink_msg_control_set_decode(msg, &control);
+            mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &mav_posture); // 可能要调整延时
             break;
         case 2:
             // id = 2 的消息对应的解码函数(mavlink_msg_xxx_decode)
