@@ -1,8 +1,13 @@
 /*
  * @Author: szf
  * @Date: 2022-10-22 13:54:44
+<<<<<<< HEAD
  * @LastEditTime: 2022-12-12 22:47:16
  * @LastEditors: szf
+=======
+ * @LastEditTime: 2022-12-07 00:31:27
+ * @LastEditors: szf_8d43 2176529058@qq.com
+>>>>>>> 2561b48b9297d54f81a4a2793aff16a0a8f9bca9
  * @Description:
  * @FilePath: \underpan_v3.1\usercode\user_src\usermian.c
  * @WeChat:szf13373959031
@@ -21,10 +26,7 @@
 #include "usermain.h"
 #include "wtr_mavlink.h"
 #include "ADS1256.h"
-#define pi         3.1415926535898
-#define DEC        (pi / 180)
-#define r_underpan 0.1934
-#define r_wheel    0.076
+#include <math.h>
 int test = 0;
 int counter = 0;
 float w_speed = 0;
@@ -95,14 +97,79 @@ void calculate_4_2(double *moter_speed,
 }
 
 /**
+ * @description: 增量式PID
+ * @param {PID} *vPID
+ * @param {float} processValue
+ * @return {*}
+ */
+void PID_Incremental(PID *vPID, float processValue)
+{
+    float thisError;
+    float increment;
+    float pError, dError, iError;
+
+    thisError = vPID->setpoint - processValue; //当前误差等于设定值减去当前值
+    //计算公式中除系数外的三个 乘数
+    pError = thisError - vPID->lasterror; //两次偏差差值err(k)-err(k-1)
+    iError = thisError;
+    dError = thisError - 2 * (vPID->lasterror) + vPID->preerror;
+
+    increment = vPID->Kp * pError + vPID->Ki * iError + vPID->Kd * dError; //增量计算
+
+    vPID->preerror = vPID->lasterror; //存放偏差用于下次运算
+    vPID->lasterror = thisError;
+
+    vPID->result += increment; //结果是上次结果 加上本次增量
+    vPID->result = range(vPID->result, -vPID->limit, vPID->limit);
+    // if(vPID->result > 0.6)
+    // {
+    //     vPID->result = 0.6;
+    // }
+    // if (vPID->result < -0.6)
+    // {
+    //     vPID->result = -0.6;
+    // }//输出限幅
+}
+
+/**
+ * @description: 位置式PID
+ * @param {PIDType} *p
+ * @return {*}
+ */
+float PID_Position(PIDType *p)
+{
+    float pe, ie, de;
+    float out = 0;
+
+    //计算当前误差
+    p->e0 = p->target - p->feedback;
+
+    //误差积分
+    p->eSum += p->e0;
+
+    //误差微分
+    de = p->e0 - p->e1;
+
+    pe = p->e0;
+    ie = p->eSum;
+
+    p->e1 = p->e0;
+
+    out = pe * (p->Kp) + ie * (p->Ki) + de * (p->Kd);
+    //输出限幅
+    out = range(out, -p->limit, p->limit);
+    return out;
+}
+
+/**
  * @description: 线程一：底盘控制
  * @author: szf
- * @date: 
+ * @date:
  * @return {void}
  */
 void thread_1(void const *argument)
 {
-    // 初始化设置
+    // 电机初始化设置
     CANFilterInit(&hcan1);
     hDJI[0].motorType = M3508;
     hDJI[1].motorType = M3508;
@@ -110,22 +177,86 @@ void thread_1(void const *argument)
     hDJI[3].motorType = M3508;
     DJI_Init();
     wtrMavlink_BindChannel(&huart8, MAVLINK_COMM_0);
-    // 串口接收信息
 
+    // PID参数设置
+    pid_pos_x.Kp = 0;
+    pid_pos_x.Ki = 0;
+    pid_pos_x.Kd = 0;
+    pid_pos_x.limit = 0.7;
+
+    pid_pos_y.Kp = 0;
+    pid_pos_y.Ki = 0;
+    pid_pos_y.Kd = 0;
+    pid_pos_y.limit = 0.7;
+
+    pid_vel_w.Kp = -0;
+    pid_vel_w.Ki = -0;
+    pid_vel_w.Kd = 0;
+    pid_vel_w.limit = 0.8;
+
+    //位置式pid参数设置
+    pid_pos_w_pos.Kp = -120;
+    pid_pos_w_pos.Ki = 0.0001;
+    pid_pos_w_pos.Kd = 0;
+    pid_pos_w_pos.limit = 1;
+
+    pid_pos_x_pos.Kp = 4;
+    pid_pos_x_pos.Ki = 0.0001;
+    pid_pos_x_pos.Kd = 0;
+    pid_pos_x_pos.limit = 1;
+
+    pid_pos_y_pos.Kp = 4;
+    pid_pos_y_pos.Ki = 0.0001;
+    pid_pos_y_pos.Kd = 0;
+    pid_pos_y_pos.limit = 1;
+
+    // 串口接收信息
     HAL_UART_Receive_DMA(&huart1, JoyStickReceiveData, 18); // DMA接收AS69
-    wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);//以mavlink接收
+    wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);              //以mavlink接收
     osDelay(100);
 
+<<<<<<< HEAD
     
     //编码器AMT102
 
 
     // 解算，速度伺服
+=======
+>>>>>>> 2561b48b9297d54f81a4a2793aff16a0a8f9bca9
     for (;;) {
 
-        calculate_4_2(moter_speed, crl_speed.vx, crl_speed.vy, crl_speed.vw);
-        // calculate_3_2(moter_speed,v_set.vx_set,v_set.vy_set,v_set.vw_set);//mavlink
+        // PID闭环控制
+        pid_pos_x.setpoint = control.x_set;
+        pid_pos_y.setpoint = control.y_set;
+        pid_vel_w.setpoint = control.vw_set;//增量
 
+        pid_pos_w_pos.target = control.vw_set;
+        pid_pos_w_pos.feedback = mav_posture.zangle;
+        pid_pos_x_pos.target = control.x_set;
+        pid_pos_x_pos.feedback = mav_posture.pos_x;
+        pid_pos_y_pos.target = control.y_set;
+        pid_pos_y_pos.feedback = mav_posture.pos_y;//位置
+        
+
+        PID_Incremental(&pid_pos_x, mav_posture.pos_x);
+        PID_Incremental(&pid_pos_y, mav_posture.pos_y);
+        PID_Incremental(&pid_vel_w, mav_posture.zangle);
+
+        //运动学逆解算
+        /*         calculate_3_2(moter_speed,
+                              control.vx_set + pid_pos_x.result,
+                              control.vy_set + pid_pos_y.result,
+                              control.vw_set + pid_vel_w.result); */
+        calculate_3_2(moter_speed,
+                      control.vx_set + PID_Position(&pid_pos_x_pos),
+                      control.vy_set + PID_Position(&pid_pos_y_pos),
+                      control.vw_set + PID_Position(&pid_pos_w_pos));
+/*         calculate_3_2(moter_speed,
+                    control.vx_set ,
+                    control.vy_set ,
+                    PID_Position(&pid_pos_w_pos)); */
+                    
+        //速度伺服
         speedServo(moter_speed[0], &hDJI[0]);
         speedServo(moter_speed[1], &hDJI[1]);
         speedServo(moter_speed[2], &hDJI[2]);
@@ -135,20 +266,11 @@ void thread_1(void const *argument)
                              hDJI[1].speedPID.output,
                              hDJI[2].speedPID.output,
                              hDJI[3].speedPID.output);
-        // 电机速度反馈，可以正向解算，传底盘的速度
-        //  mavlink_speed_control_status_t speed_t;
-        static int cnt = 0;
-        if (cnt++ > 50) {
-            cnt = 0;
-            // speed_t.vx_state = hDJI[0].FdbData.rpm;
-            // speed_t.vy_state = hDJI[1].FdbData.rpm;
-            // speed_t.vw_state = hDJI[2].FdbData.rpm;
 
-            // char ch[] = "123456\n";
-            // HAL_UART_Transmit(&huart8, (uint8_t*)&ch,7,100);
-
-            // mavlink_msg_speed_control_status_send_struct(MAVLINK_COMM_0, &speed_t);
-            HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
+        static int n_ = 0;
+        if (n_++ > 100) {
+            n_ = 0;
+            HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14); // A板上的绿灯
         }
         osDelay(1);
     }
@@ -157,28 +279,57 @@ void thread_1(void const *argument)
 /**
  * @description: 线程二：定位系统
  * @author: szf
- * @date: 
+ * @date:
  * @return {void}
  */
 void thread_2(void const *argument)
 {
     // 码盘定位系统通过串口6收发信息
     HAL_UART_Receive_IT(&huart6, (uint8_t *)&ch, 1);
+<<<<<<< HEAD
     
     // DT35距离传感器
     // 初始化
     ADS1256_Init();
     ADS1256_UpdateDiffData();
 
+=======
+
+    // mavlink_msg_posture_send_struct(MAVLINK_COMM_0,mav_posture);
+    // DT35距离传感器
+    // 初始化
+    // ADS1256_Init;
+>>>>>>> 2561b48b9297d54f81a4a2793aff16a0a8f9bca9
     for (;;) {
+        // ADS1256_UpdateDiffData;
         osDelay(100);
     }
 }
 
 /**
+ * @description:反馈底盘速度
+ * @return {*}
+ */
+/* void thread_3(void const *argument)
+{
+    // 电机速度反馈，可以正向解算，传底盘的速度
+
+    for (;;) {
+        v_state.vx_state = hDJI[0].FdbData.rpm;
+        v_state.vy_state = hDJI[1].FdbData.rpm;
+        v_state.vw_state = hDJI[2].FdbData.rpm;
+
+        mavlink_msg_speed_control_status_send_struct(MAVLINK_COMM_0, &v_state);
+
+
+        osDelay(100);
+    }
+} */
+
+/**
  * @description: 创建线程
  * @author: szf
- * @date: 
+ * @date:
  * @return {void}
  */
 void StartDefaultTask(void const *argument)
@@ -188,6 +339,9 @@ void StartDefaultTask(void const *argument)
 
     osThreadDef(position, thread_2, osPriorityNormal, 0, 512);
     osThreadCreate(osThread(position), NULL);
+
+    /*     osThreadDef(velocity, thread_3, osPriorityNormal, 0, 512);
+        osThreadCreate(osThread(velocity), NULL); */
 
     for (;;) {
         osDelay(1);
@@ -214,10 +368,10 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     // 定位模块消息
     else if (huart->Instance == USART6) // 底盘定位系统的decode,可以换为DMA轮询,封装到祖传的串口库里s
     {
-        // HAL_UART_Receive_IT(&huart6,(uint8_t *)&ch,1);
+        HAL_UART_Receive_IT(&huart6, (uint8_t *)&ch, 1);
         // USART_ClearITPendingBit( USART1, USART_FLAG_RXNE);
-        HAL_UART_IRQHandler(&huart6); // 该函数会清空中断标志，取消中断使能，并间接调用回调函数
-        switch (count)                // uint8_t隐转为int
+        // HAL_UART_IRQHandler(&huart6); // 该函数会清空中断标志，取消中断使能，并间接调用回调函数
+        switch (count) // uint8_t隐转为int
         {
             case 0:
 
@@ -259,13 +413,14 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
             case 4:
 
                 if (ch[0] == 0x0d) {
-                    mav_posture.zangle = posture.ActVal[0];
-                    mav_posture.xangle = posture.ActVal[1];
-                    mav_posture.yangle = posture.ActVal[2];
-                    mav_posture.pos_x = posture.ActVal[3];
-                    mav_posture.pos_y = posture.ActVal[4];
-                    mav_posture.w_z = posture.ActVal[5];
-                    mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &mav_posture); // 可能要调整延时
+                    mav_posture.zangle = posture.ActVal[0] * 0.001;
+                    // mav_posture.xangle = posture.ActVal[1] * 0.001;
+                    mav_posture.xangle = control.x_set;
+                    mav_posture.yangle = posture.ActVal[2] * 0.001;
+                    mav_posture.pos_x = posture.ActVal[3] * 0.001;
+                    mav_posture.pos_y = posture.ActVal[4] * 0.001;
+                    // mav_posture.w_z = posture.ActVal[5] * 0.001;
+                    mav_posture.w_z = control.vx_set;
                 }
                 count = 0;
                 break;
@@ -275,8 +430,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
                 count = 0;
                 break;
         }
-    } else {
-        void AS69_Decode(); // AS69解码
+    } 
+    else {
+        AS69_Decode(); // AS69解码
     }
 }
 
@@ -293,7 +449,8 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
     switch (msg->msgid) {
         case 9:
             // id = 9 的消息对应的解码函数(mavlink_msg_xxx_decode)
-            mavlink_msg_speed_control_set_decode(msg, &v_set);
+            mavlink_msg_control_set_decode(msg, &control);
+            mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &mav_posture); // 可能要调整延时
             break;
         case 2:
             // id = 2 的消息对应的解码函数(mavlink_msg_xxx_decode)

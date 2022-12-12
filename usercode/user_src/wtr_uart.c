@@ -1,4 +1,5 @@
 /*
+<<<<<<< HEAD
  * @Author: wtr电控组
  * @Date: 2022-10-13 23:33:37
  * @LastEditTime: 2022-11-30 20:13:56
@@ -6,6 +7,14 @@
  * @Description: 封装WTR曾经用过的解码函数，作为技术积累
  * @FilePath: \underpan_v3.1\usercode\user_src\wtr_uart.c
  * @WeChat:szf13373959031
+=======
+ * @Author: szf01 2176529058@qq.com
+ * @Date: 2022-12-03 20:06:20
+ * @LastEditors: szf01 2176529058@qq.com
+ * @LastEditTime: 2022-12-06 14:33:12
+ * @FilePath: /underpan/usercode/user_src/wtr_uart.c
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+>>>>>>> 2561b48b9297d54f81a4a2793aff16a0a8f9bca9
  */
 #include "wtr_uart.h"
 #include "DJI.h"
@@ -35,8 +44,8 @@ void AS69_Decode(){
     {
         case 1:
             //speed = (float ) (Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 200;
-            crl_speed.vy = (float ) ((Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 1500);
-            crl_speed.vx = (float ) (Raw_Data.ch1 - CH1_BIAS)/CH_RANGE * 1500;
+            crl_speed.vy = (float ) ((Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 1);
+            crl_speed.vx = (float ) (Raw_Data.ch1 - CH1_BIAS)/CH_RANGE * 1;
             /* left choice 1 */
             break;
         case 3:
@@ -54,7 +63,7 @@ void AS69_Decode(){
     switch(Raw_Data.right)
     {
         case 1:
-            crl_speed.vw = (float ) (Raw_Data.ch2 - CH2_BIAS)/CH_RANGE * 5000;
+            crl_speed.vw = (float ) (Raw_Data.ch2 - CH2_BIAS)/CH_RANGE * 1;
             /* right choice 1 */
             break;
         case 3:
