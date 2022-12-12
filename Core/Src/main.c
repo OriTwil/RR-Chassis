@@ -23,22 +23,13 @@
 #include "crc.h"
 #include "dma.h"
 #include "spi.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-// #include "Caculate.h"
-// #include "wtr_can.h"
-// #include "DJI.h"
-// #include "wtr_uart.h"
-// #include <math.h>
-// #define pi 3.1415926535898
-// #define DEC (pi/180)
-// #define r_underpan 0.1934
-// #define r_wheel 0.076
-// DJI_t hDJI[8];
-// double moter_speed [3];
+
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -71,15 +62,6 @@ void MX_FREERTOS_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 
-// void calculate(double * moter_speed,
-//                double v_x,
-//                double v_y,
-//                double v_w)
-// {
-//     moter_speed[0] = (- v_x * sin(30 * DEC) - v_y * cos(30 * DEC)  + v_w * r_underpan)/(2 * pi * r_wheel);
-//     moter_speed[1] = (+ v_x                        + v_w * r_underpan)/(2 * pi * r_wheel);
-//     moter_speed[2] = (- v_x * sin(30 * DEC) + v_y * cos(30 * DEC)  + v_w * r_underpan)/(2 * pi * r_wheel);
-// }
 
 /* USER CODE END 0 */
 
@@ -119,17 +101,9 @@ int main(void)
   MX_UART7_Init();
   MX_CRC_Init();
   MX_SPI1_Init();
+  MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-
-  // CANFilterInit(&hcan1);//过滤器设�???
-  // hDJI[0].motorType = M3508;
-  // hDJI[1].motorType = M3508;
-  // hDJI[2].motorType = M3508;//电机类型设置
-  // DJI_Init();
-  
-  // HAL_UART_Receive_DMA(&huart1,JoyStickReceiveData,18);
-	// HAL_Delay(100);
-
+  HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
   /* Call init function for freertos objects (in freertos.c) */
@@ -237,24 +211,24 @@ void SystemClock_Config(void)
 
 /**
   * @brief  Period elapsed callback in non blocking mode
-  * @note   This function is called  when TIM1 interrupt took place, inside
+  * @note   This function is called  when TIM7 interrupt took place, inside
   * HAL_TIM_IRQHandler(). It makes a direct call to HAL_IncTick() to increment
   * a global variable "uwTick" used as application time base.
   * @param  htim : TIM handle
   * @retval None
   */
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-{
-  /* USER CODE BEGIN Callback 0 */
+// void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+// {
+//   /* USER CODE BEGIN Callback 0 */
 
-  /* USER CODE END Callback 0 */
-  if (htim->Instance == TIM1) {
-    HAL_IncTick();
-  }
-  /* USER CODE BEGIN Callback 1 */
+//   /* USER CODE END Callback 0 */
+//   if (htim->Instance == TIM7) {
+//     HAL_IncTick();
+//   }
+//   /* USER CODE BEGIN Callback 1 */
 
-  /* USER CODE END Callback 1 */
-}
+//   /* USER CODE END Callback 1 */
+// }
 
 /**
   * @brief  This function is executed in case of error occurrence.

@@ -1,7 +1,7 @@
 /*
  * @Author: szf
  * @Date: 2022-10-22 13:54:44
- * @LastEditTime: 2022-11-30 20:07:56
+ * @LastEditTime: 2022-12-12 22:47:16
  * @LastEditors: szf
  * @Description:
  * @FilePath: \underpan_v3.1\usercode\user_src\usermian.c
@@ -26,7 +26,8 @@
 #define r_underpan 0.1934
 #define r_wheel    0.076
 int test = 0;
-
+int counter = 0;
+float w_speed = 0;
 /**
  * @description:
  * @author: szf
@@ -115,6 +116,10 @@ void thread_1(void const *argument)
     wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);//以mavlink接收
     osDelay(100);
 
+    
+    //编码器AMT102
+
+
     // 解算，速度伺服
     for (;;) {
 
@@ -159,10 +164,12 @@ void thread_2(void const *argument)
 {
     // 码盘定位系统通过串口6收发信息
     HAL_UART_Receive_IT(&huart6, (uint8_t *)&ch, 1);
+    
     // DT35距离传感器
     // 初始化
-    ADS1256_Init;
-    ADS1256_UpdateDiffData;
+    ADS1256_Init();
+    ADS1256_UpdateDiffData();
+
     for (;;) {
         osDelay(100);
     }
@@ -295,4 +302,26 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
         default:
             break;
     }
+}
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+    counter++;
+}
+
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
+  if (htim->Instance == TIM2) {
+    w_speed = counter / 2048 / 0.02;
+    counter = 0;
+  }
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM7) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
+
+  /* USER CODE END Callback 1 */
 }
