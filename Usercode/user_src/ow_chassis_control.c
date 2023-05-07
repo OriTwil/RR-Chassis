@@ -1,7 +1,7 @@
 /*
  * @Author: szf
  * @Date: 2023-02-23 19:01:45
- * @LastEditTime: 2023-05-07 15:10:07
+ * @LastEditTime: 2023-05-07 21:52:03
  * @LastEditors: szf
  * @Description: 全向轮底盘
  * @FilePath: \RR-Chassis\Usercode\user_src\ow_chassis_control.c
@@ -62,7 +62,12 @@ void OwChassisControlTask(void const *argument)
                                     hDJI[2].speedPID.output,
                                     hDJI[3].speedPID.output);
         // A板上的绿灯作指示灯
-        BlinkLED();
+        // BlinkLED();
+        static int n_ = 0;
+        if (n_++ > 100) {
+            n_ = 0;
+            HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14); // A板上的绿灯
+        }
         osDelay(1);
     }
 }
