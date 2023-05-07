@@ -39,13 +39,12 @@
         },
         "options": "null"
       },
-      "uploader": "pyOCD",
+      "uploader": "OpenOCD",
       "uploadConfig": {
         "bin": "",
-        "targetName": "stm32f427iihx",
-        "baseAddr": "0x08000000",
-        "speed": "4M",
-        "config": ".eide/debug.pyocd.yaml"
+        "target": "stm32f4x",
+        "interface": "cmsis-dap",
+        "baseAddr": "0x08000000"
       },
       "uploadConfigMap": {
         "JLink": {
@@ -58,6 +57,13 @@
           "proType": 1,
           "speed": 8000,
           "otherCmds": ""
+        },
+        "pyOCD": {
+          "bin": "",
+          "targetName": "stm32f427iihx",
+          "baseAddr": "0x08000000",
+          "speed": "4M",
+          "config": ".eide/debug.pyocd.yaml"
         }
       },
       "custom_dep": {
