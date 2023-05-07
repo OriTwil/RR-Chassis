@@ -70,8 +70,6 @@ void MX_FREERTOS_Init(void);
   * @retval int
   */
 int main(void)
-
-
 {
   /* USER CODE BEGIN 1 */
 
@@ -101,14 +99,9 @@ int main(void)
   MX_USART6_UART_Init();
   MX_UART8_Init();
   MX_UART7_Init();
-<<<<<<< HEAD
   MX_CRC_Init();
   MX_SPI1_Init();
   MX_TIM2_Init();
-=======
-  // MX_CRC_Init();
-  // MX_SPI1_Init();
->>>>>>> 2561b48b9297d54f81a4a2793aff16a0a8f9bca9
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
@@ -224,18 +217,18 @@ void SystemClock_Config(void)
   * @param  htim : TIM handle
   * @retval None
   */
-// void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
-// {
-//   /* USER CODE BEGIN Callback 0 */
+__weak void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
+{
+  /* USER CODE BEGIN Callback 0 */
 
-//   /* USER CODE END Callback 0 */
-//   if (htim->Instance == TIM7) {
-//     HAL_IncTick();
-//   }
-//   /* USER CODE BEGIN Callback 1 */
+  /* USER CODE END Callback 0 */
+  if (htim->Instance == TIM7) {
+    HAL_IncTick();
+  }
+  /* USER CODE BEGIN Callback 1 */
 
-//   /* USER CODE END Callback 1 */
-// }
+  /* USER CODE END Callback 1 */
+}
 
 /**
   * @brief  This function is executed in case of error occurrence.

@@ -73,6 +73,13 @@
           "target": "stm32f4x",
           "interface": "cmsis-dap",
           "baseAddr": "0x08000000"
+        },
+        "pyOCD": {
+          "bin": "",
+          "targetName": "stm32f427iihx",
+          "baseAddr": "0x08000000",
+          "speed": "4M",
+          "config": ".eide/debug.pyocd.yaml"
         }
       },
       "custom_dep": {

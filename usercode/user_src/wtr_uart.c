@@ -1,20 +1,11 @@
 /*
-<<<<<<< HEAD
  * @Author: wtr电控组
  * @Date: 2022-10-13 23:33:37
- * @LastEditTime: 2022-11-30 20:13:56
+ * @LastEditTime: 2023-03-30 01:27:01
  * @LastEditors: szf
  * @Description: 封装WTR曾经用过的解码函数，作为技术积累
  * @FilePath: \underpan_v3.1\usercode\user_src\wtr_uart.c
  * @WeChat:szf13373959031
-=======
- * @Author: szf01 2176529058@qq.com
- * @Date: 2022-12-03 20:06:20
- * @LastEditors: szf01 2176529058@qq.com
- * @LastEditTime: 2022-12-06 14:33:12
- * @FilePath: /underpan/usercode/user_src/wtr_uart.c
- * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
->>>>>>> 2561b48b9297d54f81a4a2793aff16a0a8f9bca9
  */
 #include "wtr_uart.h"
 #include "DJI.h"
@@ -39,7 +30,7 @@ void AS69_Decode(){
     Raw_Data.left = ((JoyStickReceiveData[5] >> 4) & 0x000C) >> 2;
     Raw_Data.right = ((JoyStickReceiveData[5] >> 4) & 0x0003);
     Raw_Data.wheel = ((int16_t)JoyStickReceiveData[16]) | ((int16_t)JoyStickReceiveData[17] << 8);
-
+    
     switch(Raw_Data.left)
     {
         case 1:
