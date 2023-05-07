@@ -29,6 +29,9 @@
 #include "usercallback.h"
 #include "usercalculate.h"
 
+#define rotate_ratio 0.3615 // (Width + Length)/2
+#define wheel_rpm_ratio 2387.324 // 
+
 /*定义增量式PID结构体*/
 typedef struct
 {
@@ -79,6 +82,7 @@ void CalculateFourWheels(double *moter_speed,
                    double v_w);
 void PIDIncremental(PID_Incremwntal *vPID, float processValue);
 float PIDPosition(PID_Pos *p);
+void CalculateFourMecanumWheels(double *moter_speed,double vx,double vy,double vw);
 
 mavlink_control_set_t FrameTransform(mavlink_control_set_t *control,mavlink_posture_t *posture);
 

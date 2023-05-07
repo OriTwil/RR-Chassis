@@ -1,7 +1,7 @@
 /*
  * @Author: szf
  * @Date: 2023-02-22 12:04:21
- * @LastEditTime: 2023-05-06 16:51:08
+ * @LastEditTime: 2023-05-07 01:30:58
  * @LastEditors: szf
  * @Description: 运动学逆解算及PID计算函数
  * @FilePath: \RR-Chassis\Usercode\user_src\usercalculate.c
@@ -78,6 +78,20 @@ void CalculateFourWheels_(double *moter_speed,
     moter_speed[1] = (-vx * sqrt(2) + vy * sqrt(2) + vw * r_underpan_4) / (2 * pi * r_wheel);
     moter_speed[2] = (-vx * sqrt(2) - vy * sqrt(2) + vw * r_underpan_4) / (2 * pi * r_wheel);
     moter_speed[3] = (vx * sqrt(2) - vy * sqrt(2) + vw * r_underpan_4) / (2 * pi * r_wheel);
+}
+
+/**
+ * @description:麦克纳姆轮底盘逆解算
+ * @author: szf
+ * @date:
+ * @return {void}
+ */
+void CalculateFourMecanumWheels(double *moter_speed,double vx,double vy,double vw)
+{
+    moter_speed[0] = (vx - vy - vw * rotate_ratio) * wheel_rpm_ratio;
+    moter_speed[1] = (vx + vy - vw * rotate_ratio) * wheel_rpm_ratio;
+    moter_speed[2] = (-vx + vy - vw * rotate_ratio) * wheel_rpm_ratio;
+    moter_speed[3] = (-vx - vy - vw * rotate_ratio) * wheel_rpm_ratio;
 }
 
 /**

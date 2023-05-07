@@ -18,6 +18,7 @@
 #include <math.h>
 #include "usercallback.h"
 #include "usercalculate.h"
+#include "usart.h"
 
 void PerceptionTaskStart(mavlink_controller_t *ctrl_data);
 

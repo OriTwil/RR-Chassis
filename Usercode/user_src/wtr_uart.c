@@ -1,10 +1,10 @@
 /*
  * @Author: wtr电控组
  * @Date: 2022-10-13 23:33:37
- * @LastEditTime: 2023-03-29 23:23:00
+ * @LastEditTime: 2023-05-07 14:21:04
  * @LastEditors: szf
  * @Description: 封装WTR曾经用过的解码函数，作为技术积累
- * @FilePath: \ER-Chassis-F407\Usercode\user_src\wtr_uart.c
+ * @FilePath: \RR-Chassis\Usercode\user_src\wtr_uart.c
  * @WeChat:szf13373959031
  */
 #include "wtr_uart.h"
@@ -41,8 +41,8 @@ void AS69_Decode(){
     {
         case 1:
             //speed = (float ) (Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 200;
-            crl_speed.vy = (float ) ((Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 1);
-            crl_speed.vx = (float ) (Raw_Data.ch1 - CH1_BIAS)/CH_RANGE * 1;
+            crl_speed.vx = (float ) ((Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 1);
+            crl_speed.vy = (float ) (Raw_Data.ch1 - CH1_BIAS)/CH_RANGE * 1;
             /* left choice 1 */
             break;
         case 3:
@@ -81,7 +81,7 @@ void AS69_Decode(){
 //OPS全方位平面定位系统
 void OPS_Decode()
 {
-    HAL_UART_Receive_IT(&huart3, (uint8_t *)&ch, 1);
+    HAL_UART_Receive_IT(&huart6, (uint8_t *)&ch, 1);
     // USART_ClearITPendingBit( USART1, USART_FLAG_RXNE);
     // HAL_UART_IRQHandler(&huart6); // 该函数会清空中断标志，取消中断使能，并间接调用回调函数
     switch (count) // uint8_t隐转为int

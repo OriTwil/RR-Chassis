@@ -42,7 +42,7 @@
       "uploader": "pyOCD",
       "uploadConfig": {
         "bin": "",
-        "targetName": "cortex_m",
+        "targetName": "stm32f427iihx",
         "baseAddr": "0x08000000",
         "speed": "4M",
         "config": ".eide/debug.pyocd.yaml"

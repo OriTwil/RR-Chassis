@@ -55,18 +55,18 @@ void StartDefaultTask(void const *argument)
 {
 
     CANFilterInit(&hcan1);
-    hDJI[0].motorType = M2006;
-    hDJI[1].motorType = M2006;
-    hDJI[2].motorType = M2006;
-    hDJI[3].motorType = M2006;
-    hDJI[4].motorType = M2006;
-	hDJI[5].motorType = M2006;
-    hDJI[6].motorType = M2006;
+    hDJI[0].motorType = M3508;
+    hDJI[1].motorType = M3508;
+    hDJI[2].motorType = M3508;
+    hDJI[3].motorType = M3508;
+    hDJI[4].motorType = M3508;
+	hDJI[5].motorType = M3508;
+    hDJI[6].motorType = M3508;
     DJI_Init();// 大疆电机初始化
 
-    wtrMavlink_BindChannel(&huart1, MAVLINK_COMM_0);// MAVLINK初始化
+    wtrMavlink_BindChannel(&huart8, MAVLINK_COMM_0);// MAVLINK初始化
     CtrlDataSender_Init(&huart2, MAVLINK_COMM_1); // 遥控器初始化
-    HAL_UART_Receive_DMA(&huart3, JoyStickReceiveData, 18); // DMA接收AS69
+    HAL_UART_Receive_DMA(&huart1, JoyStickReceiveData, 18); // DMA接收AS69
 
     //开启线程
     OwChassisTaskStart(&ControllerData);// 全向轮底盘控制线程

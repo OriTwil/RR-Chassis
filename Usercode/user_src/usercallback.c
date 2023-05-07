@@ -22,20 +22,17 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 
     test++;
     // 上位机消息
-    if (huart->Instance == USART2) {
-        // UART1Decode();//AS69解码
+    if (huart->Instance == UART8) {
         wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0); // 进入mavlink回调
     }
     // 定位模块消息
-    if (huart->Instance == UART4) // 底盘定位系统的decode,可以换为DMA轮询,封装到祖传的串口库里s
+    if (huart->Instance == USART6) // 底盘定位系统的decode
     {
         OPS_Decode();
     }
-    else {
+    if(huart->Instance == USART1) 
+    {
         AS69_Decode(); // AS69解码
-        // crl_speed.vy = (float ) (crldata[0] - CH0_BIAS)/CH_RANGE * 1;
-        // crl_speed.vx = (float ) (crldata[1] - CH1_BIAS)/CH_RANGE * 1;
-        // crl_speed.vw = (float ) (crldata[2] - CH2_BIAS)/CH_RANGE * 1;
     }
 }
 
@@ -68,6 +65,7 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
             break;
     }
 }
+
 int test_count = 0;
 /**
  * @description:外部中断回调函数

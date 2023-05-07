@@ -12,3 +12,4 @@
 #include "wtr_mavlink.h"
 
 void ChassisTaskStart(mavlink_controller_t *ctrl_data);
+void DeadBand(double x, double y, double *new_x, double *new_y, double threshould);

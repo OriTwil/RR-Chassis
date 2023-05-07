@@ -1,7 +1,7 @@
 /*** 
  * @Author: szf
  * @Date: 2023-02-23 19:03:31
- * @LastEditTime: 2023-05-06 16:30:09
+ * @LastEditTime: 2023-05-07 15:06:25
  * @LastEditors: szf
  * @Description: 
  * @FilePath: \RR-Chassis\Usercode\user_inc\ow_chassis_control.h
@@ -27,8 +27,11 @@
 #include <math.h>
 #include "usercallback.h"
 #include "usercalculate.h"
+#include "chassis_control.h"
 
 void OwChassisTaskStart(mavlink_controller_t *ctrl_data);
 void PIDInit();
+void PIDUpdate();
+void BlinkLED();
 
 #endif

@@ -1,9 +1,9 @@
 /*
  * @Author: szf
  * @Date: 2023-02-23 19:01:45
- * @LastEditTime: 2023-05-06 17:16:33
+ * @LastEditTime: 2023-05-07 15:10:07
  * @LastEditors: szf
- * @Description: 全向轮底盘驱动
+ * @Description: 全向轮底盘
  * @FilePath: \RR-Chassis\Usercode\user_src\ow_chassis_control.c
  * @WeChat:szf13373959031
  */
@@ -26,6 +26,9 @@
 #include "usercalculate.h"
 #include "ow_chassis_control.h"
 
+double vx_deadbanded = 0;
+double vy_deadbanded = 0;
+
 /**
  * @description: 线程一：底盘控制
  * @author: szf
@@ -43,26 +46,23 @@ void OwChassisControlTask(void const *argument)
     // 解算，速度伺服
     for (;;) {
 
-        //PID参数更新
+        // PID参数更新
         PIDUpdate();
 
+        // 解算
+        DeadBand(crl_speed.vx,crl_speed.vy,&vx_deadbanded,&vy_deadbanded,0.1);
+        CalculateFourMecanumWheels(moter_speed,vx_deadbanded,vy_deadbanded,crl_speed.vw);
         // 速度伺服
         speedServo(moter_speed[0], &hDJI[0]);
         speedServo(moter_speed[1], &hDJI[1]);
         speedServo(moter_speed[2], &hDJI[2]);
         speedServo(moter_speed[3], &hDJI[3]);
-
-        CanTransmit_DJI_1234(&hcan1, hDJI[0].speedPID.output,
-                             hDJI[1].speedPID.output,
-                             hDJI[2].speedPID.output,
-                             hDJI[3].speedPID.output);
-
+        CanTransmit_DJI_1234(&hcan1,hDJI[0].speedPID.output,
+                                    hDJI[1].speedPID.output,
+                                    hDJI[2].speedPID.output,
+                                    hDJI[3].speedPID.output);
         // A板上的绿灯作指示灯
-        static int n_ = 0;
-        if (n_++ > 100) {
-            n_ = 0;
-            HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
-        }
+        BlinkLED();
         osDelay(1);
     }
 }
@@ -101,4 +101,13 @@ void PIDUpdate()
     pid_pos_x_pos.feedback = mav_posture.pos_x;
     pid_pos_y_pos.target   = control.y_set;
     pid_pos_y_pos.feedback = mav_posture.pos_y;
+}
+
+void BlinkLED()
+{
+    static int n_ = 0;
+    if (n_++ > 100) {
+        n_ = 0;
+        HAL_GPIO_TogglePin(GPIOF, GPIO_PIN_14);
+    }
 }
