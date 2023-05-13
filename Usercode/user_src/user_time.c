@@ -9,7 +9,7 @@
  *
  */
 
-#include "time.h"
+#include "user_time.h"
 
 void delay_us(uint32_t us)
 {

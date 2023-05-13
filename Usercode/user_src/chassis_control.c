@@ -14,16 +14,11 @@
 #include "chassis_driver.h"
 #include "cmsis_os.h"
 #include "main.h"
-#include "DJI.h"
+#include "wtr_dji.h"
 #include "math.h"
 #include "uart_device.h"
-#include "useful_constant.h"
-#include "beep.h"
-#include "usermain.h"
-#include "Caculate.h"
-#include "usercalculate.h"
+#include "user_config.h"
 #include "wtr_uart.h"
-#include "usercallback.h"
 
 #define rx_DEADBAND 100.0
 
@@ -190,9 +185,9 @@ void ChassisTask(void const *argument)
                 Chassis_HallCorrecting(wheels, 3, HallCorrectingStartTick);
                 break;
             case Automatic:
-                Chassis_SetSpeed(wheels, 3, FrameTransform(&control, &mav_posture).vx_set + PID_Position(&pid_pos_x_pos),
-                                 FrameTransform(&control, &mav_posture).vy_set + PID_Position(&pid_pos_y_pos),
-                                 control.vw_set + PID_Position(&pid_pos_w_pos));
+                Chassis_SetSpeed(wheels, 3, FrameTransform(&control, &mav_posture).vx_set + PIDPosition(&pid_pos_x_pos),
+                                 FrameTransform(&control, &mav_posture).vy_set + PIDPosition(&pid_pos_y_pos),
+                                 control.vw_set + PIDPosition(&pid_pos_w_pos));
                 break;
             default:
                 break;

@@ -11,9 +11,8 @@
 
 #pragma once
 
-#include "DJI.h"
-#include "vesc.h"
-#include "usermain.h"
+#include "wtr_vesc.h"
+#include "user_main.h"
 
 typedef struct
 {

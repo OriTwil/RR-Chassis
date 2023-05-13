@@ -1,13 +1,12 @@
 /*** 
  * @Author: szf
  * @Date: 2023-02-22 11:56:47
- * @LastEditTime: 2023-05-06 17:11:05
+ * @LastEditTime: 2023-05-13 19:56:24
  * @LastEditors: szf
  * @Description: 
- * @FilePath: \RR-Chassis\Usercode\user_inc\usermain.h
+ * @FilePath: \RR-Chassis\Usercode\user_inc\user_main.h
  * @@WeChat:szf13373959031
  */
-
 
 #ifndef USERMAIN_H
 #define USERMAIN_H
@@ -17,9 +16,8 @@
 #include "dma.h"
 #include "usart.h"
 #include "gpio.h"
-#include "Caculate.h"
 #include "wtr_can.h"
-#include "DJI.h"
+#include "wtr_dji.h"
 #include "wtr_uart.h"
 #include <math.h>
 #include "main.h"
@@ -27,15 +25,18 @@
 #include "mavlink_msg_speed_control_set.h"
 #include "mavlink_msg_speed_control_status.h"
 #include "mavlink_msg_control_set.h"
-#include "usercallback.h"
-#include "usercalculate.h"
+#include "user_callback.h"
+#include "user_calculate.h"
 #include "chassis_control.h"
 #include "chassis_driver.h"
 #include "chassis_perception.h"
-#include "ow_chassis_control.h"
-#include "ctrl_data_sender.h"
-#include "beep.h"
+#include "chassis_control_ow.h"
+#include "chassis_communicate.h"
+#include "chassis_beep.h"
 #include "CLI.h"
+#include "user_time.h"
+#include "user_config.h"
+#include "chassis_state_management.h"
 
 // 宏定义计算中常数及底盘数据
 #define pi           3.1415926535898
@@ -48,12 +49,17 @@
 #define min(a, b)      (a < b ? a : b)
 #define range(x, a, b) (min(max(x, a), b))
 
+void CtrlDataSender_Init(UART_HandleTypeDef *huart, mavlink_channel_t chan);
+void BlinkLED();
+
 // static uint8_t i = 0;
 extern uint8_t i; // 不确定是不是static
 
 extern mavlink_control_set_t control;
 extern mavlink_speed_control_status_t v_state;
 extern mavlink_posture_t mav_posture;
+extern mavlink_controller_t ControllerData;
+extern mavlink_channel_t CtrlDataSendChan;
 
 extern PID_Incremwntal pid_pos_x;
 extern PID_Incremwntal pid_pos_y;

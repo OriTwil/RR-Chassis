@@ -9,10 +9,10 @@
  * 
  */
 
-#include "beep.h"
+#include "chassis_beep.h"
 #include "semphr.h"
 #include "gpio.h"
-#include "usermain.h"
+#include "user_main.h"
 
 SemaphoreHandle_t BeepSem;
 

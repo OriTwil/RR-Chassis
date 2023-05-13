@@ -10,15 +10,14 @@
 #ifndef _USERCALLBACK_H__
 #define _USERCALLBACK_H__
 
-#include "usermain.h"
+#include "user_main.h"
 #include "cmsis_os.h"
 #include "can.h"
 #include "dma.h"
 #include "usart.h"
 #include "gpio.h"
-#include "Caculate.h"
 #include "wtr_can.h"
-#include "DJI.h"
+#include "wtr_dji.h"
 #include "wtr_uart.h"
 #include <math.h>
 #include "main.h"
@@ -26,8 +25,6 @@
 #include "mavlink_msg_speed_control_set.h"
 #include "mavlink_msg_speed_control_status.h"
 #include "mavlink_msg_control_set.h"
-#include "usercallback.h"
-#include "usercalculate.h"
 
 extern int counter;
 extern int test;

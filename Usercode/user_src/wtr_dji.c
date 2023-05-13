@@ -1,6 +1,6 @@
 /*包含DJI的初始化，DJI的Transmit，DJI的解码算法*/
 
-#include "DJI.h"
+#include "wtr_dji.h"
 
 DJI_t hDJI[8];
 // 使用DJI init前需要指定motorType
@@ -15,7 +15,7 @@ void DJI_Init()
         hDJI[i].posPID.KP = 80.0f;
         hDJI[i].posPID.KI = 1.0f;
         hDJI[i].posPID.KD = 0.0f;
-        hDJI[i].posPID.outputMax = 5000;
+        hDJI[i].posPID.outputMax = 1000;
         //			  hDJI[i].posPID.outputMin = 1500;
 
         if (hDJI[i].motorType == M3508) {

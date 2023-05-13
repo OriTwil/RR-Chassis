@@ -6,8 +6,8 @@
  * @return {void}
  */
 
-#include "usermain.h"
-#include "usercallback.h"
+#include "user_main.h"
+#include "user_callback.h"
 #include "wtr_uart.h"
 #include "uart_device.h"
 #include "wtr_mavlink.h"
