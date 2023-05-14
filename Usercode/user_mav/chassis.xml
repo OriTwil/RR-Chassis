@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<mavlink>
+    <version>3</version>
+    <messages>
+        <message id="9" name="CONTROL">
+            <description>from computer</description>
+            <field type="float" name="vx_set">x 方向速度</field>
+            <field type="float" name="vy_set">y 方向速度</field>
+            <field type="float" name="vw_set">z 方向角速度</field>
+            <field type="float" name="x_set">x 方向速度</field>
+            <field type="float" name="y_set">y 方向速度</field>
+            <field type="float" name="w_set">z 方向角速度</field>
+        </message>
+        <message id="10" name="POSTURE">
+            <description>to computer</description>
+            <field type="float" name="pos_x">x 坐标</field>
+            <field type="float" name="pos_y">y 位置</field>
+            <field type="float" name="zangle">航向角</field>
+            <field type="float" name="xangle">横滚角</field>
+            <field type="float" name="yangle">俯仰角</field>
+            <field type="float" name="w_z">航向角速度</field>
+            <field type="int" name="point">目标点</field>
+        </message>
+        <message id="11" name="CHASSIS_TO_UPPER">
+            <description>to upper mcu</description>
+            <field type="float" name="pos_x">x 坐标</field>
+            <field type="float" name="pos_y">y 位置</field>
+            <field type="float" name="zangle"> 航向角</field>
+            <field type="float" name="xangle"> 横滚角</field>
+            <field type="float" name="yangle"> 俯仰角</field>
+            <field type="float" name="w_z">航向角速度</field>
+            <field type="int" name="point">目标点</field>
+        </message>
+    </messages>
+</mavlink>
