@@ -19,7 +19,7 @@
             <field type="float" name="xangle">横滚角</field>
             <field type="float" name="yangle">俯仰角</field>
             <field type="float" name="w_z">航向角速度</field>
-            <field type="int" name="point">目标点</field>
+            <field type="uint8_t" name="point">目标点</field>
         </message>
         <message id="11" name="CHASSIS_TO_UPPER">
             <description>to upper mcu</description>
@@ -29,7 +29,7 @@
             <field type="float" name="xangle"> 横滚角</field>
             <field type="float" name="yangle"> 俯仰角</field>
             <field type="float" name="w_z">航向角速度</field>
-            <field type="int" name="point">目标点</field>
+            <field type="uint8_t" name="point">目标点</field>
         </message>
     </messages>
 </mavlink>

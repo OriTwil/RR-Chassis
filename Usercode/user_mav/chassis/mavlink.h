@@ -1,12 +1,12 @@
 /** @file
- *  @brief MAVLink comm protocol built from underpan.xml
+ *  @brief MAVLink comm protocol built from chassis.xml
  *  @see http://mavlink.org
  */
 #pragma once
 #ifndef MAVLINK_H
 #define MAVLINK_H
 
-#define MAVLINK_PRIMARY_XML_HASH 870125114321110965
+#define MAVLINK_PRIMARY_XML_HASH 7925155776369640719
 
 #ifndef MAVLINK_STX
 #define MAVLINK_STX 253
@@ -29,6 +29,6 @@
 #endif
 
 #include "version.h"
-#include "underpan.h"
+#include "chassis.h"
 
 #endif // MAVLINK_H

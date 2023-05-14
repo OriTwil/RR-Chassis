@@ -1,5 +1,5 @@
 /** @file
- *  @brief MAVLink comm protocol built from underpan.xml
+ *  @brief MAVLink comm protocol built from chassis.xml
  *  @see http://mavlink.org
  */
 #pragma once
@@ -7,8 +7,8 @@
 #ifndef MAVLINK_VERSION_H
 #define MAVLINK_VERSION_H
 
-#define MAVLINK_BUILD_DATE "Thu Feb 23 2023"
+#define MAVLINK_BUILD_DATE "Sun May 14 2023"
 #define MAVLINK_WIRE_PROTOCOL_VERSION "2.0"
-#define MAVLINK_MAX_DIALECT_PAYLOAD_SIZE 24
+#define MAVLINK_MAX_DIALECT_PAYLOAD_SIZE 25
  
 #endif // MAVLINK_VERSION_H
