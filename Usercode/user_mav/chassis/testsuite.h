@@ -101,7 +101,7 @@ static void mavlink_test_posture(uint8_t system_id, uint8_t component_id, mavlin
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
     mavlink_posture_t packet_in = {
-        17.0,45.0,73.0,101.0,129.0,157.0,77
+        17.0,45.0,73.0,101.0,129.0,157.0,963498712
     };
     mavlink_posture_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));
@@ -166,7 +166,7 @@ static void mavlink_test_chassis_to_upper(uint8_t system_id, uint8_t component_i
         uint8_t buffer[MAVLINK_MAX_PACKET_LEN];
         uint16_t i;
     mavlink_chassis_to_upper_t packet_in = {
-        17.0,45.0,73.0,101.0,129.0,157.0,77
+        17.0,45.0,73.0,101.0,129.0,157.0,963498712
     };
     mavlink_chassis_to_upper_t packet1, packet2;
         memset(&packet1, 0, sizeof(packet1));

@@ -11,16 +11,16 @@ typedef struct __mavlink_posture_t {
  float xangle; /*<  横滚角*/
  float yangle; /*<  俯仰角*/
  float w_z; /*<  航向角速度*/
- uint8_t point; /*<  目标点*/
+ int32_t point; /*<  目标点*/
 } mavlink_posture_t;
 
-#define MAVLINK_MSG_ID_POSTURE_LEN 25
-#define MAVLINK_MSG_ID_POSTURE_MIN_LEN 25
-#define MAVLINK_MSG_ID_10_LEN 25
-#define MAVLINK_MSG_ID_10_MIN_LEN 25
+#define MAVLINK_MSG_ID_POSTURE_LEN 28
+#define MAVLINK_MSG_ID_POSTURE_MIN_LEN 28
+#define MAVLINK_MSG_ID_10_LEN 28
+#define MAVLINK_MSG_ID_10_MIN_LEN 28
 
-#define MAVLINK_MSG_ID_POSTURE_CRC 179
-#define MAVLINK_MSG_ID_10_CRC 179
+#define MAVLINK_MSG_ID_POSTURE_CRC 101
+#define MAVLINK_MSG_ID_10_CRC 101
 
 
 
@@ -35,7 +35,7 @@ typedef struct __mavlink_posture_t {
          { "xangle", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_posture_t, xangle) }, \
          { "yangle", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_posture_t, yangle) }, \
          { "w_z", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_posture_t, w_z) }, \
-         { "point", NULL, MAVLINK_TYPE_UINT8_T, 0, 24, offsetof(mavlink_posture_t, point) }, \
+         { "point", NULL, MAVLINK_TYPE_INT32_T, 0, 24, offsetof(mavlink_posture_t, point) }, \
          } \
 }
 #else
@@ -48,7 +48,7 @@ typedef struct __mavlink_posture_t {
          { "xangle", NULL, MAVLINK_TYPE_FLOAT, 0, 12, offsetof(mavlink_posture_t, xangle) }, \
          { "yangle", NULL, MAVLINK_TYPE_FLOAT, 0, 16, offsetof(mavlink_posture_t, yangle) }, \
          { "w_z", NULL, MAVLINK_TYPE_FLOAT, 0, 20, offsetof(mavlink_posture_t, w_z) }, \
-         { "point", NULL, MAVLINK_TYPE_UINT8_T, 0, 24, offsetof(mavlink_posture_t, point) }, \
+         { "point", NULL, MAVLINK_TYPE_INT32_T, 0, 24, offsetof(mavlink_posture_t, point) }, \
          } \
 }
 #endif
@@ -69,7 +69,7 @@ typedef struct __mavlink_posture_t {
  * @return length of the message in bytes (excluding serial stream start sign)
  */
 static inline uint16_t mavlink_msg_posture_pack(uint8_t system_id, uint8_t component_id, mavlink_message_t* msg,
-                               float pos_x, float pos_y, float zangle, float xangle, float yangle, float w_z, uint8_t point)
+                               float pos_x, float pos_y, float zangle, float xangle, float yangle, float w_z, int32_t point)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_POSTURE_LEN];
@@ -79,7 +79,7 @@ static inline uint16_t mavlink_msg_posture_pack(uint8_t system_id, uint8_t compo
     _mav_put_float(buf, 12, xangle);
     _mav_put_float(buf, 16, yangle);
     _mav_put_float(buf, 20, w_z);
-    _mav_put_uint8_t(buf, 24, point);
+    _mav_put_int32_t(buf, 24, point);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_POSTURE_LEN);
 #else
@@ -116,7 +116,7 @@ static inline uint16_t mavlink_msg_posture_pack(uint8_t system_id, uint8_t compo
  */
 static inline uint16_t mavlink_msg_posture_pack_chan(uint8_t system_id, uint8_t component_id, uint8_t chan,
                                mavlink_message_t* msg,
-                                   float pos_x,float pos_y,float zangle,float xangle,float yangle,float w_z,uint8_t point)
+                                   float pos_x,float pos_y,float zangle,float xangle,float yangle,float w_z,int32_t point)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_POSTURE_LEN];
@@ -126,7 +126,7 @@ static inline uint16_t mavlink_msg_posture_pack_chan(uint8_t system_id, uint8_t 
     _mav_put_float(buf, 12, xangle);
     _mav_put_float(buf, 16, yangle);
     _mav_put_float(buf, 20, w_z);
-    _mav_put_uint8_t(buf, 24, point);
+    _mav_put_int32_t(buf, 24, point);
 
         memcpy(_MAV_PAYLOAD_NON_CONST(msg), buf, MAVLINK_MSG_ID_POSTURE_LEN);
 #else
@@ -187,7 +187,7 @@ static inline uint16_t mavlink_msg_posture_encode_chan(uint8_t system_id, uint8_
  */
 #ifdef MAVLINK_USE_CONVENIENCE_FUNCTIONS
 
-static inline void mavlink_msg_posture_send(mavlink_channel_t chan, float pos_x, float pos_y, float zangle, float xangle, float yangle, float w_z, uint8_t point)
+static inline void mavlink_msg_posture_send(mavlink_channel_t chan, float pos_x, float pos_y, float zangle, float xangle, float yangle, float w_z, int32_t point)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char buf[MAVLINK_MSG_ID_POSTURE_LEN];
@@ -197,7 +197,7 @@ static inline void mavlink_msg_posture_send(mavlink_channel_t chan, float pos_x,
     _mav_put_float(buf, 12, xangle);
     _mav_put_float(buf, 16, yangle);
     _mav_put_float(buf, 20, w_z);
-    _mav_put_uint8_t(buf, 24, point);
+    _mav_put_int32_t(buf, 24, point);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSTURE, buf, MAVLINK_MSG_ID_POSTURE_MIN_LEN, MAVLINK_MSG_ID_POSTURE_LEN, MAVLINK_MSG_ID_POSTURE_CRC);
 #else
@@ -236,7 +236,7 @@ static inline void mavlink_msg_posture_send_struct(mavlink_channel_t chan, const
   is usually the receive buffer for the channel, and allows a reply to an
   incoming message with minimum stack space usage.
  */
-static inline void mavlink_msg_posture_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  float pos_x, float pos_y, float zangle, float xangle, float yangle, float w_z, uint8_t point)
+static inline void mavlink_msg_posture_send_buf(mavlink_message_t *msgbuf, mavlink_channel_t chan,  float pos_x, float pos_y, float zangle, float xangle, float yangle, float w_z, int32_t point)
 {
 #if MAVLINK_NEED_BYTE_SWAP || !MAVLINK_ALIGNED_FIELDS
     char *buf = (char *)msgbuf;
@@ -246,7 +246,7 @@ static inline void mavlink_msg_posture_send_buf(mavlink_message_t *msgbuf, mavli
     _mav_put_float(buf, 12, xangle);
     _mav_put_float(buf, 16, yangle);
     _mav_put_float(buf, 20, w_z);
-    _mav_put_uint8_t(buf, 24, point);
+    _mav_put_int32_t(buf, 24, point);
 
     _mav_finalize_message_chan_send(chan, MAVLINK_MSG_ID_POSTURE, buf, MAVLINK_MSG_ID_POSTURE_MIN_LEN, MAVLINK_MSG_ID_POSTURE_LEN, MAVLINK_MSG_ID_POSTURE_CRC);
 #else
@@ -334,9 +334,9 @@ static inline float mavlink_msg_posture_get_w_z(const mavlink_message_t* msg)
  *
  * @return  目标点
  */
-static inline uint8_t mavlink_msg_posture_get_point(const mavlink_message_t* msg)
+static inline int32_t mavlink_msg_posture_get_point(const mavlink_message_t* msg)
 {
-    return _MAV_RETURN_uint8_t(msg,  24);
+    return _MAV_RETURN_int32_t(msg,  24);
 }
 
 /**
