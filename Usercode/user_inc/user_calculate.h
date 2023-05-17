@@ -7,8 +7,7 @@
  * @FilePath: \ER\Usercode\user_inc\usercalculate.h
  * @@WeChat:szf13373959031
  */
-#ifndef _USERCALCULATE_H__
-#define _USERCALCULATE_H__
+#pragma once
 
 #include "user_main.h"
 #include "cmsis_os.h"
@@ -21,14 +20,11 @@
 #include <math.h>
 #include "main.h"
 #include "wtr_mavlink.h"
-#include "mavlink_msg_speed_control_set.h"
-#include "mavlink_msg_speed_control_status.h"
-#include "mavlink_msg_control_set.h"
 #include "wtr_dji.h"
 
-
-#define rotate_ratio 0.3615 // (Width + Length)/2
-#define wheel_rpm_ratio 2387.324 // 
+#define r_underpan_3 0.1934
+#define r_underpan_4 0.25
+#define r_wheel      0.076 
 
 /*定义增量式PID结构体*/
 typedef struct
@@ -62,31 +58,32 @@ typedef struct {
 extern double moter_speed[4];
 // 声明运动学逆解函数
 void CalculateFourWheels(double *moter_speed,
-                 double v_x,
-                 double v_y,
-                 double v_w);
+                         double v_x,
+                         double v_y,
+                         double v_w);
 
 void CalculateThreeWheels_(double *moter_speed,
-                 double v_x,
-                 double v_y,
-                 double v_w);
+                           double v_x,
+                           double v_y,
+                           double v_w);
 void CalculateThreeWheels(double *moter_speed,
-                   double v_x,
-                   double v_y,
-                   double v_w);
+                          double v_x,
+                          double v_y,
+                          double v_w);
 void CalculateFourWheels(double *moter_speed,
-                   double v_x,
-                   double v_y,
-                   double v_w);
+                         double v_x,
+                         double v_y,
+                         double v_w);
+void CalculateFourMecanumWheels(double *moter_speed, double vx, double vy, double vw);
+
 void PIDIncremental(PID_Incremwntal *vPID, float processValue);
+
 float PIDPosition(PID_Pos *p);
-void CalculateFourMecanumWheels(double *moter_speed,double vx,double vy,double vw);
 
 void positionServo(float ref, DJI_t *motor);
 
 void speedServo(float ref, DJI_t *motor);
 
-mavlink_control_set_t FrameTransform(mavlink_control_set_t *control,mavlink_posture_t *posture);
+void DeadBand(double x, double y, double *new_x, double *new_y, double threshould);
 
-
-#endif
+mavlink_control_t FrameTransform(mavlink_control_t *control, mavlink_posture_t *posture);

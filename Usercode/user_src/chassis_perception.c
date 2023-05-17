@@ -8,19 +8,6 @@
  * @WeChat:szf13373959031
  */
 #include "chassis_perception.h"
-#include "cmsis_os.h"
-#include "can.h"
-#include "dma.h"
-#include "usart.h"
-#include "gpio.h"
-#include "wtr_can.h"
-#include "wtr_dji.h"
-#include "wtr_uart.h"
-#include <math.h>
-#include "main.h"
-#include "wtr_mavlink.h"
-#include <math.h>
-#include "stdio.h"
 
 uint32_t test_pos[6] = {0};
 
@@ -33,15 +20,22 @@ uint32_t test_pos[6] = {0};
 void ChassisPerceptionTask(void const *argument)
 {
     // 码盘定位系统通过串口收信息
-    HAL_UART_Receive_IT(&huart6, (uint8_t *)&ch, 1);
+    HAL_UART_Receive_IT(&huart_OPS, (uint8_t *)&ch, 1);
     for (;;) {
-
-        osDelay(10);
+        switch(Robot_state.Perception_state)
+        {
+            case Receive:
+            break;
+            case Transmit:
+            // 更新码盘
+            break;
+        }
+        vTaskDelay(10);
     }
 }
 
-void PerceptionTaskStart(mavlink_controller_t *ctrl_data)
+void PerceptionTaskStart()
 {
     osThreadDef(perception, ChassisPerceptionTask, osPriorityNormal, 0, 512);
-    osThreadCreate(osThread(perception), ctrl_data);
+    osThreadCreate(osThread(perception), NULL);
 }

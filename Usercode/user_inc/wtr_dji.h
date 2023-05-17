@@ -1,5 +1,4 @@
-#ifndef DJI_H
-#define DJI_H
+#pragma once
 
 #include "can.h"
 
@@ -62,5 +61,3 @@ void CanTransmit_DJI_5678(CAN_HandleTypeDef *hcanx, int16_t cm5_iq, int16_t cm6_
 void DJI_Init();
 
 HAL_StatusTypeDef DJI_CanMsgDecode(uint32_t Stdid, uint8_t *fdbData);
-
-#endif

@@ -1,10 +1,7 @@
 /**
- * @Author: szf
+ * @OriTwil
  * @Date: 2023-02-22 10:59:01
- * @LastEditTime: 2023-02-22 19:27:40
- * @LastEditors: szf
- * @Description: E
- * @FilePath: \ER\Usercode\user_src\usermain.c
+ * @Description: 主函数
  * @WeChat:szf13373959031
  **/
 
@@ -22,24 +19,9 @@
 #include "wtr_mavlink.h"
 #include <math.h>
 #include "user_callback.h"
-#include "chassis_control.h"
-#include "chassis_driver.h"
 #include "chassis_perception.h"
-#include "CLI.h"
 
-// 变量定义
-mavlink_control_set_t control;
-mavlink_speed_control_status_t v_state;
-mavlink_posture_t mav_posture;
-mavlink_channel_t CtrlDataSendChan = MAVLINK_COMM_0;
-
-uint8_t i = 0;
-
-PID_Pos pid_pos_w_pos;
-PID_Pos pid_pos_x_pos;
-PID_Pos pid_pos_y_pos;
-
-mavlink_controller_t ControllerData = {0};
+// mavlink_controller_t ControllerData = {0};
 
 /**
  * @description: 初始化与开启线程
@@ -49,40 +31,35 @@ mavlink_controller_t ControllerData = {0};
  */
 void StartDefaultTask(void const *argument)
 {
+    ChassisInit();
+    MotorInit();                                            // 电机初始化
+    wtrMavlink_BindChannel(&huart_Computer, MAVLINK_COMM_0);        // MAVLINK初始化
+    CtrlDataSender_Init(&huart_Remote_Control, MAVLINK_COMM_1);           // 遥控器初始化
+    HAL_UART_Receive_DMA(&huart_AS69, JoyStickReceiveData, 18); // DMA接收AS69
 
-    CANFilterInit(&hcan1);
-    hDJI[0].motorType = M3508;
-    hDJI[1].motorType = M3508;
-    hDJI[2].motorType = M3508;
-    hDJI[3].motorType = M3508;
-    hDJI[4].motorType = M3508;
-	hDJI[5].motorType = M3508;
-    hDJI[6].motorType = M3508;
-    DJI_Init();// 大疆电机初始化
-
-    wtrMavlink_BindChannel(&huart8, MAVLINK_COMM_0);// MAVLINK初始化
-    CtrlDataSender_Init(&huart2, MAVLINK_COMM_1); // 遥控器初始化
-    HAL_UART_Receive_DMA(&huart1, JoyStickReceiveData, 18); // DMA接收AS69
-
-    //开启线程
-    OwChassisTaskStart(&ControllerData);// 全向轮底盘控制线程
-    // PerceptionTaskStart(&ControllerData);  // 底盘感知定位线程
-    // ChassisTaskStart(&ControllerData); //舵轮底盘控制线程
-	// CommunicateTaskStart(&ControllerData);// 遥控器线程
-    // StateManagemanttaskStart(&ControllerData);
+    // 开启线程
+    ChassisStateMachineTaskStart();       // 全向轮底盘控制线程
+    PerceptionTaskStart();      // 底盘感知定位线程
+    CommunicateTaskStart();     // 通信线程
+    StateManagemanttaskStart(); // 状态切换线程
 
     for (;;) {
-        osDelay(1);
+        vTaskDelay(1);
     }
 }
 
 void CtrlDataSender_Init(UART_HandleTypeDef *huart, mavlink_channel_t chan)
 {
-	// WTR_MAVLink_Init(huart, chan);
-	wtrMavlink_BindChannel(huart, MAVLINK_COMM_1);// MAVLINK初始化
-	CtrlDataSendChan = chan;
+    // WTR_MAVLink_Init(huart, chan);
+    wtrMavlink_BindChannel(huart, MAVLINK_COMM_1); // MAVLINK初始化
+    CtrlDataSendChan = chan;
 }
 
+/**
+ * @description: 闪A板上的灯(测试用)
+ * @date:
+ * @return {void}
+ */
 void BlinkLED()
 {
     static int n_ = 0;

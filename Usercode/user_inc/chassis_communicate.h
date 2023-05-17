@@ -1,11 +1,8 @@
 /**
- * @file controller_data_sender.h
- * @author TITH (1023515576@qq.com)
- * @brief 发送遥控器原始数据
- * @version 0.1
- * @date 2022-07-22
- * 
- * @copyright Copyright (c) 2022
+ * @author OriTwil
+ * @brief 通信组件
+ * @version 1.0
+ * @date 2023.5.18
  * 
  */
 #pragma once
@@ -16,4 +13,9 @@
 #include "usart.h"
 #include "user_main.h"
 
-void CommunicateTaskStart(mavlink_controller_t* controller);
+extern mavlink_control_t control; // 上位机规划后的控制信息
+extern mavlink_posture_t mav_posture; // 定位系统的信息
+// extern mavlink_controller_t ControllerData; //todo 遥控器
+extern mavlink_channel_t CtrlDataSendChan;
+
+void CommunicateTaskStart();

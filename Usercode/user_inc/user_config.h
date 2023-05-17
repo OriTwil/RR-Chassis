@@ -1,12 +1,10 @@
 /*** 
- * @Author: Xieyang
- * @Date: 2023-02-23 18:51:00
- * @LastEditTime: 2023-02-23 18:51:13
- * @LastEditors: szf
- * @Description: 
+ * @Author: OriTwil
+ * @Description: 用户配置文件
  * @FilePath: \ER\Usercode\user_inc\useful_constant.h
  * @@WeChat:szf13373959031
  */
+
 /**
  * @brief 一些有用的常量，基本上是从 GCC 的 math.h 中复制下来的(因为 ARMCC 的库里貌似没有)
  * 
@@ -25,10 +23,11 @@
 #define M_LN2		_M_LN2
 #define M_LN10		2.30258509299404568402
 #define M_PI		3.14159265358979323846
+#define DEC          (M_PI / 180)
 
 #ifndef M_PI_2
 #define M_PI_2		1.57079632679489661923
-#endif // !M_PI_2
+#endif
 
 #define M_PI_4		0.78539816339744830962
 #define M_1_PI		0.31830988618379067154
@@ -47,4 +46,33 @@
 #define M_LOG2_E        _M_LN2
 #define M_INVLN2        1.4426950408889633870E0  /* 1 / log(2) */
 
+// 限幅
+#define max(a, b)      (a > b ? a : b)
+#define min(a, b)      (a < b ? a : b)
+#define range(x, a, b) (min(max(x, a), b))
+
+/**
+ * @brief 端口
+ * 
+ */
+#define huart_AS69 huart1
+#define huart_OPS huart6
+#define huart_Computer huart8
+#define huart_Remote_Control huart2
+#define UART_Computer UART8
+#define UART_OPS USART6
+#define UART_AS69 USART1
+/**
+ * @brief id
+ * 
+ */
+
+/**
+ * @brief parameters
+ * 
+ */
+
+// 底盘
+#define rotate_ratio 0.3615 // (Width + Length)/2
+#define wheel_rpm_ratio 2387.324 // 换算线速度到rpm
 

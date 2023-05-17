@@ -9,36 +9,26 @@
 #include "user_main.h"
 #include "user_callback.h"
 #include "wtr_uart.h"
-#include "uart_device.h"
 #include "wtr_mavlink.h"
 
-int counter          = 0;
-int test             = 0;
-float w_speed        = 0;
 int16_t crldata[4] = {0};
+uint8_t i = 0;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-
-    test++;
     // 上位机消息
-    if (huart->Instance == UART8) {
+    if (huart->Instance == UART_Computer) {
         wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0); // 进入mavlink回调
     }
     // 定位模块消息
-    if (huart->Instance == USART6) // 底盘定位系统的decode
+    if (huart->Instance == UART_OPS) // 底盘定位系统的decode
     {
         OPS_Decode();
     }
-    if(huart->Instance == USART1) 
+    if(huart->Instance == UART_AS69) 
     {
         AS69_Decode(); // AS69解码
     }
-}
-
-void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
-{
-	UD_TxCpltCallback(huart);
 }
 
 /**
@@ -47,18 +37,18 @@ void HAL_UART_TxCpltCallback(UART_HandleTypeDef *huart)
  * @param msg 接收到的消息
  * @return
  */
-extern mavlink_controller_t ControllerData;
+// extern mavlink_controller_t ControllerData;
 void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
 {
 
     switch (msg->msgid) {
         case 9:
             // id = 9 的消息对应的解码函数(mavlink_msg_xxx_decode)
-            mavlink_msg_control_set_decode(msg, &control);
+            mavlink_msg_control_decode(msg, &control);
             break;
         case 1:
             // id = 1 的消息对应的解码函数(mavlink_msg_xxx_decode)
-            mavlink_msg_controller_decode(msg, &ControllerData); // 遥控器 
+            // mavlink_msg_controller_decode(msg, &ControllerData); // 遥控器 
             break;
         // ......
         default:
@@ -73,27 +63,17 @@ int test_count = 0;
  * @date:
  * @return {void}
  */
-extern uni_wheel_t wheels[3];
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-    test_count++;
     switch (GPIO_Pin)
 	{
 	case GPIO_PIN_12:
-		Wheel_Hall_Callback(GPIOE, GPIO_Pin, &wheels[0]);
 		break;
 	case GPIO_PIN_15:
-		Wheel_Hall_Callback(GPIOE, GPIO_Pin, &wheels[1]);
-		// UWheels_Hall_Callback(1);
 		break;
 	case GPIO_PIN_13:
-		Wheel_Hall_Callback(GPIOE, GPIO_Pin, &wheels[2]);
-        test_count++;
-		// UWheels_Hall_Callback(2);
 		break;
 	default:
-        counter++;
-		// printf("EXTI %d\n", GPIO_Pin);
 		break;
 	}
 }

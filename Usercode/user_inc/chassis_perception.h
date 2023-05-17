@@ -16,6 +16,6 @@
 #include "usart.h"
 #include "chassis_state_management.h"
 
-void PerceptionTaskStart(mavlink_controller_t *ctrl_data);
+void PerceptionTaskStart();
 
 #endif

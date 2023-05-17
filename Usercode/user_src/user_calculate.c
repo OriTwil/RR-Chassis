@@ -25,9 +25,9 @@ void CalculateThreeWheels(double *moter_speed,
                  double v_y,
                  double v_w)
 {
-    moter_speed[0] = (-v_x * sin(30 * DEC) - v_y * cos(30 * DEC) + v_w * r_underpan_3) / (2 * pi * r_wheel);
-    moter_speed[1] = (+v_x + v_w * r_underpan_3) / (2 * pi * r_wheel);
-    moter_speed[2] = (-v_x * sin(30 * DEC) + v_y * cos(30 * DEC) + v_w * r_underpan_3) / (2 * pi * r_wheel);
+    moter_speed[0] = (-v_x * sin(30 * DEC) - v_y * cos(30 * DEC) + v_w * r_underpan_3) / (2 * M_PI * r_wheel);
+    moter_speed[1] = (+v_x + v_w * r_underpan_3) / (2 * M_PI * r_wheel);
+    moter_speed[2] = (-v_x * sin(30 * DEC) + v_y * cos(30 * DEC) + v_w * r_underpan_3) / (2 * M_PI * r_wheel);
 }
 
 /**
@@ -41,9 +41,9 @@ void CalculateThreeWheels_(double *moter_speed,
                    double v_y,
                    double v_w)
 {
-    moter_speed[2] = (-v_y * sin(30 * DEC) + v_x * cos(30 * DEC) + v_w * r_underpan_3) * 60 / (2 * pi * r_wheel) * 19;
-    moter_speed[1] = (+v_y + v_w * r_underpan_3) * 60 / (2 * pi * r_wheel) * 19;
-    moter_speed[0] = (-v_y * sin(30 * DEC) - v_x * cos(30 * DEC) + v_w * r_underpan_3) * 60 / (2 * pi * r_wheel) * 19;
+    moter_speed[2] = (-v_y * sin(30 * DEC) + v_x * cos(30 * DEC) + v_w * r_underpan_3) * 60 / (2 * M_PI * r_wheel) * 19;
+    moter_speed[1] = (+v_y + v_w * r_underpan_3) * 60 / (2 * M_PI * r_wheel) * 19;
+    moter_speed[0] = (-v_y * sin(30 * DEC) - v_x * cos(30 * DEC) + v_w * r_underpan_3) * 60 / (2 * M_PI * r_wheel) * 19;
 }
 
 /**
@@ -57,10 +57,10 @@ void CalculateFourWheels(double *moter_speed,
                  double v_y,
                  double v_w)
 {
-    moter_speed[0] = (v_y + v_w * r_underpan_4) / (2 * pi * r_wheel);
-    moter_speed[1] = (-v_x + v_w * r_underpan_4) / (2 * pi * r_wheel);
-    moter_speed[2] = (-v_y + v_w * r_underpan_4) / (2 * pi * r_wheel);
-    moter_speed[3] = (v_x + v_w * r_underpan_4) / (2 * pi * r_wheel);
+    moter_speed[0] = (v_y + v_w * r_underpan_4) / (2 * M_PI * r_wheel);
+    moter_speed[1] = (-v_x + v_w * r_underpan_4) / (2 * M_PI * r_wheel);
+    moter_speed[2] = (-v_y + v_w * r_underpan_4) / (2 * M_PI * r_wheel);
+    moter_speed[3] = (v_x + v_w * r_underpan_4) / (2 * M_PI * r_wheel);
 }
 
 /**
@@ -74,10 +74,10 @@ void CalculateFourWheels_(double *moter_speed,
                    double v_y,
                    double v_w)
 {
-    moter_speed[0] = (vx * sqrt(2) + vy * sqrt(2) + vw * r_underpan_4) / (2 * pi * r_wheel);
-    moter_speed[1] = (-vx * sqrt(2) + vy * sqrt(2) + vw * r_underpan_4) / (2 * pi * r_wheel);
-    moter_speed[2] = (-vx * sqrt(2) - vy * sqrt(2) + vw * r_underpan_4) / (2 * pi * r_wheel);
-    moter_speed[3] = (vx * sqrt(2) - vy * sqrt(2) + vw * r_underpan_4) / (2 * pi * r_wheel);
+    moter_speed[0] = (vx * sqrt(2) + vy * sqrt(2) + vw * r_underpan_4) / (2 * M_PI * r_wheel);
+    moter_speed[1] = (-vx * sqrt(2) + vy * sqrt(2) + vw * r_underpan_4) / (2 * M_PI * r_wheel);
+    moter_speed[2] = (-vx * sqrt(2) - vy * sqrt(2) + vw * r_underpan_4) / (2 * M_PI * r_wheel);
+    moter_speed[3] = (vx * sqrt(2) - vy * sqrt(2) + vw * r_underpan_4) / (2 * M_PI * r_wheel);
 }
 
 /**
@@ -165,9 +165,9 @@ float PIDPosition(PID_Pos *p)
  * @return 
  * @bug 转换方程还不确定
  */
-mavlink_control_set_t FrameTransform(mavlink_control_set_t *control,mavlink_posture_t *posture)
+mavlink_control_t FrameTransform(mavlink_control_t *control,mavlink_posture_t *posture)
 {
-    mavlink_control_set_t result;
+    mavlink_control_t result;
     result.vx_set = control->vx_set * cos(posture->zangle) + control->vy_set * sin(posture->zangle);
     result.vy_set = -control->vx_set * sin(posture->zangle) + control->vy_set * cos(posture->zangle);
     return result;
@@ -216,4 +216,25 @@ void speedServo(float ref, DJI_t * motor){
 	motor->speedPID.ref = ref;
 	motor->speedPID.fdb = motor->FdbData.rpm;
 	PID_Calc(&motor->speedPID);
+}
+
+/**
+ * @brief 死区
+ *
+ */
+void DeadBand(double x, double y, double *new_x, double *new_y, double threshould)
+{
+    double length     = sqrt(x * x + y * y);
+    double new_length = length - threshould;
+
+    if (new_length <= 0) {
+        *new_x = 0;
+        *new_y = 0;
+        return;
+    }
+
+    double k = new_length / length;
+
+    *new_x = x * k;
+    *new_y = y * k;
 }
