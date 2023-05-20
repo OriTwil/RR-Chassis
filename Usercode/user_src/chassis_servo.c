@@ -24,8 +24,9 @@ void ServoTask(void const *argument)
         SetPIDTarget(Chassis_Control.Chassis_Control_x, Chassis_Control.Chassis_Control_y, Chassis_Control.Chassis_Control_w, &Chassis_Pid);
         SetPIDFeedback(Chassis_Position.Chassis_Position_x, Chassis_Position.Chassis_Position_y, Chassis_Position.Chassis_Position_w, &Chassis_Pid);
         // 麦轮解算
+        xSemaphoreTake(Chassis_Control.xMutex_control,(TickType_t)10);
         CalculateFourMecanumWheels(moter_speed, Chassis_Control.Chassis_Control_vx, Chassis_Control.Chassis_Control_vy, Chassis_Control.Chassis_Control_vw);
-
+        xSemaphoreGive(Chassis_Control.xMutex_control);
         // 伺服控制
         speedServo(moter_speed[0], &hDJI[0]);
         speedServo(moter_speed[1], &hDJI[1]);

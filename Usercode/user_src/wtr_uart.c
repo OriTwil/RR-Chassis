@@ -81,7 +81,7 @@ void AS69_Decode(){
 //OPS全方位平面定位系统
 void OPS_Decode()
 {
-    HAL_UART_Receive_IT(&huart6, (uint8_t *)&ch, 1);
+    HAL_UART_Receive_IT(&huart_OPS, (uint8_t *)&ch, 1);
     // USART_ClearITPendingBit( USART1, USART_FLAG_RXNE);
     // HAL_UART_IRQHandler(&huart6); // 该函数会清空中断标志，取消中断使能，并间接调用回调函数
     switch (count) // uint8_t隐转为int

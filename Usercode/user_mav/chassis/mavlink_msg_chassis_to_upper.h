@@ -3,8 +3,8 @@
 
 #define MAVLINK_MSG_ID_CHASSIS_TO_UPPER 11
 
-
-typedef struct __mavlink_chassis_to_upper_t {
+//? 可以这样改吗
+typedef volatile struct __mavlink_chassis_to_upper_t {
  float pos_x; /*<  x 坐标*/
  float pos_y; /*<  y 位置*/
  float zangle; /*<   航向角*/

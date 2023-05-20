@@ -78,7 +78,7 @@ void CalculateFourMecanumWheels(double *moter_speed, double vx, double vy, doubl
 
 void PIDIncremental(PID_Incremwntal *vPID, float processValue);
 
-float PIDPosition(PID_Pos *p);
+float PIDPosition(__IO PID_Pos *p);
 
 void positionServo(float ref, DJI_t *motor);
 

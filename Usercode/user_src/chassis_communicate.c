@@ -12,10 +12,10 @@
 #include "chassis_state_management.h"
 
 // 变量定义
-mavlink_control_t control;               // 上位机规划后的控制信息
-mavlink_posture_t mav_posture;           // 定位系统的信息
-mavlink_chassis_to_upper_t chassis_data; // todo 遥控器
-mavlink_channel_t CtrlDataSendChan   = MAVLINK_COMM_0; //todo MAVLINK分配与测试
+mavlink_control_t control;                             // 上位机规划后的控制信息
+mavlink_posture_t mav_posture;                         // 定位系统的信息
+mavlink_chassis_to_upper_t chassis_data;               // todo 遥控器
+mavlink_channel_t CtrlDataSendChan   = MAVLINK_COMM_0; // todo MAVLINK分配与测试
 mavlink_channel_t ChassisToUpperChan = MAVLINK_COMM_1;
 
 void CommunicateTask(void const *argument)
@@ -29,6 +29,18 @@ void CommunicateTask(void const *argument)
         // mavlink_msg_chassis_to_upper_send_struct(MAVLINK_COMM_1,chassis_data);
         mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &mav_posture); // 位置信息发到上位机
         vPortExitCritical();
+
+        // 发送按键通知
+        if (1/* 判断按键1是否按下 */) {
+            xTaskNotify(g_stateManagementTaskHandle, BUTTON1_NOTIFICATION, eSetBits);
+        }
+        if (1/* 判断按键2是否按下 */) {
+            xTaskNotify(g_stateManagementTaskHandle, BUTTON2_NOTIFICATION, eSetBits);
+        }
+        if (1/* 判断按键3是否按下 */) {
+            xTaskNotify(g_stateManagementTaskHandle, BUTTON3_NOTIFICATION, eSetBits);
+        }
+
         vTaskDelayUntil(&PreviousWakeTime, 4);
     }
 }

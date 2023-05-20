@@ -41,7 +41,7 @@ void StartDefaultTask(void const *argument)
     ChassisStateMachineTaskStart();       // 全向轮底盘控制线程
     PerceptionTaskStart();      // 底盘感知定位线程
     CommunicateTaskStart();     // 通信线程
-    StateManagemanttaskStart(); // 状态切换线程
+    StateManagemantTaskStart(); // 状态切换线程
 
     for (;;) {
         vTaskDelay(1);

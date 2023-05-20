@@ -134,8 +134,8 @@ void PIDIncremental(PID_Incremwntal *vPID, float processValue)
  * @param {PIDType} *p
  * @return {*}
  */
-float PIDPosition(PID_Pos *p)
-{
+float PIDPosition(__IO PID_Pos *p)
+{ 
     float pe, ie, de;
     float out = 0;
 

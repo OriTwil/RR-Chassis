@@ -38,7 +38,7 @@ typedef enum {
     ComputerControl
 } CHASSIS_STATE;
 
-typedef struct
+typedef __IO struct
 {
     /* data */
     PID_Pos Pid_pos_w;
@@ -47,7 +47,7 @@ typedef struct
     SemaphoreHandle_t xMutex_pid;
 } CHASSIS_PID;
 
-typedef struct
+typedef __IO struct
 {
     float Chassis_Position_x;
     float Chassis_Position_y;
@@ -56,7 +56,7 @@ typedef struct
     SemaphoreHandle_t xMutex_position;
 } CHASSIS_POSITION;
 
-typedef struct
+typedef __IO struct
 {
     float Chassis_Control_vx;
     float Chassis_Control_vy;
@@ -67,14 +67,14 @@ typedef struct
     SemaphoreHandle_t xMutex_control;
 } CHASSIS_CONTROL;
 
-typedef struct {
+typedef __IO struct {
     PERCEPTION_STATE Perception_state;
     CHASSIS_STATE Chassis_state;
     SemaphoreHandle_t xMutex_Robot;
     CHASSIS_POINT Chassis_point;
 } ROBOT_STATE;
 
-void StateManagemanttaskStart();
+void StateManagemantTaskStart();
 
 void ChassisInit();
 
@@ -100,5 +100,6 @@ extern ROBOT_STATE Robot_state;
 extern CHASSIS_PID Chassis_Pid;
 extern CHASSIS_POSITION Chassis_Position;
 extern CHASSIS_CONTROL Chassis_Control;
+extern TaskHandle_t g_stateManagementTaskHandle;
 
 #endif

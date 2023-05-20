@@ -4,7 +4,7 @@
 #define MAVLINK_MSG_ID_CONTROL 9
 
 
-typedef struct __mavlink_control_t {
+typedef volatile struct __mavlink_control_t {
  float vx_set; /*<  x 方向速度*/
  float vy_set; /*<  y 方向速度*/
  float vw_set; /*<  z 方向角速度*/

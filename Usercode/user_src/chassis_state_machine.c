@@ -21,6 +21,7 @@
 #include "wtr_mavlink.h"
 #include <math.h>
 #include "chassis_state_machine.h"
+#include "chassis_state_management.h"
 
 double vx_deadbanded = 0;
 double vy_deadbanded = 0;
@@ -59,7 +60,7 @@ void ChassisStateMachineTask(void const *argument)
                 
                 vPortEnterCritical();
                 SetChassisPosition(mav_posture.pos_x, mav_posture.pos_y, mav_posture.zangle, &Chassis_Position); //更新底盘位置
-                DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 摇杆
+                DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 DJI遥控器摇杆
                 SetChassisControlPosition(Chassis_Position.Chassis_Position_x, Chassis_Position.Chassis_Position_y, Chassis_Position.Chassis_Position_w, &Chassis_Control); // 没什么用，反正这个状态用不到PID
                 SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, crl_speed.vw, &Chassis_Control); // 用摇杆控制底盘
                 vPortExitCritical();

@@ -4,7 +4,7 @@
 #define MAVLINK_MSG_ID_POSTURE 10
 
 
-typedef struct __mavlink_posture_t {
+typedef volatile struct __mavlink_posture_t {
  float pos_x; /*<  x 坐标*/
  float pos_y; /*<  y 位置*/
  float zangle; /*<  航向角*/

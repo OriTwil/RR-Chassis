@@ -8,11 +8,13 @@
  * @WeChat:szf13373959031
  */
 #include "chassis_state_management.h"
+#include "chassis_communicate.h"
 
-ROBOT_STATE Robot_state; 
+ROBOT_STATE Robot_state;
 CHASSIS_PID Chassis_Pid;
 CHASSIS_POSITION Chassis_Position;
 CHASSIS_CONTROL Chassis_Control;
+TaskHandle_t g_stateManagementTaskHandle;
 
 /**
  * @description: 操作线程
@@ -21,10 +23,32 @@ CHASSIS_CONTROL Chassis_Control;
  */
 void StateManagemantTask(void const *argument)
 {
-    uint32_t PreviousWakeTime = osKernelSysTick();
+    uint32_t notificationValue;
     vTaskDelay(20);
     for (;;) {
-        vTaskDelayUntil(&PreviousWakeTime, 5);
+        // 等待按键通知
+        xTaskNotifyWait(0, 0, &notificationValue, portMAX_DELAY);
+
+        // 处理按键通知
+        if (notificationValue & BUTTON1_NOTIFICATION) {
+            // 执行按键1的操作
+            //  FireSwitchNumber
+            //  PickupSwitchStep
+            //  PickupSwitchState
+            //  SetServoRefPickupTrajectory(0, 0, 195, &Pickup_ref);
+            //  ...
+        }
+
+        if (notificationValue & BUTTON2_NOTIFICATION) {
+            // 执行按键2的操作
+            // ...
+        }
+
+        if (notificationValue & BUTTON3_NOTIFICATION) {
+            // 执行按键3的操作
+            // ...
+        }
+        vTaskDelay(5);
     }
 }
 
@@ -45,11 +69,11 @@ void StateManagemantTestTask(void const *argument)
  * @description: 开启线程
  * @return {void}
  */
-void StateManagemanttaskStart()
+void StateManagemantTaskStart()
 {
 
     osThreadDef(statemanagement, StateManagemantTask, osPriorityBelowNormal, 0, 512);
-    osThreadCreate(osThread(statemanagement), NULL);
+    g_stateManagementTaskHandle =  osThreadCreate(osThread(statemanagement), NULL);
 
     // osThreadDef(statemanagementtest,StateManagemantTestTask,osPriorityBelowNormal,0,512);
     // osThreadCreate(osThread(statemanagementtest),NULL);
@@ -174,7 +198,7 @@ void SetPIDFeedback(float feedback_x, float feedback_y, float feedback_w, CHASSI
 
 /**
  * @description: 更新底盘位置
- * @param position_ 底盘位置信息 
+ * @param position_ 底盘位置信息
  * @return {void}
  */
 void SetChassisPosition(float position_x, float position_y, float position_w, CHASSIS_POSITION *chassis_position)
