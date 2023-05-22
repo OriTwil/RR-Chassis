@@ -36,12 +36,14 @@ void StartDefaultTask(void const *argument)
     wtrMavlink_BindChannel(&huart_Computer, MAVLINK_COMM_0);        // MAVLINK初始化
     CtrlDataSender_Init(&huart_Remote_Control, MAVLINK_COMM_1);           // 遥控器初始化
     HAL_UART_Receive_DMA(&huart_AS69, JoyStickReceiveData, 18); // DMA接收AS69
+    wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);
 
     // 开启线程
-    ChassisStateMachineTaskStart();       // 全向轮底盘控制线程
-    PerceptionTaskStart();      // 底盘感知定位线程
-    CommunicateTaskStart();     // 通信线程
-    StateManagemantTaskStart(); // 状态切换线程
+    // ChassisStateMachineTaskStart();       // 全向轮底盘控制线程
+    // PerceptionTaskStart();      // 底盘感知定位线程
+    // CommunicateTaskStart();     // 通信线程
+    // StateManagemantTaskStart(); // 状态切换线程
+    // ServoTaskStart();
 
     for (;;) {
         vTaskDelay(1);

@@ -100,6 +100,4 @@ extern ROBOT_STATE Robot_state;
 extern CHASSIS_PID Chassis_Pid;
 extern CHASSIS_POSITION Chassis_Position;
 extern CHASSIS_CONTROL Chassis_Control;
-extern TaskHandle_t g_stateManagementTaskHandle;
-
 #endif

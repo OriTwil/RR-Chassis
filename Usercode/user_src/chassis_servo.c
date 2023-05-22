@@ -62,7 +62,7 @@ void ServoTestTask(void const *argument)
  */
 void ServoTaskStart()
 {
-    osThreadDef(servo, ServoTask, osPriorityBelowNormal, 0, 512);
+    osThreadDef(servo, ServoTask, osPriorityNormal, 0, 512);
     osThreadCreate(osThread(servo), NULL);
 
     // osThreadDef(servo_test,ServoTestTask,osPriorityBelowNormal,0,512);

@@ -28,20 +28,21 @@ void CommunicateTask(void const *argument)
         // mavlink_msg_controller_send_struct(CtrlDataSendChan, argument);
         // mavlink_msg_chassis_to_upper_send_struct(MAVLINK_COMM_1,chassis_data);
         mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &mav_posture); // 位置信息发到上位机
-        vPortExitCritical();
-
         // 发送按键通知
-        if (1/* 判断按键1是否按下 */) {
-            xTaskNotify(g_stateManagementTaskHandle, BUTTON1_NOTIFICATION, eSetBits);
-        }
-        if (1/* 判断按键2是否按下 */) {
-            xTaskNotify(g_stateManagementTaskHandle, BUTTON2_NOTIFICATION, eSetBits);
-        }
-        if (1/* 判断按键3是否按下 */) {
-            xTaskNotify(g_stateManagementTaskHandle, BUTTON3_NOTIFICATION, eSetBits);
-        }
-
-        vTaskDelayUntil(&PreviousWakeTime, 4);
+        // if (Raw_Data.left == 1/* 判断按键1是否按下 */) {
+        //     mav_posture.point = 1;
+        //     xTaskNotify(g_stateManagementTaskHandle, BUTTON1_NOTIFICATION, eSetBits);
+        // }
+        // if (Raw_Data.left == 2/* 判断按键2是否按下 */) {
+        //     mav_posture.point = 2;
+        //     xTaskNotify(g_stateManagementTaskHandle, BUTTON2_NOTIFICATION, eSetBits);
+        // }
+        // if (Raw_Data.left == 3/* 判断按键3是否按下 */) {
+        //     mav_posture.point = 3;
+        //     xTaskNotify(g_stateManagementTaskHandle, BUTTON3_NOTIFICATION, eSetBits);
+        // }
+        vPortExitCritical();
+        vTaskDelayUntil(&PreviousWakeTime, 1);
     }
 }
 

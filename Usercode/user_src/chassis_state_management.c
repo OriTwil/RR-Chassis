@@ -14,7 +14,6 @@ ROBOT_STATE Robot_state;
 CHASSIS_PID Chassis_Pid;
 CHASSIS_POSITION Chassis_Position;
 CHASSIS_CONTROL Chassis_Control;
-TaskHandle_t g_stateManagementTaskHandle;
 
 /**
  * @description: 操作线程
@@ -23,31 +22,21 @@ TaskHandle_t g_stateManagementTaskHandle;
  */
 void StateManagemantTask(void const *argument)
 {
-    uint32_t notificationValue;
     vTaskDelay(20);
     for (;;) {
-        // 等待按键通知
-        xTaskNotifyWait(0, 0, &notificationValue, portMAX_DELAY);
-
-        // 处理按键通知
-        if (notificationValue & BUTTON1_NOTIFICATION) {
-            // 执行按键1的操作
-            //  FireSwitchNumber
-            //  PickupSwitchStep
-            //  PickupSwitchState
-            //  SetServoRefPickupTrajectory(0, 0, 195, &Pickup_ref);
-            //  ...
+        ChassisSwitchState(RemoteControl,&Robot_state);
+        vPortEnterCritical();
+        // 发送按键通知
+        if (Raw_Data.left == 1/* 判断按键1是否按下 */) {
+            mav_posture.point = 1;
         }
-
-        if (notificationValue & BUTTON2_NOTIFICATION) {
-            // 执行按键2的操作
-            // ...
+        if (Raw_Data.left == 2/* 判断按键2是否按下 */) {
+            mav_posture.point = 2;
         }
-
-        if (notificationValue & BUTTON3_NOTIFICATION) {
-            // 执行按键3的操作
-            // ...
+        if (Raw_Data.left == 3/* 判断按键3是否按下 */) {
+            mav_posture.point = 3;
         }
+        vPortExitCritical();
         vTaskDelay(5);
     }
 }
@@ -61,6 +50,18 @@ void StateManagemantTestTask(void const *argument)
     uint32_t PreviousWakeTime = osKernelSysTick();
     vTaskDelay(20);
     for (;;) {
+        vPortEnterCritical();
+        // 发送按键通知
+        if (Raw_Data.left == 1/* 判断按键1是否按下 */) {
+            mav_posture.point = 1;
+        }
+        if (Raw_Data.left == 2/* 判断按键2是否按下 */) {
+            mav_posture.point = 2;
+        }
+        if (Raw_Data.left == 3/* 判断按键3是否按下 */) {
+            mav_posture.point = 3;
+        }
+        vPortExitCritical();
         vTaskDelayUntil(&PreviousWakeTime, 5);
     }
 }
@@ -72,12 +73,12 @@ void StateManagemantTestTask(void const *argument)
 void StateManagemantTaskStart()
 {
 
-    osThreadDef(statemanagement, StateManagemantTask, osPriorityBelowNormal, 0, 512);
-    g_stateManagementTaskHandle =  osThreadCreate(osThread(statemanagement), NULL);
-
-    // osThreadDef(statemanagementtest,StateManagemantTestTask,osPriorityBelowNormal,0,512);
+    osThreadDef(statemanagement, StateManagemantTask, osPriorityNormal, 0, 512);
+    osThreadCreate(osThread(statemanagement), NULL);
+    // xTaskCreate(StateManagemantTask,"statemanagement",configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY + 1,&g_stateManagementTaskHandle);
+    // osThreadDef(statemanagementtest,StateManagemantTestTask,osPriorityNormal,0,512);
     // osThreadCreate(osThread(statemanagementtest),NULL);
-}
+}   
 
 /**
  * @description: 底盘初始化
