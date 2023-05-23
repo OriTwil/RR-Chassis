@@ -9,7 +9,8 @@
 - 5.6 add repository
 - 5.8 Complete basic servo, positioning, and navigation of the chassis
 - 5.17 还差遥控器操作逻辑的设计
-
+- 5.23 和上位机联合导航
+  
 ## Test results
 ###### 5.8 底盘定位与轨迹规划
 
