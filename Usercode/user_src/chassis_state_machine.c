@@ -45,32 +45,32 @@ void ChassisStateMachineTask(void const *argument)
     for (;;) {
         switch (Robot_state.Chassis_state) {
             case Locked:
-                if (islocked == false) //todo 第一次进入locked状态(不够简洁)
+                if (islocked == false) // todo 第一次进入locked状态(不够简洁)
                 {
                     pos_x_locked = mav_posture.pos_x;
                     pos_y_locked = mav_posture.pos_y;
-                    pos_w_locked = mav_posture.zangle; //记录下刚切换到Locked状态的坐标
+                    pos_w_locked = mav_posture.zangle; // 记录下刚切换到Locked状态的坐标
                     islocked     = true;
                 }
-                SetChassisControlPosition(pos_x_locked, pos_y_locked, pos_w_locked, &Chassis_Control); // 锁死在Locked位置
+                SetChassisControlPosition(pos_x_locked, pos_y_locked, pos_w_locked, &Chassis_Control);                                                                      // 锁死在Locked位置
                 SetChassisControlVelocity(PIDPosition(&Chassis_Pid.Pid_pos_x), PIDPosition(&Chassis_Pid.Pid_pos_y), PIDPosition(&Chassis_Pid.Pid_pos_w), &Chassis_Control); // 反馈控制底盘锁死在该位置
 
             case RemoteControl:
                 islocked = false;
-                
+
                 vPortEnterCritical();
-                SetChassisPosition(mav_posture.pos_x, mav_posture.pos_y, mav_posture.zangle, &Chassis_Position); //更新底盘位置
-                DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 DJI遥控器摇杆
+                SetChassisPosition(mav_posture.pos_x, mav_posture.pos_y, mav_posture.zangle, &Chassis_Position);                                                            // 更新底盘位置
+                DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1);                                                                  // 死区控制 DJI遥控器摇杆
                 SetChassisControlPosition(Chassis_Position.Chassis_Position_x, Chassis_Position.Chassis_Position_y, Chassis_Position.Chassis_Position_w, &Chassis_Control); // 没什么用，反正这个状态用不到PID
-                SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, crl_speed.vw, &Chassis_Control); // 用摇杆控制底盘
+                SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, crl_speed.vw, &Chassis_Control);                                                                    // 用摇杆控制底盘
                 vPortExitCritical();
-        
+
             case ComputerControl:
                 islocked = false;
                 vPortEnterCritical();
-                SetChassisPosition(mav_posture.pos_x, mav_posture.pos_y, mav_posture.zangle, &Chassis_Position); // 更新底盘位置
-                SetChassisControlPosition(control.x_set,control.y_set,control.w_set,&Chassis_Control); // 上位机规划值作为伺服值
-                SetChassisControlVelocity(control.vx_set,control.vy_set,control.vw_set,&Chassis_Control); // 上位机规划值作为伺服值
+                SetChassisPosition(mav_posture.pos_x, mav_posture.pos_y, mav_posture.zangle, &Chassis_Position);                                                                                                               // 更新底盘位置
+                SetChassisControlPosition(control.x_set, control.y_set, control.w_set, &Chassis_Control);                                                                                                                      // 上位机规划值作为伺服值
+                SetChassisControlVelocity(control.vx_set + PIDPosition(&Chassis_Pid.Pid_pos_x), control.vy_set + PIDPosition(&Chassis_Pid.Pid_pos_y), control.vw_set + PIDPosition(&Chassis_Pid.Pid_pos_w), &Chassis_Control); // 上位机规划值作为伺服值
                 vPortExitCritical();
         }
 

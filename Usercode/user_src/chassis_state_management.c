@@ -24,19 +24,7 @@ void StateManagemantTask(void const *argument)
 {
     vTaskDelay(20);
     for (;;) {
-        ChassisSwitchState(RemoteControl,&Robot_state);
-        vPortEnterCritical();
-        // 发送按键通知
-        if (Raw_Data.left == 1/* 判断按键1是否按下 */) {
-            mav_posture.point = 1;
-        }
-        if (Raw_Data.left == 2/* 判断按键2是否按下 */) {
-            mav_posture.point = 2;
-        }
-        if (Raw_Data.left == 3/* 判断按键3是否按下 */) {
-            mav_posture.point = 3;
-        }
-        vPortExitCritical();
+        ChassisSwitchState(ComputerControl,&Robot_state);
         vTaskDelay(5);
     }
 }

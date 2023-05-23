@@ -17,6 +17,9 @@ mavlink_posture_t mav_posture;                         // 定位系统的信息
 mavlink_chassis_to_upper_t chassis_data;               // todo 遥控器
 mavlink_channel_t CtrlDataSendChan   = MAVLINK_COMM_0; // todo MAVLINK分配与测试
 mavlink_channel_t ChassisToUpperChan = MAVLINK_COMM_1;
+mavlink_posture_t posture_temp;
+
+
 
 void CommunicateTask(void const *argument)
 {
@@ -25,29 +28,27 @@ void CommunicateTask(void const *argument)
     wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);                  // 以mavlink接收上位机通过串口发送的消息
     while (1) {
         vPortEnterCritical();
+        if (Raw_Data.left == 1/* 判断按键1是否按下 */) {
+            mav_posture.point = 1;
+        }
+        if (Raw_Data.left == 2/* 判断按键2是否按下 */) {
+            mav_posture.point = 2;
+        }
+        if (Raw_Data.left == 3/* 判断按键3是否按下 */) {
+            mav_posture.point = 3;
+        }
+        posture_temp = mav_posture; //定位数据拷贝
+        vPortExitCritical();
+
         // mavlink_msg_controller_send_struct(CtrlDataSendChan, argument);
         // mavlink_msg_chassis_to_upper_send_struct(MAVLINK_COMM_1,chassis_data);
-        mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &mav_posture); // 位置信息发到上位机
-        // 发送按键通知
-        // if (Raw_Data.left == 1/* 判断按键1是否按下 */) {
-        //     mav_posture.point = 1;
-        //     xTaskNotify(g_stateManagementTaskHandle, BUTTON1_NOTIFICATION, eSetBits);
-        // }
-        // if (Raw_Data.left == 2/* 判断按键2是否按下 */) {
-        //     mav_posture.point = 2;
-        //     xTaskNotify(g_stateManagementTaskHandle, BUTTON2_NOTIFICATION, eSetBits);
-        // }
-        // if (Raw_Data.left == 3/* 判断按键3是否按下 */) {
-        //     mav_posture.point = 3;
-        //     xTaskNotify(g_stateManagementTaskHandle, BUTTON3_NOTIFICATION, eSetBits);
-        // }
-        vPortExitCritical();
-        vTaskDelayUntil(&PreviousWakeTime, 1);
+        mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &posture_temp); // 定位信息发到上位机
+        vTaskDelayUntil(&PreviousWakeTime, 5);
     }
 }
 
 void CommunicateTaskStart()
 {
-    osThreadDef(communicate, CommunicateTask, osPriorityNormal, 0, 512);
+    osThreadDef(communicate, CommunicateTask, osPriorityBelowNormal, 0, 512);
     osThreadCreate(osThread(communicate), NULL);
 }
