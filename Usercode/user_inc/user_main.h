@@ -38,5 +38,4 @@
 #include "mavlink_msg_control.h"
 #include "mavlink_msg_posture.h"
 
-void CtrlDataSender_Init(UART_HandleTypeDef *huart, mavlink_channel_t chan);
 void BlinkLED();

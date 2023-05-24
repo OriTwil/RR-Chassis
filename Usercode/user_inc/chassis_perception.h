@@ -17,5 +17,6 @@
 #include "chassis_state_management.h"
 
 void PerceptionTaskStart();
+void PerceptionInit();
 
 #endif

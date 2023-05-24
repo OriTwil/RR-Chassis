@@ -19,31 +19,27 @@ mavlink_channel_t CtrlDataSendChan   = MAVLINK_COMM_0; // todo MAVLINK分配与�
 mavlink_channel_t ChassisToUpperChan = MAVLINK_COMM_1;
 mavlink_posture_t posture_temp;
 
-
-
 void CommunicateTask(void const *argument)
 {
     uint32_t PreviousWakeTime = osKernelSysTick();
-    HAL_UART_Receive_DMA(&huart_AS69, JoyStickReceiveData, 18); // DMA接收AS69
-    wtrMavlink_StartReceiveIT(MAVLINK_COMM_0);                  // 以mavlink接收上位机通过串口发送的消息
     while (1) {
         vPortEnterCritical();
-        if (Raw_Data.left == 1/* 判断按键1是否按下 */) {
+        if (Raw_Data.left == 1 /* 判断按键1是否按下 */) {
             mav_posture.point = 1;
         }
-        if (Raw_Data.left == 2/* 判断按键2是否按下 */) {
+        if (Raw_Data.left == 2 /* 判断按键2是否按下 */) {
             mav_posture.point = 2;
         }
-        if (Raw_Data.left == 3/* 判断按键3是否按下 */) {
+        if (Raw_Data.left == 3 /* 判断按键3是否按下 */) {
             mav_posture.point = 3;
         }
-        posture_temp = mav_posture; //定位数据拷贝
+        posture_temp = mav_posture; // 定位数据拷贝
         vPortExitCritical();
 
         // mavlink_msg_controller_send_struct(CtrlDataSendChan, argument);
-        // mavlink_msg_chassis_to_upper_send_struct(MAVLINK_COMM_1,chassis_data);
-        mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &posture_temp); // 定位信息发到上位机
-        vTaskDelayUntil(&PreviousWakeTime, 5);
+        mavlink_msg_chassis_to_upper_send_struct(MAVLINK_COMM_2, &chassis_data); // 板间通信
+        mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &posture_temp);          // 定位信息发到上位机
+        vTaskDelayUntil(&PreviousWakeTime, 3);
     }
 }
 
@@ -51,4 +47,18 @@ void CommunicateTaskStart()
 {
     osThreadDef(communicate, CommunicateTask, osPriorityBelowNormal, 0, 512);
     osThreadCreate(osThread(communicate), NULL);
+}
+
+void CommunicateInit()
+{
+    // WTR_MAVLink_Init(huart, chan);
+    wtrMavlink_BindChannel(&huart_Remote_Control, MAVLINK_COMM_1);   // 遥控器MAVLINK初始化
+    wtrMavlink_BindChannel(&huart_Computer, MAVLINK_COMM_0);         // 上位机MAVLINK初始化
+    wtrMavlink_BindChannel(&huart_Chassis_to_Upper, MAVLINK_COMM_2); // 板间通信MAVLINK初始化
+
+    wtrMavlink_StartReceiveIT(MAVLINK_COMM_0); // 以mavlink接收上位机通过串口发送的消息
+    wtrMavlink_StartReceiveIT(MAVLINK_COMM_1); // 接收遥控器MAVLINK
+    wtrMavlink_StartReceiveIT(MAVLINK_COMM_2); // 板间通信MAVLINK
+
+    HAL_UART_Receive_DMA(&huart_AS69, JoyStickReceiveData, 18); // DMA接收AS69
 }

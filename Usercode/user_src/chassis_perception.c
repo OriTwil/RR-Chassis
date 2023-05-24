@@ -19,8 +19,7 @@ uint32_t test_pos[6] = {0};
  */
 void ChassisPerceptionTask(void const *argument)
 {
-    // 码盘定位系统通过串口收信息
-    HAL_UART_Receive_IT(&huart_OPS, (uint8_t *)&ch, 1);
+    vTaskDelay(100);
     for (;;) {
         switch(Robot_state.Perception_state)
         {
@@ -38,4 +37,10 @@ void PerceptionTaskStart()
 {
     osThreadDef(perception, ChassisPerceptionTask, osPriorityNormal, 0, 512);
     osThreadCreate(osThread(perception), NULL);
+}
+
+void PerceptionInit()
+{
+    // 码盘定位系统通过串口收信息
+    HAL_UART_Receive_IT(&huart_OPS, (uint8_t *)&ch, 1);
 }

@@ -25,3 +25,4 @@ extern mavlink_channel_t CtrlDataSendChan;
 // extern TaskHandle_t g_stateManagementTaskHandle;
 
 void CommunicateTaskStart();
+void CommunicateInit();

@@ -59,6 +59,7 @@
 #define huart_OPS huart6
 #define huart_Computer huart8
 #define huart_Remote_Control huart2
+#define huart_Chassis_to_Upper huart7
 #define UART_Computer UART8
 #define UART_OPS USART6
 #define UART_AS69 USART1

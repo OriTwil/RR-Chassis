@@ -20,6 +20,7 @@
 #include <math.h>
 #include "user_callback.h"
 #include "chassis_perception.h"
+#include "chassis_communicate.h"
 
 // mavlink_controller_t ControllerData = {0};
 
@@ -31,30 +32,23 @@
  */
 void StartDefaultTask(void const *argument)
 {
-    ChassisInit();
-    MotorInit();                                            // 电机初始化
-    wtrMavlink_BindChannel(&huart_Computer, MAVLINK_COMM_0);        // MAVLINK初始化
-    CtrlDataSender_Init(&huart_Remote_Control, MAVLINK_COMM_1);           // 遥控器初始化
-    HAL_UART_Receive_DMA(&huart_AS69, JoyStickReceiveData, 18); // DMA接收AS69
+    /*初始化*/
+    ChassisInit();     // 底盘组件初始化
+    MotorInit();       // 电机初始化
+    CommunicateInit(); // 通信初始化
+    PerceptionInit();  // 定位组件初始化
     vTaskDelay(100);
 
-    // 开启线程
-    // ChassisStateMachineTaskStart();       // 全向轮底盘控制线程
-    PerceptionTaskStart();      // 底盘感知定位线程
-    CommunicateTaskStart();     // 通信线程
-    StateManagemantTaskStart(); // 状态切换线程
-    ServoTaskStart();
+    /*开启线程*/
+    // ChassisStateMachineTaskStart(); // 底盘状态机
+    PerceptionTaskStart();          // 底盘感知定位线程
+    CommunicateTaskStart();         // 通信线程
+    StateManagemantTaskStart();     // 状态切换线程
+    ServoTaskStart();               // 伺服线程
 
     for (;;) {
-        vTaskDelay(1);
+        vTaskDelay(2);
     }
-}
-
-void CtrlDataSender_Init(UART_HandleTypeDef *huart, mavlink_channel_t chan)
-{
-    // WTR_MAVLink_Init(huart, chan);
-    wtrMavlink_BindChannel(huart, MAVLINK_COMM_1); // MAVLINK初始化
-    CtrlDataSendChan = chan;
 }
 
 /**
