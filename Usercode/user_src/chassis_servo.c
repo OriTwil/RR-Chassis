@@ -20,13 +20,28 @@ void ServoTask(void const *argument)
     uint32_t PreviousWakeTime = osKernelSysTick();
     vTaskDelay(20);
     for (;;) {
-        // 更新PID的目标值和反馈值
-        SetPIDTarget(Chassis_Control.Chassis_Control_x, Chassis_Control.Chassis_Control_y, Chassis_Control.Chassis_Control_w, &Chassis_Pid);
-        SetPIDFeedback(Chassis_Position.Chassis_Position_x, Chassis_Position.Chassis_Position_y, Chassis_Position.Chassis_Position_w, &Chassis_Pid);
-        // 麦轮解算
-        xSemaphoreTake(Chassis_Control.xMutex_control,(TickType_t)10);
-        CalculateFourMecanumWheels(moter_speed, Chassis_Control.Chassis_Control_vx, Chassis_Control.Chassis_Control_vy, Chassis_Control.Chassis_Control_vw);
+        // 更新PID的目标值
+        xSemaphoreTake(Chassis_Control.xMutex_control, (TickType_t)10);
+        SetPIDTarget(Chassis_Control.Chassis_Control_x,
+                     Chassis_Control.Chassis_Control_y,
+                     Chassis_Control.Chassis_Control_w,
+                     &Chassis_Pid);
         xSemaphoreGive(Chassis_Control.xMutex_control);
+        // 更新PID的反馈值
+        xSemaphoreTake(Chassis_Position.xMutex_position, (TickType_t)10);
+        SetPIDFeedback(Chassis_Position.Chassis_Position_x,
+                       Chassis_Position.Chassis_Position_y,
+                       Chassis_Position.Chassis_Position_w,
+                       &Chassis_Pid);
+        xSemaphoreGive(Chassis_Position.xMutex_position);
+        // 麦轮解算
+        xSemaphoreTake(Chassis_Control.xMutex_control, (TickType_t)10);
+        CalculateFourMecanumWheels(moter_speed,
+                                   Chassis_Control.Chassis_Control_vx,
+                                   Chassis_Control.Chassis_Control_vy,
+                                   Chassis_Control.Chassis_Control_vw);
+        xSemaphoreGive(Chassis_Control.xMutex_control);
+
         // 伺服控制
         speedServo(moter_speed[0], &hDJI[0]);
         speedServo(moter_speed[1], &hDJI[1]);
@@ -36,8 +51,9 @@ void ServoTask(void const *argument)
                              hDJI[1].speedPID.output,
                              hDJI[2].speedPID.output,
                              hDJI[3].speedPID.output);
-
-        vTaskDelayUntil(&PreviousWakeTime, 3);
+        // int a = 0;
+        vTaskDelayUntil(&PreviousWakeTime, 5);
+        // vTaskDelay(5);
     }
 }
 
@@ -62,7 +78,7 @@ void ServoTestTask(void const *argument)
  */
 void ServoTaskStart()
 {
-    osThreadDef(servo, ServoTask, osPriorityAboveNormal, 0, 512);
+    osThreadDef(servo, ServoTask, osPriorityNormal, 0, 512);
     osThreadCreate(osThread(servo), NULL);
 
     // osThreadDef(servo_test,ServoTestTask,osPriorityBelowNormal,0,512);

@@ -226,3 +226,39 @@ void SetChassisControlPosition(float x_control, float y_control, float w_control
     chassis_control->Chassis_Control_w = w_control;
     xSemaphoreGive(chassis_control->xMutex_control);
 }
+
+ROBOT_STATE ReadRobotState(ROBOT_STATE *current_robot_state)
+{
+    ROBOT_STATE robot_state_temp;
+    xSemaphoreTake(current_robot_state->xMutex_Robot, (TickType_t)10);
+    robot_state_temp = *current_robot_state;
+    xSemaphoreGive(current_robot_state->xMutex_Robot);
+    return robot_state_temp;
+}
+
+CHASSIS_CONTROL ReadChassisControl(CHASSIS_CONTROL *chassis_control)
+{
+    CHASSIS_CONTROL chassis_control_temp;
+    xSemaphoreTake(chassis_control->xMutex_control, (TickType_t)10);
+    chassis_control_temp = *chassis_control;
+    xSemaphoreGive(chassis_control->xMutex_control);
+    return chassis_control_temp;
+}
+
+CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position)
+{
+    CHASSIS_POSITION chassis_position_temp;
+    xSemaphoreTake(chassis_position->xMutex_position, (TickType_t)10);
+    chassis_position_temp = *chassis_position;
+    xSemaphoreGive(chassis_position->xMutex_position);
+    return chassis_position_temp;
+}
+
+CHASSIS_PID ReadChassisPID(CHASSIS_PID *chassis_pid)
+{
+    CHASSIS_PID chassis_pid_temp;
+    xSemaphoreTake(chassis_pid->xMutex_pid, (TickType_t)10);
+    chassis_pid_temp = *chassis_pid;
+    xSemaphoreGive(chassis_pid->xMutex_pid);
+    return chassis_pid_temp;
+}

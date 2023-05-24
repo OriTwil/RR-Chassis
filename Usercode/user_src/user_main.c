@@ -33,18 +33,18 @@
 void StartDefaultTask(void const *argument)
 {
     /*初始化*/
+    CommunicateInit(); // 通信初始化
     ChassisInit();     // 底盘组件初始化
     MotorInit();       // 电机初始化
-    CommunicateInit(); // 通信初始化
     PerceptionInit();  // 定位组件初始化
     vTaskDelay(100);
 
     /*开启线程*/
-    // ChassisStateMachineTaskStart(); // 底盘状态机
-    PerceptionTaskStart();          // 底盘感知定位线程
+    ChassisStateMachineTaskStart(); // 底盘状态机
     CommunicateTaskStart();         // 通信线程
-    StateManagemantTaskStart();     // 状态切换线程
     ServoTaskStart();               // 伺服线程
+    StateManagemantTaskStart();     // 状态切换线程
+    // PerceptionTaskStart();          // 底盘感知定位线程
 
     for (;;) {
         vTaskDelay(2);

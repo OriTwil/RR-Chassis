@@ -96,6 +96,13 @@ void SetChassisControlVelocity(float vx_control, float vy_control, float vw_cont
 
 void SetChassisControlPosition(float x_control, float y_control, float w_control, CHASSIS_CONTROL *chassis_control);
 
+ROBOT_STATE ReadRobotState(ROBOT_STATE *current_robot_state);
+
+CHASSIS_CONTROL ReadChassisControl(CHASSIS_CONTROL *chassis_control);
+
+CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position);
+
+CHASSIS_PID ReadChassisPID(CHASSIS_PID *chassis_pid);
 extern ROBOT_STATE Robot_state;
 extern CHASSIS_PID Chassis_Pid;
 extern CHASSIS_POSITION Chassis_Position;
