@@ -4,6 +4,9 @@
 ## "Rabbit Robot"
 <image src="https://github.com/OriTwil/RR-Upper-Structure-A/blob/main/image/xmind-rr.png" width="1000">
 <image src="https://github.com/OriTwil/RR-Upper-Structure-A/blob/main/image/mavlink-rr.png" width="1000">
+  
+## Dynamics
+<image src="https://github.com/OriTwil/RR-Chassis/blob/main/Image/RR_cal.jpg" width="600">
 
 ## Update History
 - 5.6 add repository
