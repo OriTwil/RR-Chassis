@@ -51,9 +51,7 @@ void ServoTask(void const *argument)
                              hDJI[1].speedPID.output,
                              hDJI[2].speedPID.output,
                              hDJI[3].speedPID.output);
-        // int a = 0;
         vTaskDelayUntil(&PreviousWakeTime, 5);
-        // vTaskDelay(5);
     }
 }
 

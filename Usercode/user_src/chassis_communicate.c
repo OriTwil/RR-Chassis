@@ -14,7 +14,7 @@
 // 变量定义
 mavlink_control_t control;                             // 上位机规划后的控制信息
 mavlink_posture_t mav_posture;                         // 定位系统的信息
-mavlink_chassis_to_upper_t chassis_data;               // todo 遥控器
+mavlink_chassis_to_upper_t chassis_data;               // 板间通信
 
 // 拷贝变量
 mavlink_posture_t posture_temp;
@@ -38,10 +38,9 @@ void CommunicateTask(void const *argument)
             chassis_data.point = 3;
         }
         posture_temp = mav_posture; // 定位数据拷贝
-        chassis_data_temp = chassis_data;
+        chassis_data_temp = chassis_data; // 板间通信数据拷贝
         vPortExitCritical();
 
-        // mavlink_msg_controller_send_struct(CtrlDataSendChan, argument);
         mavlink_msg_chassis_to_upper_send_struct(MAVLINK_COMM_2, &chassis_data_temp); // 板间通信
         mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &posture_temp);          // 定位信息发到上位机
         vTaskDelay(10);
@@ -69,13 +68,13 @@ void CommunicateInit()
     mav_posture.zangle = 0;
 
     // WTR_MAVLink_Init(huart, chan);
-    wtrMavlink_BindChannel(&huart_Remote_Control, MAVLINK_COMM_1);   // 遥控器MAVLINK初始化
     wtrMavlink_BindChannel(&huart_Computer, MAVLINK_COMM_0);         // 上位机MAVLINK初始化
+    wtrMavlink_BindChannel(&huart_Remote_Control, MAVLINK_COMM_1);   // 遥控器MAVLINK初始化
     wtrMavlink_BindChannel(&huart_Chassis_to_Upper, MAVLINK_COMM_2); // 板间通信MAVLINK初始化
 
-    wtrMavlink_StartReceiveIT(MAVLINK_COMM_0); // 以mavlink接收上位机通过串口发送的消息
+    wtrMavlink_StartReceiveIT(MAVLINK_COMM_0); // 以MAVLINK接收上位机通过串口发送的消息
     wtrMavlink_StartReceiveIT(MAVLINK_COMM_1); // 接收遥控器MAVLINK
     wtrMavlink_StartReceiveIT(MAVLINK_COMM_2); // 板间通信MAVLINK
 
-    HAL_UART_Receive_DMA(&huart_AS69, JoyStickReceiveData, 18); // DMA接收AS69
+    HAL_UART_Receive_DMA(&huart_AS69, JoyStickReceiveData, 18); // DMA接收AS69 DJI
 }

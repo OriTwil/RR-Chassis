@@ -43,41 +43,47 @@ void ChassisStateMachineTask(void const *argument)
     vTaskDelay(20);
     // 解算，速度伺服
     for (;;) {
+        // 拷贝数据，防止关中断或取互斥锁时间过长
         ROBOT_STATE Robot_state_temp = ReadRobotState(&Robot_state);
+        vPortEnterCritical();
+        mavlink_control_t control_temp = control;
+        mavlink_posture_t posture_temp = mav_posture;
+        vPortExitCritical();
+
         switch (Robot_state_temp.Chassis_state) {
             case Locked:
                 if (islocked == false) // todo 第一次进入locked状态(不够简洁)
                 {
-                    pos_x_locked = mav_posture.pos_x;
-                    pos_y_locked = mav_posture.pos_y;
-                    pos_w_locked = mav_posture.zangle; // 记录下刚切换到Locked状态的坐标
+                    pos_x_locked = posture_temp.pos_x;
+                    pos_y_locked = posture_temp.pos_y;
+                    pos_w_locked = posture_temp.zangle; // 记录下刚切换到Locked状态的坐标
                     islocked     = true;
                 }
-                SetChassisControlPosition(pos_x_locked, pos_y_locked, pos_w_locked, &Chassis_Control);                                                                      // 锁死在Locked位置
-                SetChassisControlVelocity(PIDPosition(&Chassis_Pid.Pid_pos_x), PIDPosition(&Chassis_Pid.Pid_pos_y), PIDPosition(&Chassis_Pid.Pid_pos_w), &Chassis_Control); // 反馈控制底盘锁死在该位置
+                SetChassisControlPosition(pos_x_locked, pos_y_locked, pos_w_locked, &Chassis_Control); // 锁死在Locked位置
+                SetChassisControlVelocity(PIDPosition(&Chassis_Pid.Pid_pos_x),
+                                          PIDPosition(&Chassis_Pid.Pid_pos_y),
+                                          PIDPosition(&Chassis_Pid.Pid_pos_w),
+                                          &Chassis_Control); // 反馈控制底盘锁死在该位置
 
             case RemoteControl:
                 islocked = false;
 
+                SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position); // 更新底盘位置
                 vPortEnterCritical();
-                SetChassisPosition(mav_posture.pos_x, mav_posture.pos_y, mav_posture.zangle, &Chassis_Position);                                                            // 更新底盘位置
-                DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1);                                                                  // 死区控制 DJI遥控器摇杆
-                SetChassisControlPosition(Chassis_Position.Chassis_Position_x, Chassis_Position.Chassis_Position_y, Chassis_Position.Chassis_Position_w, &Chassis_Control); // 没什么用，反正这个状态用不到PID
-                SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, crl_speed.vw, &Chassis_Control);                                                                    // 用摇杆控制底盘
+                DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 DJI遥控器摇杆
+                SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, crl_speed.vw, &Chassis_Control);   // 用摇杆控制底盘
                 vPortExitCritical();
 
             case ComputerControl:
                 islocked = false;
-                vPortEnterCritical();
-                mavlink_control_t control_temp = control;
-                mavlink_posture_t posture_temp = mav_posture;
-                vPortExitCritical();
-
-                SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position); // 更新底盘位置
-                SetChassisControlPosition(control_temp.x_set, control_temp.y_set, control_temp.w_set, &Chassis_Control);
+                SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position);      // 更新底盘位置
+                SetChassisControlPosition(control_temp.x_set, control_temp.y_set, control_temp.w_set, &Chassis_Control); // 上位机规划值作为伺服值
                 xSemaphoreTake(Chassis_Pid.xMutex_pid, (TickType_t)10);
-                SetChassisControlVelocity(control_temp.vx_set + PIDPosition(&Chassis_Pid.Pid_pos_x), control_temp.vy_set + PIDPosition(&Chassis_Pid.Pid_pos_y), control_temp.vw_set + PIDPosition(&Chassis_Pid.Pid_pos_w), &Chassis_Control); // 上位机规划值作为伺服值
-                xSemaphoreGive(Chassis_Pid.xMutex_pid);                                                                                                                                                                                       // 上位机规划值作为伺服值
+                SetChassisControlVelocity(control_temp.vx_set + PIDPosition(&Chassis_Pid.Pid_pos_x),
+                                          control_temp.vy_set + PIDPosition(&Chassis_Pid.Pid_pos_y),
+                                          control_temp.vw_set + PIDPosition(&Chassis_Pid.Pid_pos_w),
+                                          &Chassis_Control); // 上位机规划值作为伺服值
+                xSemaphoreGive(Chassis_Pid.xMutex_pid);
         }
 
         vTaskDelayUntil(&PreviousWakeTime, 5);
@@ -88,21 +94,7 @@ void ChassisStateTestTask(void const *argument)
 {
     vTaskDelay(20);
     // 解算，速度伺服
-    for (;;) {
-        // 读定位系统和上位机的Mavlink
-        vPortEnterCritical();
-        control_temp                   = control;
-        mavlink_posture_t posture_temp = mav_posture;
-        vPortExitCritical();
-
-        // 更新底盘位置
-        SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position);
-        // 更新底盘目标位置(根据规划轨迹)
-        SetChassisControlPosition(control_temp.x_set, control_temp.y_set, control_temp.w_set, &Chassis_Control);
-        // 更新底盘目标速度(根据规划轨迹)
-        xSemaphoreTake(Chassis_Pid.xMutex_pid, (TickType_t)10);
-        SetChassisControlVelocity(control_temp.vx_set + PIDPosition(&Chassis_Pid.Pid_pos_x), control_temp.vy_set + PIDPosition(&Chassis_Pid.Pid_pos_y), control_temp.vw_set + PIDPosition(&Chassis_Pid.Pid_pos_w), &Chassis_Control); // 上位机规划值作为伺服值
-        xSemaphoreGive(Chassis_Pid.xMutex_pid);                                                                                                                                                                                       // 上位机规划值作为伺服值
+    for (;;) { // 上位机规划值作为伺服值
 
         vTaskDelay(5);
     }

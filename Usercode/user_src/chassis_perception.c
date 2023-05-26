@@ -10,6 +10,7 @@
 #include "chassis_perception.h"
 
 uint32_t test_pos[6] = {0};
+ROBOT_STATE Robot_state_temp;
 
 /**
  * @description: 定位系统
@@ -21,7 +22,8 @@ void ChassisPerceptionTask(void const *argument)
 {
     vTaskDelay(100);
     for (;;) {
-        switch(Robot_state.Perception_state)
+        Robot_state_temp = ReadRobotState(&Robot_state);
+        switch(Robot_state_temp.Perception_state)
         {
             case Receive:
             break;

@@ -38,18 +38,6 @@ void StateManagemantTestTask(void const *argument)
     uint32_t PreviousWakeTime = osKernelSysTick();
     vTaskDelay(20);
     for (;;) {
-        vPortEnterCritical();
-        // 发送按键通知
-        if (Raw_Data.left == 1/* 判断按键1是否按下 */) {
-            mav_posture.point = 1;
-        }
-        if (Raw_Data.left == 2/* 判断按键2是否按下 */) {
-            mav_posture.point = 2;
-        }
-        if (Raw_Data.left == 3/* 判断按键3是否按下 */) {
-            mav_posture.point = 3;
-        }
-        vPortExitCritical();
         vTaskDelayUntil(&PreviousWakeTime, 5);
     }
 }
@@ -63,7 +51,7 @@ void StateManagemantTaskStart()
 
     osThreadDef(statemanagement, StateManagemantTask, osPriorityNormal, 0, 512);
     osThreadCreate(osThread(statemanagement), NULL);
-    // xTaskCreate(StateManagemantTask,"statemanagement",configMINIMAL_STACK_SIZE,NULL,tskIDLE_PRIORITY + 1,&g_stateManagementTaskHandle);
+
     // osThreadDef(statemanagementtest,StateManagemantTestTask,osPriorityNormal,0,512);
     // osThreadCreate(osThread(statemanagementtest),NULL);
 }   
@@ -262,3 +250,5 @@ CHASSIS_PID ReadChassisPID(CHASSIS_PID *chassis_pid)
     xSemaphoreGive(chassis_pid->xMutex_pid);
     return chassis_pid_temp;
 }
+
+//todo 写一个从地图坐标系到底盘坐标系的转换函数
