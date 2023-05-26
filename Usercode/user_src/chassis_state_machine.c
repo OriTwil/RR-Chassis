@@ -31,10 +31,6 @@ float pos_x_locked = 0;
 float pos_y_locked = 0;
 float pos_w_locked = 0;
 
-mavlink_control_t control_temp;
-ROBOT_STATE Robot_state_temp;
-// mavlink_posture_t posture_temp;
-
 /**
  * @description: 线程一：底盘状态机
  * @date:
@@ -47,7 +43,7 @@ void ChassisStateMachineTask(void const *argument)
     vTaskDelay(20);
     // 解算，速度伺服
     for (;;) {
-        Robot_state_temp = ReadRobotState(&Robot_state);
+        ROBOT_STATE Robot_state_temp = ReadRobotState(&Robot_state);
         switch (Robot_state_temp.Chassis_state) {
             case Locked:
                 if (islocked == false) // todo 第一次进入locked状态(不够简洁)
@@ -73,9 +69,10 @@ void ChassisStateMachineTask(void const *argument)
             case ComputerControl:
                 islocked = false;
                 vPortEnterCritical();
-                control_temp                   = control;
+                mavlink_control_t control_temp = control;
                 mavlink_posture_t posture_temp = mav_posture;
                 vPortExitCritical();
+
                 SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position); // 更新底盘位置
                 SetChassisControlPosition(control_temp.x_set, control_temp.y_set, control_temp.w_set, &Chassis_Control);
                 xSemaphoreTake(Chassis_Pid.xMutex_pid, (TickType_t)10);

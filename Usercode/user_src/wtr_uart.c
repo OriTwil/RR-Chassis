@@ -13,6 +13,7 @@
 #include "math.h"
 #include "usart.h"
 #include "user_main.h"
+#include "chassis_communicate.h"
 
 Remote_t Raw_Data;
 underpan_speed crl_speed;
@@ -133,7 +134,13 @@ void OPS_Decode()
                     mav_posture.pos_x = posture.ActVal[3] * 0.001;
                     mav_posture.pos_y = posture.ActVal[4] * 0.001;
                     mav_posture.w_z = posture.ActVal[5] * 0.001;
-                    // mav_posture.w_z = control.vx_set;
+
+                    chassis_data.zangle = posture.ActVal[0] * 0.001;
+                    chassis_data.xangle = posture.ActVal[1] * 0.001;
+                    chassis_data.yangle = posture.ActVal[2] * 0.001;
+                    chassis_data.pos_x = posture.ActVal[3] * 0.001;
+                    chassis_data.pos_y = posture.ActVal[4] * 0.001;
+                    chassis_data.w_z = posture.ActVal[5] * 0.001;
                 }
                 count = 0;
                 break;

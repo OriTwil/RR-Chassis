@@ -21,8 +21,7 @@
 extern mavlink_control_t control;     // 上位机规划后的控制信息
 extern mavlink_posture_t mav_posture; // 定位系统的信息
 // extern mavlink_controller_t ControllerData; //todo 遥控器
-extern mavlink_channel_t CtrlDataSendChan;
-// extern TaskHandle_t g_stateManagementTaskHandle;
+extern mavlink_chassis_to_upper_t chassis_data;               
 
 void CommunicateTaskStart();
 void CommunicateInit();
