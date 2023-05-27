@@ -8,7 +8,7 @@
  */
 
 #include "chassis_communicate.h"
-#include "user_main.h"
+#include "chassis_start.h"
 #include "chassis_state_management.h"
 
 // 变量定义

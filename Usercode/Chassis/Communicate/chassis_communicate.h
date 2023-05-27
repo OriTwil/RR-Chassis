@@ -9,9 +9,9 @@
 
 #include "wtr_mavlink.h"
 #include "main.h"
+#include "chassis_start.h"
 #include "cmsis_os.h"
 #include "usart.h"
-#include "user_main.h"
 
 // 按键通知值定义
 #define BUTTON1_NOTIFICATION (1 << 0)

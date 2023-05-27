@@ -9,7 +9,7 @@
  */
 #pragma once
 
-#include "user_main.h"
+#include "chassis_start.h"
 #include "cmsis_os.h"
 #include "can.h"
 #include "dma.h"
@@ -23,7 +23,6 @@
 #include "wtr_mavlink.h"
 
 extern int16_t crldata[4];
-extern uint8_t i; //todo 不确定是不是static
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 

@@ -9,10 +9,10 @@
 #ifndef CHASSIS_STATE_MANAGEMANT
 #define CHASSIS_STATE_MANAGEMANT
 
-#include "user_main.h"
 #include "chassis_state_machine.h"
 #include "chassis_perception.h"
-#include "user_calculate.h"
+#include "chassis_start.h"
+#include "wtr_calculate.h"
 #include "semphr.h"
 
 typedef enum {
@@ -32,6 +32,7 @@ typedef enum {
     Ninth_Point,
     Tenth_Point
 } CHASSIS_POINT;
+
 typedef enum {
     Locked,
     RemoteControl,

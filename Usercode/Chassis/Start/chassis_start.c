@@ -15,10 +15,9 @@
 #include "wtr_uart.h"
 #include <math.h>
 #include "main.h"
-#include "user_main.h"
+#include "chassis_start.h"
 #include "wtr_mavlink.h"
 #include <math.h>
-#include "user_callback.h"
 #include "chassis_perception.h"
 #include "chassis_communicate.h"
 
@@ -39,13 +38,15 @@ void StartDefaultTask(void const *argument)
     PerceptionInit();  // 定位组件初始化
     vTaskDelay(100);
 
+    taskENTER_CRITICAL();
     /*开启线程*/
     ChassisStateMachineTaskStart(); // 底盘状态机
     CommunicateTaskStart();         // 通信线程
     ServoTaskStart();               // 伺服线程
     StateManagemantTaskStart();     // 状态切换线程
     // PerceptionTaskStart();          // 底盘感知定位线程
-
+    taskEXIT_CRITICAL();
+    
     for (;;) {
         vTaskDelay(2);
     }

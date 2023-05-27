@@ -12,7 +12,7 @@
 #include "string.h"
 #include "math.h"
 #include "usart.h"
-#include "user_main.h"
+#include "chassis_start.h"
 #include "chassis_communicate.h"
 
 Remote_t Raw_Data;
@@ -25,6 +25,7 @@ float vx, vy, vw;
 Posture posture;
 uint8_t ch[1];
 static uint8_t count = 0;
+uint8_t i          = 0;
 
 // AS69
 void AS69_Decode()

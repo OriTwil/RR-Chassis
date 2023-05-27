@@ -7,7 +7,7 @@
  */
 
 #include "chassis_servo.h"
-#include "user_config.h"
+#include "chassis_config.h"
 #include "chassis_state_management.h"
 
 /**
