@@ -14,9 +14,11 @@
 #include "wtr_mavlink.h"
 #include <math.h>
 #include "usart.h"
-#include "chassis_state_management.h"
+#include "chassis_commen.h"
 
 void PerceptionTaskStart();
 void PerceptionInit();
+
+void PerceptionSwitchState(PERCEPTION_STATE target_perception_state, ROBOT_STATE *current_robot_state);
 
 #endif

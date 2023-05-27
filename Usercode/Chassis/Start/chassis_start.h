@@ -32,7 +32,6 @@
 #include "chassis_state_machine.h"
 #include "chassis_communicate.h"
 #include "chassis_servo.h"
-#include "chassis_state_management.h"
 
 #include "mavlink_msg_chassis_to_upper.h"
 #include "mavlink_msg_control.h"

@@ -9,7 +9,6 @@
 
 #include "chassis_communicate.h"
 #include "chassis_start.h"
-#include "chassis_state_management.h"
 
 // 变量定义
 mavlink_control_t control;                             // 上位机规划后的控制信息
@@ -25,18 +24,6 @@ void CommunicateTask(void const *argument)
     vTaskDelay(20);
     for (;;) {
         vPortEnterCritical();
-        if (Raw_Data.left == 1 /* 判断按键1是否按下 */) {
-            mav_posture.point = 1;
-            chassis_data.point = 1;
-        }
-        if (Raw_Data.left == 2 /* 判断按键2是否按下 */) {
-            mav_posture.point = 2;
-            chassis_data.point = 2;
-        }
-        if (Raw_Data.left == 3 /* 判断按键3是否按下 */) {
-            mav_posture.point = 3;
-            chassis_data.point = 3;
-        }
         posture_temp = mav_posture; // 定位数据拷贝
         chassis_data_temp = chassis_data; // 板间通信数据拷贝
         vPortExitCritical();

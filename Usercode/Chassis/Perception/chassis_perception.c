@@ -8,6 +8,7 @@
  * @WeChat:szf13373959031
  */
 #include "chassis_perception.h"
+#include "chassis_commen.h"
 
 uint32_t test_pos[6] = {0};
 ROBOT_STATE Robot_state_temp;
@@ -45,4 +46,16 @@ void PerceptionInit()
 {
     // 码盘定位系统通过串口收信息
     HAL_UART_Receive_IT(&huart_OPS, (uint8_t *)&ch, 1);
+}
+
+/**
+ * @description: 切换传感器状态
+ * @param target_perception_state 目标状态(Receive Transmit)
+ * @return {void}
+ */
+void PerceptionSwitchState(PERCEPTION_STATE target_perception_state, ROBOT_STATE *current_robot_state)
+{
+    xSemaphoreTake(current_robot_state->xMutex_Robot, (TickType_t)10);
+    current_robot_state->Perception_state = target_perception_state;
+    xSemaphoreGive(current_robot_state->xMutex_Robot);
 }

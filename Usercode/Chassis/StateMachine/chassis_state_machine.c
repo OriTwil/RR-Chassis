@@ -21,7 +21,11 @@
 #include "wtr_mavlink.h"
 #include <math.h>
 #include "chassis_state_machine.h"
-#include "chassis_state_management.h"
+#include "chassis_commen.h"
+
+CHASSIS_POSITION Chassis_Position;
+CHASSIS_CONTROL Chassis_Control;
+ROBOT_STATE Robot_state;
 
 double vx_deadbanded = 0;
 double vy_deadbanded = 0;
@@ -112,4 +116,97 @@ void ChassisStateMachineTaskStart()
 
     // osThreadDef(chassis_test, ChassisStateTestTask, osPriorityNormal, 0, 2048);
     // osThreadCreate(osThread(chassis_test), NULL);
+}
+
+/**
+ * @description: 切换底盘点位
+ * @param target_chassis_point 目标点位(First_Point Second_Point Third_Point ...)
+ * @return {void}
+ */
+void ChassisSwsitchPoint(CHASSIS_POINT target_chassis_point, ROBOT_STATE *current_robot_state)
+{
+    xSemaphoreTake(current_robot_state->xMutex_Robot, (TickType_t)10);
+    current_robot_state->Chassis_point = target_chassis_point;
+    xSemaphoreGive(current_robot_state->xMutex_Robot);
+}
+
+/**
+ * @description: 切换底盘状态
+ * @param target_chassis_state 目标状态(Locked RemoteControl ComputerControl)
+ * @return {void}
+ */
+void ChassisSwitchState(CHASSIS_STATE target_chassis_state, ROBOT_STATE *current_robot_state)
+{
+    xSemaphoreTake(current_robot_state->xMutex_Robot, (TickType_t)10);
+    current_robot_state->Chassis_state = target_chassis_state;
+    xSemaphoreGive(current_robot_state->xMutex_Robot);
+}
+
+/**
+ * @description: 更新底盘位置
+ * @param position_ 底盘位置信息
+ * @return {void}
+ */
+void SetChassisPosition(float position_x, float position_y, float position_w, CHASSIS_POSITION *chassis_position)
+{
+    xSemaphoreTake(chassis_position->xMutex_position, (TickType_t)10);
+    chassis_position->Chassis_Position_x = position_x;
+    chassis_position->Chassis_Position_y = position_y;
+    chassis_position->Chassis_Position_w = position_w;
+    xSemaphoreGive(chassis_position->xMutex_position);
+}
+
+/**
+ * @description: 设置底盘伺服速度值
+ * @param vx_control 底盘速度伺服值
+ * @return {void}
+ */
+void SetChassisControlVelocity(float vx_control, float vy_control, float vw_control, CHASSIS_CONTROL *chassis_control)
+{
+    xSemaphoreTake(chassis_control->xMutex_control, (TickType_t)10);
+    chassis_control->Chassis_Control_vx = vx_control;
+    chassis_control->Chassis_Control_vy = vy_control;
+    chassis_control->Chassis_Control_vw = vw_control;
+    xSemaphoreGive(chassis_control->xMutex_control);
+}
+
+/**
+ * @description: 设置底盘目标位置
+ * @param _control 底盘目标位置
+ * @return {void}
+ */
+void SetChassisControlPosition(float x_control, float y_control, float w_control, CHASSIS_CONTROL *chassis_control)
+{
+    xSemaphoreTake(chassis_control->xMutex_control, (TickType_t)10);
+    chassis_control->Chassis_Control_x = x_control;
+    chassis_control->Chassis_Control_y = y_control;
+    chassis_control->Chassis_Control_w = w_control;
+    xSemaphoreGive(chassis_control->xMutex_control);
+}
+
+ROBOT_STATE ReadRobotState(ROBOT_STATE *current_robot_state)
+{
+    ROBOT_STATE robot_state_temp;
+    xSemaphoreTake(current_robot_state->xMutex_Robot, (TickType_t)10);
+    robot_state_temp = *current_robot_state;
+    xSemaphoreGive(current_robot_state->xMutex_Robot);
+    return robot_state_temp;
+}
+
+CHASSIS_CONTROL ReadChassisControl(CHASSIS_CONTROL *chassis_control)
+{
+    CHASSIS_CONTROL chassis_control_temp;
+    xSemaphoreTake(chassis_control->xMutex_control, (TickType_t)10);
+    chassis_control_temp = *chassis_control;
+    xSemaphoreGive(chassis_control->xMutex_control);
+    return chassis_control_temp;
+}
+
+CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position)
+{
+    CHASSIS_POSITION chassis_position_temp;
+    xSemaphoreTake(chassis_position->xMutex_position, (TickType_t)10);
+    chassis_position_temp = *chassis_position;
+    xSemaphoreGive(chassis_position->xMutex_position);
+    return chassis_position_temp;
 }

@@ -8,7 +8,9 @@
 
 #include "chassis_servo.h"
 #include "chassis_config.h"
-#include "chassis_state_management.h"
+#include "chassis_commen.h"
+
+CHASSIS_PID Chassis_Pid;
 
 /**
  * @description: 伺服线程
@@ -95,4 +97,42 @@ void MotorInit()
     hDJI[5].motorType = M3508;
     hDJI[6].motorType = M3508;
     DJI_Init(); // 大疆电机初始化
+}
+
+/**
+ * @description: 设置PID目标值
+ * @param target_ PID目标值
+ * @return {void}
+ */
+void SetPIDTarget(float target_x, float target_y, float target_w, CHASSIS_PID *chassis_pid)
+{
+    xSemaphoreTake(chassis_pid->xMutex_pid, (TickType_t)10);
+    // 位置式PID
+    chassis_pid->Pid_pos_w.target = target_w;
+    chassis_pid->Pid_pos_x.target = target_x;
+    chassis_pid->Pid_pos_y.target = target_y;
+    xSemaphoreGive(chassis_pid->xMutex_pid);
+}
+
+/**
+ * @description: 设置PID反馈值
+ * @param feedback_ PID反馈值
+ * @return {void}
+ */
+void SetPIDFeedback(float feedback_x, float feedback_y, float feedback_w, CHASSIS_PID *chassis_pid)
+{
+    xSemaphoreTake(chassis_pid->xMutex_pid, (TickType_t)10);
+    chassis_pid->Pid_pos_x.feedback = feedback_x;
+    chassis_pid->Pid_pos_y.feedback = feedback_y;
+    chassis_pid->Pid_pos_w.feedback = feedback_w;
+    xSemaphoreGive(chassis_pid->xMutex_pid);
+}
+
+CHASSIS_PID ReadChassisPID(CHASSIS_PID *chassis_pid)
+{
+    CHASSIS_PID chassis_pid_temp;
+    xSemaphoreTake(chassis_pid->xMutex_pid, (TickType_t)10);
+    chassis_pid_temp = *chassis_pid;
+    xSemaphoreGive(chassis_pid->xMutex_pid);
+    return chassis_pid_temp;
 }
