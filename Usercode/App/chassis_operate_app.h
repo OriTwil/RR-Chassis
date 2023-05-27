@@ -15,7 +15,6 @@
 #include "wtr_calculate.h"
 #include "semphr.h"
 #include "chassis_commen.h"
-#include "chassis_state_management.h"
 
 void StateManagemantTaskStart();
 

@@ -22,6 +22,8 @@
 #include "chassis_communicate.h"
 #include "chassis_commen.h"
 
+#include "chassis_operate_app.h"
+
 
 // mavlink_controller_t ControllerData = {0};
 
