@@ -1,7 +1,7 @@
-#ifndef __CHASSIS_COMMEN_H__
-#define __CHASSIS_COMMEN_H__
+#ifndef __COMMEN_H__
+#define __COMMEN_H__
 
-// 数据结构
+#include "wtr_calculate.h"
 typedef enum {
     Receive,
     Transmit
@@ -61,5 +61,43 @@ typedef __IO struct {
     SemaphoreHandle_t xMutex_Robot;
     CHASSIS_POINT Chassis_point;
 } ROBOT_STATE;
+
+typedef struct
+{
+    mavlink_joystick_air_led_t msg_joystick_air_led;
+    mavlink_joystick_air_dashboard_set_title_t msg_joystick_air_dashboard_set_title;
+    mavlink_joystick_air_dashboard_set_msg_t msg_joystick_air_dashboard_set_msg;
+    mavlink_joystick_air_dashboard_del_t msg_joystick_air_dashboard_del;
+    SemaphoreHandle_t xMutex_joystick;
+} JOYSTICK_SEND;
+
+// joystick
+typedef enum {
+    Left_switch = 0,
+    Right_switch
+} SWITCHS;
+
+typedef enum {
+    Btn_LeftCrossUp     = 2,
+    Btn_LeftCrossDown   = 1,
+    Btn_LeftCrossLeft   = 13,
+    Btn_LeftCrossRight  = 5,
+    Btn_LeftCrossMid    = 9,
+    Btn_RightCrossUp    = 4,
+    Btn_RightCrossDown  = 3,
+    Btn_RightCrossLeft  = 7,
+    Btn_RightCrossRight = 15,
+    Btn_RightCrossMid   = 11,
+    Btn_Btn0            = 6,
+    Btn_Btn1            = 10,
+    Btn_Btn2            = 14,
+    Btn_Btn3            = 8,
+    Btn_Btn4            = 12,
+    Btn_Btn5            = 16,
+    Btn_KnobL           = 17,
+    Btn_KnobR           = 18,
+    Btn_JoystickL       = 19,
+    Btn_JoystickR       = 20,
+} KEYS;
 
 #endif

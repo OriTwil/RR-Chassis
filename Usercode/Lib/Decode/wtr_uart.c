@@ -11,8 +11,7 @@
 #include "wtr_dji.h"
 #include "string.h"
 #include "math.h"
-#include "usart.h"
-#include "chassis_start.h"
+#include "chassis_config.h"
 #include "chassis_communicate.h"
 
 Remote_t Raw_Data;

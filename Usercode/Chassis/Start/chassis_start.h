@@ -8,7 +8,8 @@
  * @@WeChat:szf13373959031
  */
 
-#pragma once
+#ifndef __CHASSIS_START_H__
+#define __CHASSIS_START_H__
 
 #include "cmsis_os.h"
 #include "can.h"
@@ -38,3 +39,5 @@
 #include "mavlink_msg_posture.h"
 
 void BlinkLED();
+
+#endif

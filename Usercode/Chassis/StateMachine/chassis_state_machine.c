@@ -21,7 +21,9 @@
 #include "wtr_mavlink.h"
 #include <math.h>
 #include "chassis_state_machine.h"
+#include "chassis_communicate.h"
 #include "chassis_commen.h"
+#include "chassis_servo.h"
 
 CHASSIS_POSITION Chassis_Position;
 CHASSIS_CONTROL Chassis_Control;

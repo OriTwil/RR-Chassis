@@ -9,6 +9,8 @@
  */
 #include "chassis_perception.h"
 #include "chassis_commen.h"
+#include "chassis_state_machine.h"
+#include "chassis_config.h"
 
 uint32_t test_pos[6] = {0};
 ROBOT_STATE Robot_state_temp;

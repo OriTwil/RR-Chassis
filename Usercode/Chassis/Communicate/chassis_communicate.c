@@ -8,7 +8,9 @@
  */
 
 #include "chassis_communicate.h"
-#include "chassis_start.h"
+#include "chassis_commen.h"
+#include "chassis_config.h"
+#include "wtr_uart.h"
 
 // 变量定义
 mavlink_control_t control;                             // 上位机规划后的控制信息

@@ -1,7 +1,6 @@
 #ifndef CHASSIS_PERCEPTION_H
 #define CHASSIS_PERCEPTION_H
 
-#include "chassis_start.h"
 #include "cmsis_os.h"
 #include "can.h"
 #include "dma.h"

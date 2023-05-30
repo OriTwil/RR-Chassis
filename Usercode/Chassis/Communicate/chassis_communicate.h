@@ -5,11 +5,10 @@
  * @date 2023.5.18
  *
  */
-#pragma once
+#ifndef __CHASSIS_COMMUNICATE_H__
+#define __CHASSIS_COMMUNICATE_H__
 
 #include "wtr_mavlink.h"
-#include "main.h"
-#include "chassis_start.h"
 #include "cmsis_os.h"
 #include "usart.h"
 
@@ -25,3 +24,5 @@ extern mavlink_chassis_to_upper_t chassis_data;
 
 void CommunicateTaskStart();
 void CommunicateInit();
+
+#endif

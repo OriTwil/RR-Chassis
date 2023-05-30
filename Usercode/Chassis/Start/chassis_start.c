@@ -21,7 +21,7 @@
 #include "chassis_perception.h"
 #include "chassis_communicate.h"
 #include "chassis_commen.h"
-
+#include "chassis_remote_control.h"
 #include "chassis_operate_app.h"
 
 
@@ -40,6 +40,7 @@ void StartDefaultTask(void const *argument)
     ChassisInit();     // 底盘组件初始化
     MotorInit();       // 电机初始化
     PerceptionInit();  // 定位组件初始化
+    RemoteControlInit();
     vTaskDelay(100);
 
     taskENTER_CRITICAL();
@@ -48,7 +49,8 @@ void StartDefaultTask(void const *argument)
     CommunicateTaskStart();         // 通信线程
     ServoTaskStart();               // 伺服线程
     StateManagemantTaskStart();     // 状态切换线程
-    // PerceptionTaskStart();          // 底盘感知定位线程
+    PerceptionTaskStart();          // 底盘感知定位线程
+    RemoteControlStart();
     taskEXIT_CRITICAL();
     
     for (;;) {

@@ -10,7 +10,8 @@
  * 
  */
 
-#pragma once
+#ifndef __CHASSIS_CONFIG_H__
+#define __CHASSIS_CONFIG_H__
 
 /* Natural log of 2 */
 #define _M_LN2        0.693147180559945309417
@@ -77,3 +78,4 @@
 #define rotate_ratio 0.3615 // (Width + Length)/2
 #define wheel_rpm_ratio 2387.324 // 换算线速度到rpm
 
+#endif

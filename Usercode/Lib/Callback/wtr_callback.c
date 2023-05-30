@@ -11,9 +11,9 @@
 #include "wtr_uart.h"
 #include "wtr_mavlink.h"
 #include "chassis_communicate.h"
+#include "chassis_remote_control.h"
 
 int16_t crldata[4] = {0};
-
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
@@ -43,13 +43,12 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
 {
 
     switch (msg->msgid) {
-        case 9:
+        case MAVLINK_MSG_ID_CONTROL:
             // id = 9 的消息对应的解码函数(mavlink_msg_xxx_decode)
             mavlink_msg_control_decode(msg, &control);
             break;
-        case 1:
-            // id = 1 的消息对应的解码函数(mavlink_msg_xxx_decode)
-            // mavlink_msg_controller_decode(msg, &ControllerData); // 遥控器
+        case MAVLINK_MSG_ID_JOYSTICK_AIR:
+            mavlink_msg_joystick_air_decode(msg, &msg_joystick_air);
             break;
         // ......
         default:

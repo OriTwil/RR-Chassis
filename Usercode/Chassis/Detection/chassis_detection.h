@@ -1,0 +1,4 @@
+#ifndef __CHASSIS_DETECTION_H__
+#define __CHASSIS_DETECTION_H__
+
+#endif // !__CHASSIS_DETECTION_H__

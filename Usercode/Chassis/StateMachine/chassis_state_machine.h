@@ -6,20 +6,13 @@
  * @Description: 状态机
  * @@WeChat:szf13373959031
  */
-#pragma once
+#ifndef __CHASSIS_STATE_MACHINE__
+#define __CHASSIS_STATE_MACHINE__
 
 #include "can.h"
 #include "cmsis_os.h"
-#include "dma.h"
-#include "usart.h"
-#include "gpio.h"
-#include "wtr_can.h"
-#include "wtr_uart.h"
-#include <math.h>
-#include "main.h"
 #include "wtr_mavlink.h"
 #include <math.h>
-#include "chassis_start.h"
 #include "wtr_calculate.h"
 #include "chassis_commen.h"
 
@@ -45,3 +38,5 @@ CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position);
 extern ROBOT_STATE Robot_state;
 extern CHASSIS_POSITION Chassis_Position;
 extern CHASSIS_CONTROL Chassis_Control;
+
+#endif
