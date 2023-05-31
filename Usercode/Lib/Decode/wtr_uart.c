@@ -24,7 +24,7 @@ float vx, vy, vw;
 Posture posture;
 uint8_t ch[1];
 static uint8_t count = 0;
-uint8_t i          = 0;
+uint8_t i            = 0;
 
 // AS69
 void AS69_Decode()
@@ -40,6 +40,11 @@ void AS69_Decode()
     Raw_Data.right = ((JoyStickReceiveData[5] >> 4) & 0x0003);
     Raw_Data.wheel = ((int16_t)JoyStickReceiveData[16]) | ((int16_t)JoyStickReceiveData[17] << 8);
 
+    /* UART1 callback decode function  */
+}
+
+void DJI_Control()
+{
     switch (Raw_Data.left) {
         case 1:
             // speed = (float ) (Raw_Data.ch0 - CH0_BIAS)/CH_RANGE * 200;
@@ -75,10 +80,7 @@ void AS69_Decode()
         default:
             break;
     }
-
-    /* UART1 callback decode function  */
 }
-
 // OPS全方位平面定位系统
 void OPS_Decode()
 {

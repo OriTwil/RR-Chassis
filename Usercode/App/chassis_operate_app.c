@@ -16,6 +16,7 @@
 
 #include "chassis_config.h"
 #include "chassis_commen.h"
+#include "chassis_remote_control.h"
 /**
  * @description: 操作线程
  * @todo 根据各个传感器、遥控器等设计操作手操作流程
@@ -25,11 +26,11 @@ void StateManagemantTask(void const *argument)
 {
     vTaskDelay(20);
     for (;;) {
-        //自动模式
+        // 自动模式
         Automatic();
         // DJI遥控器控制模式
         DJIRemoteControl();
-        
+
         vTaskDelay(5);
     }
 }
@@ -120,6 +121,31 @@ void DJIRemoteControl()
 void Automatic()
 {
     ChassisSwitchState(ComputerControl, &Robot_state);
+
+    if (ReadJoystickButtons(msg_joystick_air, Btn_LeftCrossLeft)) {
+        // Code for Btn_LeftCrossLeft
+        ChassisSwitchPoint(First_Point, &Robot_state);
+    }
+
+    if (ReadJoystickButtons(msg_joystick_air, Btn_LeftCrossRight)) {
+        // Code for Btn_LeftCrossRight
+        ChassisSwitchPoint(Second_Point, &Robot_state);
+    }
+
+    if (ReadJoystickButtons(msg_joystick_air, Btn_LeftCrossMid)) {
+        // Code for Btn_LeftCrossMid
+        ChassisSwitchPoint(Third_Point, &Robot_state);
+    }
+
+    if (ReadJoystickButtons(msg_joystick_air, Btn_RightCrossUp)) {
+        // Code for Btn_RightCrossUp
+        ChassisSwitchPoint(Fourth_Point, &Robot_state);
+    }
+
+    if (ReadJoystickButtons(msg_joystick_air, Btn_RightCrossDown)) {
+        // Code for Btn_RightCrossDown
+        ChassisSwitchPoint(Fifth_Point, &Robot_state);
+    }
 }
 
 // todo 写一个从地图坐标系到底盘坐标系的转换函数

@@ -24,6 +24,7 @@
 #include "chassis_communicate.h"
 #include "chassis_commen.h"
 #include "chassis_servo.h"
+#include "chassis_remote_control.h"
 
 CHASSIS_POSITION Chassis_Position;
 CHASSIS_CONTROL Chassis_Control;
@@ -75,6 +76,9 @@ void ChassisStateMachineTask(void const *argument)
                 islocked = false;
 
                 SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position); // 更新底盘位置
+
+                Joystick_Control();
+                // DJI_Control();
                 vPortEnterCritical();
                 DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 DJI遥控器摇杆
                 SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, crl_speed.vw, &Chassis_Control);   // 用摇杆控制底盘
@@ -125,7 +129,7 @@ void ChassisStateMachineTaskStart()
  * @param target_chassis_point 目标点位(First_Point Second_Point Third_Point ...)
  * @return {void}
  */
-void ChassisSwsitchPoint(CHASSIS_POINT target_chassis_point, ROBOT_STATE *current_robot_state)
+void ChassisSwitchPoint(CHASSIS_POINT target_chassis_point, ROBOT_STATE *current_robot_state)
 {
     xSemaphoreTake(current_robot_state->xMutex_Robot, (TickType_t)10);
     current_robot_state->Chassis_point = target_chassis_point;
@@ -211,4 +215,11 @@ CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position)
     chassis_position_temp = *chassis_position;
     xSemaphoreGive(chassis_position->xMutex_position);
     return chassis_position_temp;
+}
+
+void Joystick_Control()
+{
+    crl_speed.vx = ReadJoystickRight_x(msg_joystick_air);
+    crl_speed.vy = ReadJoystickRight_y(msg_joystick_air);
+    crl_speed.vw = ReadJoystickLeft_x(msg_joystick_air);
 }

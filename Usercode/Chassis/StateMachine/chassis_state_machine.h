@@ -18,10 +18,9 @@
 
 void ChassisStateMachineTaskStart();
 
-void ChassisSwitchPoint(CHASSIS_POINT target_chassis_point, ROBOT_STATE *current_robot_state);
-// extern CHASSIS_STATE Chassis_state;
-
 void ChassisSwitchState(CHASSIS_STATE target_chassis_state, ROBOT_STATE *current_robot_state);
+
+void ChassisSwitchPoint(CHASSIS_POINT target_chassis_point, ROBOT_STATE *current_robot_state);
 
 void SetChassisPosition(float position_x, float position_y, float position_w, CHASSIS_POSITION *chassis_position);
 

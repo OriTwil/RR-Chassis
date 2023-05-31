@@ -45,5 +45,6 @@ extern Posture posture;
 extern uint8_t ch[1]; // 不确定是不是static
 
 void AS69_Decode();
+void DJI_Control();
 void OPS_Decode();
 #endif
