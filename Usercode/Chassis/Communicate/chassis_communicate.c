@@ -11,27 +11,30 @@
 #include "chassis_commen.h"
 #include "chassis_config.h"
 #include "wtr_uart.h"
+#include "chassis_remote_control.h"
 
 // 变量定义
-mavlink_control_t control;                             // 上位机规划后的控制信息
-mavlink_posture_t mav_posture;                         // 定位系统的信息
-mavlink_chassis_to_upper_t chassis_data;               // 板间通信
+mavlink_control_t control;               // 上位机规划后的控制信息
+mavlink_posture_t mav_posture;           // 定位系统的信息
+mavlink_chassis_to_upper_t chassis_data; // 板间通信
 
 // 拷贝变量
 mavlink_posture_t posture_temp;
 mavlink_chassis_to_upper_t chassis_data_temp;
-
+mavlink_joystick_air_t msg_joystick_air_temp;
 void CommunicateTask(void const *argument)
 {
     vTaskDelay(20);
     for (;;) {
         vPortEnterCritical();
-        posture_temp = mav_posture; // 定位数据拷贝
-        chassis_data_temp = chassis_data; // 板间通信数据拷贝
+        posture_temp          = mav_posture;  // 定位数据拷贝
+        chassis_data_temp     = chassis_data; // 板间通信数据拷贝
+        msg_joystick_air_temp = msg_joystick_air;
         vPortExitCritical();
 
         mavlink_msg_chassis_to_upper_send_struct(MAVLINK_COMM_2, &chassis_data_temp); // 板间通信
-        mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &posture_temp);          // 定位信息发到上位机
+        mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &posture_temp);               // 定位信息发到上位机
+        mavlink_msg_joystick_air_send_struct(MAVLINK_COMM_2, &msg_joystick_air_temp); // 板间通信
         vTaskDelay(10);
     }
 }
