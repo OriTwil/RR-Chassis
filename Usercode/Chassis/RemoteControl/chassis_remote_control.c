@@ -3,15 +3,45 @@
 #include "chassis_config.h"
 #include "wtr_mavlink.h"
 #include "wtr_uart.h"
+#include "chassis_communicate.h"
+#include "chassis_state_machine.h"
 
-mavlink_joystick_air_t msg_joystick_air;
-JOYSTICK_SEND msg_joystick_send;
+JOYSTICK_AIR Msg_joystick_air;
+JOYSTICK_AIR_LED msg_joystick_air_led;
+JOYSTICK_AIR_DASHBOARD_SET_TITLE msg_joystick_air_title_point;
+JOYSTICK_AIR_DASHBOARD_SET_TITLE msg_joystick_air_title_state;
+JOYSTICK_AIR_DASHBOARD_SET_TITLE msg_joystick_air_title_posture;
+JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_point;
+JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_state;
+JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_posture;
+JOYSTICK_AIR_DASHBOARD_DELETE msg_joystick_air_delete;
+
+char title_point[20] = "point";
+char title_state[20]   = "state";
+char title_posture[20]  = "posture";
+char msg_point[20]   = "no_msg";
+char msg_state[20]     = "no_msg";
+char msg_posture[20] = "no_msg";
+#define ID_Point 6
+#define ID_State   8
+#define ID_Posture 16
 
 void RemoteControlTask(void const *argument)
 {
     uint32_t PreviousWakeTime = xTaskGetTickCount();
+    
     while (1) {
-        RemoteControlSendMsg(&msg_joystick_send);
+        TitleInit();
+        // 底盘位置
+        // MsgUpdatePoint();
+        // 底盘状态
+        // MsgUpdateState();
+        // 位置
+        MsgUpdatePosture();
+
+        RemoteControlSendMsg(&msg_joystick_air_msg_point);
+        RemoteControlSendMsg(&msg_joystick_air_msg_state);
+        RemoteControlSendMsg(&msg_joystick_air_msg_posture);
         vTaskDelayUntil(&PreviousWakeTime, 100);
     }
 }
@@ -30,121 +60,191 @@ void RemoteControlStart()
     osThreadCreate(osThread(RemoteControl), NULL);
 }
 
-void RemoteControlSendMsg(JOYSTICK_SEND *msg_joystick_send)
+void RemoteControlSendMsg(JOYSTICK_AIR_DASHBOARD_SET_MSG *Msg_joystick_air_msg)
 {
-    xSemaphoreTake(msg_joystick_send->xMutex_joystick, portMAX_DELAY);
-    JOYSTICK_SEND msg_joystick_send_temp = *msg_joystick_send;
-    xSemaphoreGive(msg_joystick_send->xMutex_joystick);
+    xSemaphoreTake(Msg_joystick_air_msg->xMutex_joystick_air_dashboard_set_msg, portMAX_DELAY);
+    JOYSTICK_AIR_DASHBOARD_SET_MSG Msg_joystick_air_msg_temp = *Msg_joystick_air_msg;
+    xSemaphoreGive(Msg_joystick_air_msg->xMutex_joystick_air_dashboard_set_msg);
 
-    mavlink_msg_joystick_air_dashboard_set_msg_send_struct(MAVLINK_COMM_1, &msg_joystick_send_temp.msg_joystick_air_dashboard_set_msg);
+    mavlink_msg_joystick_air_dashboard_set_msg_send_struct(MAVLINK_COMM_1, &Msg_joystick_air_msg_temp.msg_joystick_air_dashboard_set_msg);
 }
 
-void JoystickSwitchLED(float r, float g, float b, float lightness, uint16_t duration, JOYSTICK_SEND *msg_joystick_send)
+void JoystickSwitchLED(float r, float g, float b, float lightness, uint16_t duration, JOYSTICK_AIR_LED *Msg_joystick_air_led)
 {
-    xSemaphoreTake(msg_joystick_send->xMutex_joystick, portMAX_DELAY);
-    msg_joystick_send->msg_joystick_air_led.r         = r;
-    msg_joystick_send->msg_joystick_air_led.g         = g;
-    msg_joystick_send->msg_joystick_air_led.b         = b;
-    msg_joystick_send->msg_joystick_air_led.lightness = lightness;
-    msg_joystick_send->msg_joystick_air_led.duration  = duration;
-    JOYSTICK_SEND msg_joystick_send_temp              = *msg_joystick_send;
-    xSemaphoreGive(msg_joystick_send->xMutex_joystick);
+    xSemaphoreTake(Msg_joystick_air_led->xMutex_joystick_air_led, portMAX_DELAY);
+    Msg_joystick_air_led->msg_joystick_air_led.r         = r;
+    Msg_joystick_air_led->msg_joystick_air_led.g         = g;
+    Msg_joystick_air_led->msg_joystick_air_led.b         = b;
+    Msg_joystick_air_led->msg_joystick_air_led.lightness = lightness;
+    Msg_joystick_air_led->msg_joystick_air_led.duration  = duration;
+    JOYSTICK_AIR_LED msg_joystick_send_temp              = *Msg_joystick_air_led;
+    xSemaphoreGive(Msg_joystick_air_led->xMutex_joystick_air_led);
 
     mavlink_msg_joystick_air_led_send_struct(MAVLINK_COMM_1, &msg_joystick_send_temp.msg_joystick_air_led);
 }
 
-void JoystickSwitchTitle(uint8_t id, char title[20], JOYSTICK_SEND *msg_joystick_send)
+void JoystickSwitchTitle(uint8_t id, char title[20], JOYSTICK_AIR_DASHBOARD_SET_TITLE *Msg_joystick_air_title)
 {
-    xSemaphoreTake(msg_joystick_send->xMutex_joystick, portMAX_DELAY);
-    msg_joystick_send->msg_joystick_air_dashboard_set_title.id = id;
-    strncpy(msg_joystick_send->msg_joystick_air_dashboard_set_title.title, title, 20);
-    JOYSTICK_SEND msg_joystick_send_temp = *msg_joystick_send;
-    xSemaphoreGive(msg_joystick_send->xMutex_joystick);
+    xSemaphoreTake(Msg_joystick_air_title->xMutex_joystick_air_dashboard_set_title, portMAX_DELAY);
+    Msg_joystick_air_title->msg_joystick_air_dashboard_set_title.id = id;
+    strncpy(Msg_joystick_air_title->msg_joystick_air_dashboard_set_title.title, title, 20);
+    JOYSTICK_AIR_DASHBOARD_SET_TITLE Msg_joystick_air_title_temp = *Msg_joystick_air_title;
+    xSemaphoreGive(Msg_joystick_air_title->xMutex_joystick_air_dashboard_set_title);
 
-    mavlink_msg_joystick_air_dashboard_set_title_send_struct(MAVLINK_COMM_1, &msg_joystick_send_temp.msg_joystick_air_dashboard_set_title);
+    mavlink_msg_joystick_air_dashboard_set_title_send_struct(MAVLINK_COMM_1, &Msg_joystick_air_title_temp.msg_joystick_air_dashboard_set_title);
 }
 
-void JoystickSwitchMsg(uint8_t id, char message[20], JOYSTICK_SEND *msg_joystick_send)
+void JoystickSwitchMsg(uint8_t id, char message[20], JOYSTICK_AIR_DASHBOARD_SET_MSG *Msg_joystick_air_msg)
 {
-    xSemaphoreTake(msg_joystick_send->xMutex_joystick, portMAX_DELAY);
-    msg_joystick_send->msg_joystick_air_dashboard_set_msg.id = id;
-    strncpy(msg_joystick_send->msg_joystick_air_dashboard_set_msg.message, message, 20);
-    xSemaphoreGive(msg_joystick_send->xMutex_joystick);
+    xSemaphoreTake(Msg_joystick_air_msg->xMutex_joystick_air_dashboard_set_msg, portMAX_DELAY);
+    Msg_joystick_air_msg->msg_joystick_air_dashboard_set_msg.id = id;
+    strncpy(Msg_joystick_air_msg->msg_joystick_air_dashboard_set_msg.message, message, 20);
+    xSemaphoreGive(Msg_joystick_air_msg->xMutex_joystick_air_dashboard_set_msg);
 }
 
-void JoystickDelete(uint8_t id, JOYSTICK_SEND *msg_joystick_send)
+void JoystickDelete(uint8_t id, JOYSTICK_AIR_DASHBOARD_DELETE *Msg_joystick_air_delete)
 {
-    xSemaphoreTake(msg_joystick_send->xMutex_joystick, portMAX_DELAY);
-    msg_joystick_send->msg_joystick_air_dashboard_del.id = id;
-    JOYSTICK_SEND msg_joystick_send_temp                 = *msg_joystick_send;
-    xSemaphoreGive(msg_joystick_send->xMutex_joystick);
+    xSemaphoreTake(Msg_joystick_air_delete->xMutex_joystick_air_dashboard_del, portMAX_DELAY);
+    Msg_joystick_air_delete->msg_joystick_air_dashboard_del.id = id;
+    JOYSTICK_AIR_DASHBOARD_DELETE Msg_joystick_air_delete_temp = *Msg_joystick_air_delete;
+    xSemaphoreGive(Msg_joystick_air_delete->xMutex_joystick_air_dashboard_del);
 
-    mavlink_msg_joystick_air_dashboard_del_send_struct(MAVLINK_COMM_1, &msg_joystick_send_temp.msg_joystick_air_dashboard_del);
+    mavlink_msg_joystick_air_dashboard_del_send_struct(MAVLINK_COMM_1, &Msg_joystick_air_delete_temp.msg_joystick_air_dashboard_del);
 }
 
-bool ReadJoystickButtons(mavlink_joystick_air_t msg_joystick_air_, KEYS index)
+bool ReadJoystickButtons(JOYSTICK_AIR *msg_joystick_air_, KEYS index)
 {
+    xSemaphoreTake(msg_joystick_air_->xMutex_joystick_air, portMAX_DELAY);
     vPortEnterCritical();
-    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_;
+    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_->msg_joystick_air;
     vPortExitCritical();
+    xSemaphoreGive(msg_joystick_air_->xMutex_joystick_air);
 
     return ((msg_joystick_air_temp.buttons >> (index - 1)) & 1);
 }
 
-float ReadJoystickLeft_x(mavlink_joystick_air_t msg_joystick_air_)
+float ReadJoystickLeft_x(JOYSTICK_AIR *msg_joystick_air_)
 {
+    xSemaphoreTake(msg_joystick_air_->xMutex_joystick_air, portMAX_DELAY);
     vPortEnterCritical();
-    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_;
+    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_->msg_joystick_air;
     vPortExitCritical();
+    xSemaphoreGive(msg_joystick_air_->xMutex_joystick_air);
     return msg_joystick_air_temp.joystickL[0];
 }
 
-float ReadJoystickLeft_y(mavlink_joystick_air_t msg_joystick_air_)
+float ReadJoystickLeft_y(JOYSTICK_AIR *msg_joystick_air_)
 {
+    xSemaphoreTake(msg_joystick_air_->xMutex_joystick_air, portMAX_DELAY);
     vPortEnterCritical();
-    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_;
+    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_->msg_joystick_air;
     vPortExitCritical();
+    xSemaphoreGive(msg_joystick_air_->xMutex_joystick_air);
     return msg_joystick_air_temp.joystickL[1];
 }
 
-float ReadJoystickRight_x(mavlink_joystick_air_t msg_joystick_air_)
+float ReadJoystickRight_x(JOYSTICK_AIR *msg_joystick_air_)
 {
+    xSemaphoreTake(msg_joystick_air_->xMutex_joystick_air, portMAX_DELAY);
     vPortEnterCritical();
-    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_;
+    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_->msg_joystick_air;
     vPortExitCritical();
+    xSemaphoreGive(msg_joystick_air_->xMutex_joystick_air);
     return msg_joystick_air_temp.joystickR[0];
 }
 
-float ReadJoystickRight_y(mavlink_joystick_air_t msg_joystick_air_)
+float ReadJoystickRight_y(JOYSTICK_AIR *msg_joystick_air_)
 {
+    xSemaphoreTake(msg_joystick_air_->xMutex_joystick_air, portMAX_DELAY);
     vPortEnterCritical();
-    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_;
+    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_->msg_joystick_air;
     vPortExitCritical();
+    xSemaphoreGive(msg_joystick_air_->xMutex_joystick_air);
     return msg_joystick_air_temp.joystickR[1];
 }
 
-int16_t ReadJoystickKnobsLeft_x(mavlink_joystick_air_t msg_joystick_air_)
+int16_t ReadJoystickKnobsLeft_x(JOYSTICK_AIR *msg_joystick_air_)
 {
+    xSemaphoreTake(msg_joystick_air_->xMutex_joystick_air, portMAX_DELAY);
     vPortEnterCritical();
-    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_;
+    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_->msg_joystick_air;
     vPortExitCritical();
+    xSemaphoreGive(msg_joystick_air_->xMutex_joystick_air);
 
     return msg_joystick_air_temp.knobs[0];
 }
 
-int16_t ReadJoystickKnobsLeft_y(mavlink_joystick_air_t msg_joystick_air_)
+int16_t ReadJoystickKnobsLeft_y(JOYSTICK_AIR *msg_joystick_air_)
 {
+    xSemaphoreTake(msg_joystick_air_->xMutex_joystick_air, portMAX_DELAY);
     vPortEnterCritical();
-    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_;
+    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_->msg_joystick_air;
     vPortExitCritical();
+    xSemaphoreGive(msg_joystick_air_->xMutex_joystick_air);
 
     return msg_joystick_air_temp.knobs[1];
 }
 
-bool ReadJoystickSwitchs(mavlink_joystick_air_t msg_joystick_air_, SWITCHS index)
+bool ReadJoystickSwitchs(JOYSTICK_AIR *msg_joystick_air_, SWITCHS index)
+{
+    xSemaphoreTake(msg_joystick_air_->xMutex_joystick_air, portMAX_DELAY);
+    vPortEnterCritical();
+    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_->msg_joystick_air;
+    vPortExitCritical();
+    xSemaphoreGive(msg_joystick_air_->xMutex_joystick_air);
+
+    return ((msg_joystick_air_temp.switchs >> index) & 1);
+}
+
+// 应用函数
+void TitleInit()
+{
+    JoystickSwitchTitle(ID_Point, title_point, &msg_joystick_air_title_point);
+    JoystickSwitchTitle(ID_State, title_state, &msg_joystick_air_title_state);
+    JoystickSwitchTitle(ID_Posture,title_posture,&msg_joystick_air_title_posture);
+}
+
+void MsgUpdatePoint()
+{
+    xSemaphoreTake(Robot_state.xMutex_Robot, portMAX_DELAY);
+    ROBOT_STATE Robot_state_temp = Robot_state;
+    xSemaphoreGive(Robot_state.xMutex_Robot);
+    snprintf(msg_point, sizeof(msg_point), "%d", Robot_state_temp.Chassis_point);
+    JoystickSwitchMsg(ID_Point, msg_point, &msg_joystick_air_msg_point);
+}
+
+void MsgUpdatePosture()
 {
     vPortEnterCritical();
-    mavlink_joystick_air_t msg_joystick_air_temp = msg_joystick_air_;
+    float posture_x = mav_posture.pos_x;
+    float posture_y = mav_posture.pos_y;
+    float posture_w = mav_posture.zangle;
     vPortExitCritical();
-    return ((msg_joystick_air_temp.switchs >> index) & 1);
+
+    snprintf(msg_posture, sizeof(msg_posture), "x= %.2f", 1.0);
+    JoystickSwitchMsg(ID_Posture, msg_posture, &msg_joystick_air_msg_posture);
+}
+
+void MsgUpdateState()
+{
+    xSemaphoreTake(Robot_state.xMutex_Robot, portMAX_DELAY);
+    ROBOT_STATE Robot_state_temp = Robot_state;
+    xSemaphoreGive(Robot_state.xMutex_Robot);
+    switch (Robot_state_temp.Chassis_state) {
+        case Locked:
+            snprintf(msg_state, sizeof(msg_state), "Locked");
+            break;
+        case RemoteControl:
+
+            snprintf(msg_state, sizeof(msg_state), "RemoteControl");
+            break;
+        case ComputerControl:
+
+            snprintf(msg_state, sizeof(msg_state), "ComputerControl");
+            break;
+        default:
+            snprintf(msg_state, sizeof(msg_state), "ERROR");
+            break;
+    }
+    JoystickSwitchMsg(ID_State, msg_state, &msg_joystick_air_msg_state);
 }

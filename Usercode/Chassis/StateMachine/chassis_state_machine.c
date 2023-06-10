@@ -219,7 +219,7 @@ CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position)
 
 void Joystick_Control()
 {
-    crl_speed.vx = ReadJoystickRight_x(msg_joystick_air);
-    crl_speed.vy = ReadJoystickRight_y(msg_joystick_air);
-    crl_speed.vw = ReadJoystickLeft_x(msg_joystick_air);
+    crl_speed.vx = ReadJoystickRight_x(&Msg_joystick_air);
+    crl_speed.vy = ReadJoystickRight_y(&Msg_joystick_air);
+    crl_speed.vw = ReadJoystickLeft_x(&Msg_joystick_air);
 }

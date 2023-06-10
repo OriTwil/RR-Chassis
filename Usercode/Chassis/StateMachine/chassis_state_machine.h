@@ -34,6 +34,8 @@ CHASSIS_CONTROL ReadChassisControl(CHASSIS_CONTROL *chassis_control);
 
 CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position);
 
+void Joystick_Control();
+
 extern ROBOT_STATE Robot_state;
 extern CHASSIS_POSITION Chassis_Position;
 extern CHASSIS_CONTROL Chassis_Control;

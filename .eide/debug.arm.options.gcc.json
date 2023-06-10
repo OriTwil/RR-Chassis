@@ -1,10 +1,11 @@
 {
-    "version": 4,
+    "version": 5,
     "beforeBuildTasks": [],
     "afterBuildTasks": [],
     "global": {
         "$float-abi-type": "hard",
-        "output-debug-info": "enable"
+        "output-debug-info": "enable",
+        "misc-control": "--specs=nosys.specs --specs=nano.specs"
     },
     "c/cpp-compiler": {
         "language-c": "c11",
@@ -18,7 +19,7 @@
     "linker": {
         "output-format": "elf",
         "remove-unused-input-sections": true,
-        "LD_FLAGS": "--specs=nosys.specs --specs=nano.specs",
+        "LD_FLAGS": " ",
         "LIB_FLAGS": "-lm"
     }
 }

@@ -6,21 +6,33 @@
 
 void RemoteControlInit();
 void RemoteControlStart();
-void RemoteControlSendMsg(JOYSTICK_SEND *msg_joystick_send);
-void JoystickSwitchLED(float r, float g, float b, float lightness, uint16_t duration, JOYSTICK_SEND *msg_joystick_send);
-void JoystickSwitchTitle(uint8_t id, char title[20], JOYSTICK_SEND *msg_joystick_send);
-void JoystickSwitchMsg(uint8_t id, char message[20], JOYSTICK_SEND *msg_joystick_send);
-void JoystickDelete(uint8_t id, JOYSTICK_SEND *msg_joystick_send);
-bool ReadJoystickButtons(mavlink_joystick_air_t msg_joystick_air_, KEYS index);
-float ReadJoystickLeft_x(mavlink_joystick_air_t msg_joystick_air_);
-float ReadJoystickLeft_y(mavlink_joystick_air_t msg_joystick_air_);
-float ReadJoystickRight_x(mavlink_joystick_air_t msg_joystick_air_);
-float ReadJoystickRight_y(mavlink_joystick_air_t msg_joystick_air_);
-int16_t ReadJoystickKnobsLeft_x(mavlink_joystick_air_t msg_joystick_air_);
-int16_t ReadJoystickKnobsLeft_y(mavlink_joystick_air_t msg_joystick_air_);
-bool ReadJoystickSwitchs(mavlink_joystick_air_t msg_joystick_air_, SWITCHS index);
+void RemoteControlSendMsg(JOYSTICK_AIR_DASHBOARD_SET_MSG *Msg_joystick_air_msg);
+void JoystickSwitchLED(float r, float g, float b, float lightness, uint16_t duration, JOYSTICK_AIR_LED *Msg_joystick_air_led);
+void JoystickSwitchTitle(uint8_t id, char title[20], JOYSTICK_AIR_DASHBOARD_SET_TITLE *Msg_joystick_air_title);
+void JoystickSwitchMsg(uint8_t id, char message[20], JOYSTICK_AIR_DASHBOARD_SET_MSG *Msg_joystick_air_msg);
+void JoystickDelete(uint8_t id, JOYSTICK_AIR_DASHBOARD_DELETE *Msg_joystick_air_delete);
+bool ReadJoystickButtons(JOYSTICK_AIR *msg_joystick_air_, KEYS index);
+float ReadJoystickLeft_x(JOYSTICK_AIR *msg_joystick_air_);
+float ReadJoystickLeft_y(JOYSTICK_AIR *msg_joystick_air_);
+float ReadJoystickRight_x(JOYSTICK_AIR *msg_joystick_air_);
+float ReadJoystickRight_y(JOYSTICK_AIR *msg_joystick_air_);
+int16_t ReadJoystickKnobsLeft_x(JOYSTICK_AIR *msg_joystick_air_);
+int16_t ReadJoystickKnobsLeft_y(JOYSTICK_AIR *msg_joystick_air_);
+bool ReadJoystickSwitchs(JOYSTICK_AIR *msg_joystick_air_, SWITCHS index);
 
-extern mavlink_joystick_air_t msg_joystick_air;
-extern JOYSTICK_SEND msg_joystick_send;
+void TitleInit();
+void MsgUpdatePoint();
+void MsgUpdateState();
+void MsgUpdatePosture();
+
+extern JOYSTICK_AIR Msg_joystick_air;
+extern JOYSTICK_AIR_LED msg_joystick_air_led;
+extern JOYSTICK_AIR_DASHBOARD_SET_TITLE msg_joystick_air_title_point;
+extern JOYSTICK_AIR_DASHBOARD_SET_TITLE msg_joystick_air_title_state;
+extern JOYSTICK_AIR_DASHBOARD_SET_TITLE msg_joystick_air_title_posture;
+extern JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_point;
+extern JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_state;
+extern JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_posture;
+extern JOYSTICK_AIR_DASHBOARD_DELETE msg_joystick_air_delete;
 
 #endif

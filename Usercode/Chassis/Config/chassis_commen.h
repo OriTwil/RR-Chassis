@@ -64,12 +64,32 @@ typedef __IO struct {
 
 typedef struct
 {
+    mavlink_joystick_air_t msg_joystick_air;
+    SemaphoreHandle_t xMutex_joystick_air;
+} JOYSTICK_AIR;
+typedef struct
+{
     mavlink_joystick_air_led_t msg_joystick_air_led;
+    SemaphoreHandle_t xMutex_joystick_air_led;
+} JOYSTICK_AIR_LED;
+
+typedef struct 
+{
     mavlink_joystick_air_dashboard_set_title_t msg_joystick_air_dashboard_set_title;
+    SemaphoreHandle_t xMutex_joystick_air_dashboard_set_title;
+}JOYSTICK_AIR_DASHBOARD_SET_TITLE;
+
+typedef struct
+{
     mavlink_joystick_air_dashboard_set_msg_t msg_joystick_air_dashboard_set_msg;
+    SemaphoreHandle_t xMutex_joystick_air_dashboard_set_msg;
+}JOYSTICK_AIR_DASHBOARD_SET_MSG;
+
+typedef struct
+{
     mavlink_joystick_air_dashboard_del_t msg_joystick_air_dashboard_del;
-    SemaphoreHandle_t xMutex_joystick;
-} JOYSTICK_SEND;
+    SemaphoreHandle_t xMutex_joystick_air_dashboard_del;
+}JOYSTICK_AIR_DASHBOARD_DELETE;
 
 // joystick
 typedef enum {

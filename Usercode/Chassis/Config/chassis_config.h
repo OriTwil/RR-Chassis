@@ -57,12 +57,13 @@
  * 
  */
 #define huart_AS69 huart1
-#define huart_OPS huart6
-#define huart_Computer huart8
-#define huart_Remote_Control huart2
-#define huart_Chassis_to_Upper huart7
-#define UART_Computer UART8
-#define UART_OPS USART6
+#define huart_OPS huart7
+#define huart_Computer huart2
+#define huart_Remote_Control huart8
+#define huart_Chassis_to_Upper huart6
+#define UART_Remote_Control UART8
+#define UART_Computer USART2
+#define UART_OPS UART7
 #define UART_AS69 USART1
 /**
  * @brief id

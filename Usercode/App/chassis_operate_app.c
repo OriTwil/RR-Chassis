@@ -29,9 +29,9 @@ void StateManagemantTask(void const *argument)
         // 自动模式
         Automatic();
         // DJI遥控器控制模式
-        DJIRemoteControl();
+        // DJIRemoteControl();
 
-        vTaskDelay(5);
+        vTaskDelay(10);
     }
 }
 
@@ -73,6 +73,16 @@ void ChassisInit()
 
     PIDInit();
     Chassis_Pid.xMutex_pid = xSemaphoreCreateMutex();
+
+    Msg_joystick_air.xMutex_joystick_air = xSemaphoreCreateMutex();
+    msg_joystick_air_led.xMutex_joystick_air_led = xSemaphoreCreateMutex();
+    msg_joystick_air_title_point.xMutex_joystick_air_dashboard_set_title = xSemaphoreCreateMutex();
+    msg_joystick_air_title_state.xMutex_joystick_air_dashboard_set_title = xSemaphoreCreateMutex();
+    msg_joystick_air_title_posture.xMutex_joystick_air_dashboard_set_title = xSemaphoreCreateMutex();
+    msg_joystick_air_msg_point.xMutex_joystick_air_dashboard_set_msg = xSemaphoreCreateMutex();
+    msg_joystick_air_msg_state.xMutex_joystick_air_dashboard_set_msg = xSemaphoreCreateMutex();
+    msg_joystick_air_msg_posture.xMutex_joystick_air_dashboard_set_msg = xSemaphoreCreateMutex();
+    msg_joystick_air_delete.xMutex_joystick_air_dashboard_del = xSemaphoreCreateMutex();
 }
 
 /**
@@ -120,31 +130,43 @@ void DJIRemoteControl()
 
 void Automatic()
 {
-    ChassisSwitchState(ComputerControl, &Robot_state);
 
-    if (ReadJoystickButtons(msg_joystick_air, Btn_LeftCrossLeft)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossLeft)) {
         // Code for Btn_LeftCrossLeft
         ChassisSwitchPoint(First_Point, &Robot_state);
     }
 
-    if (ReadJoystickButtons(msg_joystick_air, Btn_LeftCrossRight)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossRight)) {
         // Code for Btn_LeftCrossRight
         ChassisSwitchPoint(Second_Point, &Robot_state);
     }
 
-    if (ReadJoystickButtons(msg_joystick_air, Btn_LeftCrossMid)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossMid)) {
         // Code for Btn_LeftCrossMid
         ChassisSwitchPoint(Third_Point, &Robot_state);
     }
 
-    if (ReadJoystickButtons(msg_joystick_air, Btn_RightCrossUp)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossUp)) {
         // Code for Btn_RightCrossUp
         ChassisSwitchPoint(Fourth_Point, &Robot_state);
     }
 
-    if (ReadJoystickButtons(msg_joystick_air, Btn_RightCrossDown)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossDown)) {
         // Code for Btn_RightCrossDown
         ChassisSwitchPoint(Fifth_Point, &Robot_state);
+    }
+
+    if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 0) {
+        ChassisSwitchState(Locked, &Robot_state);
+    }
+
+    if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 1) {
+        if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn0)) {
+            ChassisSwitchState(RemoteControl, &Robot_state);
+        }
+        if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn1)) {
+            ChassisSwitchState(ComputerControl, &Robot_state);
+        }
     }
 }
 

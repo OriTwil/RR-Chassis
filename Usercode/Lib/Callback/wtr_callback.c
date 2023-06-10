@@ -30,6 +30,9 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     if (huart->Instance == UART_AS69) {
         AS69_Decode(); // AS69解码
     }
+    if (huart->Instance == UART_Remote_Control) {
+        wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_1); // 进入mavlink回调
+    }
 }
 
 /**
@@ -48,7 +51,7 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
             mavlink_msg_control_decode(msg, &control);
             break;
         case MAVLINK_MSG_ID_JOYSTICK_AIR:
-            mavlink_msg_joystick_air_decode(msg, &msg_joystick_air);
+            mavlink_msg_joystick_air_decode(msg, &Msg_joystick_air.msg_joystick_air);
             break;
         // ......
         default:
