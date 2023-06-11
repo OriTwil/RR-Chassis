@@ -33,9 +33,9 @@ void RemoteControlTask(void const *argument)
     while (1) {
         TitleInit();
         // 底盘位置
-        // MsgUpdatePoint();
+        MsgUpdatePoint();
         // 底盘状态
-        // MsgUpdateState();
+        MsgUpdateState();
         // 位置
         MsgUpdatePosture();
 

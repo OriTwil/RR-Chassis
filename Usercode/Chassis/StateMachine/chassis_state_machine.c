@@ -71,6 +71,7 @@ void ChassisStateMachineTask(void const *argument)
                                           PIDPosition(&Chassis_Pid.Pid_pos_y),
                                           PIDPosition(&Chassis_Pid.Pid_pos_w),
                                           &Chassis_Control); // 反馈控制底盘锁死在该位置
+                break;
 
             case RemoteControl:
                 islocked = false;
@@ -83,7 +84,7 @@ void ChassisStateMachineTask(void const *argument)
                 DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 DJI遥控器摇杆
                 SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, crl_speed.vw, &Chassis_Control);   // 用摇杆控制底盘
                 vPortExitCritical();
-
+                break;
             case ComputerControl:
                 islocked = false;
                 SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position);      // 更新底盘位置
@@ -94,6 +95,7 @@ void ChassisStateMachineTask(void const *argument)
                                           control_temp.vw_set + PIDPosition(&Chassis_Pid.Pid_pos_w),
                                           &Chassis_Control); // 上位机规划值作为伺服值
                 xSemaphoreGive(Chassis_Pid.xMutex_pid);
+                break;
         }
 
         vTaskDelayUntil(&PreviousWakeTime, 5);

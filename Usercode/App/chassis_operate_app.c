@@ -53,7 +53,7 @@ void StateManagemantTaskStart()
 void ChassisInit()
 {
     Robot_state.Chassis_point    = First_Point;
-    Robot_state.Chassis_state    = Locked;
+    Robot_state.Chassis_state    = RemoteControl;
     Robot_state.Perception_state = Receive;
     Robot_state.xMutex_Robot     = xSemaphoreCreateMutex();
 
@@ -161,10 +161,10 @@ void Automatic()
     }
 
     if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 1) {
-        if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn0)) {
+        if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn2)) {
             ChassisSwitchState(RemoteControl, &Robot_state);
         }
-        if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn1)) {
+        if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn3)) {
             ChassisSwitchState(ComputerControl, &Robot_state);
         }
     }
