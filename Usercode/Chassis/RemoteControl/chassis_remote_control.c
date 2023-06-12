@@ -16,22 +16,29 @@ JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_state;
 JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_posture;
 JOYSTICK_AIR_DASHBOARD_DELETE msg_joystick_air_delete;
 
-char title_point[20] = "point";
+char title_point[20]   = "point";
 char title_state[20]   = "state";
-char title_posture[20]  = "posture";
-char msg_point[20]   = "no_msg";
+char title_posture[20] = "posture";
+char msg_point[20]     = "no_msg";
 char msg_state[20]     = "no_msg";
-char msg_posture[20] = "no_msg";
-#define ID_Point 6
+char msg_posture[20]   = "no_msg";
+#define ID_Point   6
 #define ID_State   8
 #define ID_Posture 16
 
 void RemoteControlTask(void const *argument)
 {
     uint32_t PreviousWakeTime = xTaskGetTickCount();
+    uint32_t counter = 0;
     
     while (1) {
-        TitleInit();
+        if(counter % 50 == 0)
+        {
+            TitleInit();
+            counter = 0;
+        }
+        counter++;
+
         // 底盘位置
         MsgUpdatePoint();
         // 底盘状态
@@ -63,10 +70,11 @@ void RemoteControlStart()
 void RemoteControlSendMsg(JOYSTICK_AIR_DASHBOARD_SET_MSG *Msg_joystick_air_msg)
 {
     xSemaphoreTake(Msg_joystick_air_msg->xMutex_joystick_air_dashboard_set_msg, portMAX_DELAY);
-    JOYSTICK_AIR_DASHBOARD_SET_MSG Msg_joystick_air_msg_temp = *Msg_joystick_air_msg;
+    mavlink_joystick_air_dashboard_set_msg_t msg_joystick_air_dashboard_set_msg_temp = Msg_joystick_air_msg->msg_joystick_air_dashboard_set_msg;
     xSemaphoreGive(Msg_joystick_air_msg->xMutex_joystick_air_dashboard_set_msg);
 
-    mavlink_msg_joystick_air_dashboard_set_msg_send_struct(MAVLINK_COMM_1, &Msg_joystick_air_msg_temp.msg_joystick_air_dashboard_set_msg);
+    mavlink_msg_joystick_air_dashboard_set_msg_send_struct(MAVLINK_COMM_1, &msg_joystick_air_dashboard_set_msg_temp);
+    vTaskDelay(25);
 }
 
 void JoystickSwitchLED(float r, float g, float b, float lightness, uint16_t duration, JOYSTICK_AIR_LED *Msg_joystick_air_led)
@@ -201,7 +209,7 @@ void TitleInit()
 {
     JoystickSwitchTitle(ID_Point, title_point, &msg_joystick_air_title_point);
     JoystickSwitchTitle(ID_State, title_state, &msg_joystick_air_title_state);
-    JoystickSwitchTitle(ID_Posture,title_posture,&msg_joystick_air_title_posture);
+    JoystickSwitchTitle(ID_Posture, title_posture, &msg_joystick_air_title_posture);
 }
 
 void MsgUpdatePoint()
@@ -211,6 +219,7 @@ void MsgUpdatePoint()
     xSemaphoreGive(Robot_state.xMutex_Robot);
     snprintf(msg_point, sizeof(msg_point), "%d", Robot_state_temp.Chassis_point);
     JoystickSwitchMsg(ID_Point, msg_point, &msg_joystick_air_msg_point);
+    vTaskDelay(2);
 }
 
 void MsgUpdatePosture()
@@ -223,6 +232,7 @@ void MsgUpdatePosture()
 
     snprintf(msg_posture, sizeof(msg_posture), "x= %.2f", 1.0);
     JoystickSwitchMsg(ID_Posture, msg_posture, &msg_joystick_air_msg_posture);
+    vTaskDelay(2);
 }
 
 void MsgUpdateState()
@@ -247,4 +257,5 @@ void MsgUpdateState()
             break;
     }
     JoystickSwitchMsg(ID_State, msg_state, &msg_joystick_air_msg_state);
+    vTaskDelay(2);
 }
