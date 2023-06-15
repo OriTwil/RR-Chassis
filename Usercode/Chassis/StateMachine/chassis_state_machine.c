@@ -87,6 +87,7 @@ void ChassisStateMachineTask(void const *argument)
                 break;
             case ComputerControl:
                 islocked = false;
+                control_temp = FrameTransform(&control,&mav_posture);
                 SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position);      // 更新底盘位置
                 SetChassisControlPosition(control_temp.x_set, control_temp.y_set, control_temp.w_set, &Chassis_Control); // 上位机规划值作为伺服值
                 xSemaphoreTake(Chassis_Pid.xMutex_pid, (TickType_t)10);
@@ -224,4 +225,24 @@ void Joystick_Control()
     crl_speed.vx = ReadJoystickRight_x(&Msg_joystick_air);
     crl_speed.vy = ReadJoystickRight_y(&Msg_joystick_air);
     crl_speed.vw = ReadJoystickLeft_x(&Msg_joystick_air);
+}
+
+/**
+ * @description: 速度方向转换
+ * @param 
+ * @return 
+ * @bug 转换方程还不确定
+ */
+mavlink_control_t FrameTransform(mavlink_control_t *control,mavlink_posture_t *posture)
+{
+    mavlink_control_t result;
+    vPortEnterCritical();
+    result.vx_set = control->vx_set * cos(posture->zangle) + control->vy_set * sin(posture->zangle);
+    result.vy_set = -control->vx_set * sin(posture->zangle) + control->vy_set * cos(posture->zangle);
+    result.vw_set = control->vw_set;
+    result.w_set = control->w_set;
+    result.x_set = control->x_set;
+    result.y_set = control->y_set;
+    vPortExitCritical();
+    return result;
 }

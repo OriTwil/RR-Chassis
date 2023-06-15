@@ -34,6 +34,8 @@ CHASSIS_CONTROL ReadChassisControl(CHASSIS_CONTROL *chassis_control);
 
 CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position);
 
+mavlink_control_t FrameTransform(mavlink_control_t *control, mavlink_posture_t *posture);
+
 void Joystick_Control();
 
 extern ROBOT_STATE Robot_state;

@@ -159,19 +159,6 @@ float PIDPosition(__IO PID_Pos *p)
     return out;
 }
 
-/**
- * @description: 速度方向转换
- * @param 
- * @return 
- * @bug 转换方程还不确定
- */
-mavlink_control_t FrameTransform(mavlink_control_t *control,mavlink_posture_t *posture)
-{
-    mavlink_control_t result;
-    result.vx_set = control->vx_set * cos(posture->zangle) + control->vy_set * sin(posture->zangle);
-    result.vy_set = -control->vx_set * sin(posture->zangle) + control->vy_set * cos(posture->zangle);
-    return result;
-}
 
 //增量式PID算法
 void PID_Calc(PID_t *pid){

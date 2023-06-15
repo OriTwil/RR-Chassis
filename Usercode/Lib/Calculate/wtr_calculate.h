@@ -86,6 +86,4 @@ void speedServo(float ref, DJI_t *motor);
 
 void DeadBand(double x, double y, double *new_x, double *new_y, double threshould);
 
-mavlink_control_t FrameTransform(mavlink_control_t *control, mavlink_posture_t *posture);
-
 #endif
