@@ -82,20 +82,27 @@ void ChassisStateMachineTask(void const *argument)
                 // DJI_Control();
                 vPortEnterCritical();
                 DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 DJI遥控器摇杆
-                SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, crl_speed.vw, &Chassis_Control);   // 用摇杆控制底盘
+                // double vx_deadbanded = vx_deadbanded * cos(mav_posture.zangle * DEC) + vy_deadbanded * sin(mav_posture.zangle * DEC);
+                // double vy_deadbanded = -vx_deadbanded * sin(mav_posture.zangle * DEC) + vy_deadbanded * cos(mav_posture.zangle * DEC);
+                SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, crl_speed.vw, &Chassis_Control); // 用摇杆控制底盘
                 vPortExitCritical();
                 break;
-            case ComputerControl:
+        case ComputerControl:
                 islocked = false;
-                control_temp = FrameTransform(&control,&mav_posture);
                 SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position);      // 更新底盘位置
                 SetChassisControlPosition(control_temp.x_set, control_temp.y_set, control_temp.w_set, &Chassis_Control); // 上位机规划值作为伺服值
+
                 xSemaphoreTake(Chassis_Pid.xMutex_pid, (TickType_t)10);
-                SetChassisControlVelocity(control_temp.vx_set + PIDPosition(&Chassis_Pid.Pid_pos_x),
-                                          control_temp.vy_set + PIDPosition(&Chassis_Pid.Pid_pos_y),
-                                          control_temp.vw_set + PIDPosition(&Chassis_Pid.Pid_pos_w),
-                                          &Chassis_Control); // 上位机规划值作为伺服值
+                control_temp.vx_set = control_temp.vx_set + PIDPosition(&Chassis_Pid.Pid_pos_x);
+                control_temp.vy_set = control_temp.vy_set + PIDPosition(&Chassis_Pid.Pid_pos_y);
+                control_temp.vw_set = PIDPosition(&Chassis_Pid.Pid_pos_w);
                 xSemaphoreGive(Chassis_Pid.xMutex_pid);
+                control_temp = FrameTransform(&control_temp, &mav_posture);
+
+                SetChassisControlVelocity(control_temp.vx_set,
+                                          control_temp.vy_set,
+                                          control_temp.vw_set,
+                                          &Chassis_Control); // 上位机规划值作为伺服值
                 break;
         }
 
@@ -229,20 +236,20 @@ void Joystick_Control()
 
 /**
  * @description: 速度方向转换
- * @param 
- * @return 
+ * @param
+ * @return
  * @bug 转换方程还不确定
  */
-mavlink_control_t FrameTransform(mavlink_control_t *control,mavlink_posture_t *posture)
+mavlink_control_t FrameTransform(mavlink_control_t *control, mavlink_posture_t *posture)
 {
     mavlink_control_t result;
     vPortEnterCritical();
-    result.vx_set = control->vx_set * cos(posture->zangle) + control->vy_set * sin(posture->zangle);
-    result.vy_set = -control->vx_set * sin(posture->zangle) + control->vy_set * cos(posture->zangle);
+    result.vx_set = control->vx_set * cos(posture->zangle * DEC) + control->vy_set * sin(posture->zangle * DEC);
+    result.vy_set = -control->vx_set * sin(posture->zangle * DEC) + control->vy_set * cos(posture->zangle * DEC);
     result.vw_set = control->vw_set;
-    result.w_set = control->w_set;
-    result.x_set = control->x_set;
-    result.y_set = control->y_set;
+    result.w_set  = control->w_set;
+    result.x_set  = control->x_set;
+    result.y_set  = control->y_set;
     vPortExitCritical();
     return result;
 }

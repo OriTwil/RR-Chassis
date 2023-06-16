@@ -92,20 +92,20 @@ void ChassisInit()
 void PIDInit()
 {
     // 位置式pid参数设置
-    Chassis_Pid.Pid_pos_w.Kp    = 40;
+    Chassis_Pid.Pid_pos_w.Kp    = 0.06;
     Chassis_Pid.Pid_pos_w.Ki    = 0;
     Chassis_Pid.Pid_pos_w.Kd    = 0;
-    Chassis_Pid.Pid_pos_w.limit = 0.5;
+    Chassis_Pid.Pid_pos_w.limit = 1;
 
     Chassis_Pid.Pid_pos_x.Kp    = 5;
-    Chassis_Pid.Pid_pos_x.Ki    = 0;
+    Chassis_Pid.Pid_pos_x.Ki    = 0.0001;
     Chassis_Pid.Pid_pos_x.Kd    = 0;
-    Chassis_Pid.Pid_pos_x.limit = 0.5;
+    Chassis_Pid.Pid_pos_x.limit = 1;
 
     Chassis_Pid.Pid_pos_y.Kp    = 5;
-    Chassis_Pid.Pid_pos_y.Ki    = 0;
+    Chassis_Pid.Pid_pos_y.Ki    = 0.0001;
     Chassis_Pid.Pid_pos_y.Kd    = 0;
-    Chassis_Pid.Pid_pos_y.limit = 0.5;
+    Chassis_Pid.Pid_pos_y.limit = 1;
 }
 
 void DJIRemoteControl()
