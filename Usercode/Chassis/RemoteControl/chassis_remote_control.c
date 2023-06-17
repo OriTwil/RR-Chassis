@@ -29,11 +29,10 @@ char msg_posture[20]   = "no_msg";
 void RemoteControlTask(void const *argument)
 {
     uint32_t PreviousWakeTime = xTaskGetTickCount();
-    uint32_t counter = 0;
-    
+    uint32_t counter          = 0;
+
     while (1) {
-        if(counter % 50 == 0)
-        {
+        if (counter % 50 == 0) {
             TitleInit();
             counter = 0;
         }
@@ -214,10 +213,10 @@ void TitleInit()
 
 void MsgUpdatePoint()
 {
-    xSemaphoreTake(Robot_state.xMutex_Robot, portMAX_DELAY);
-    ROBOT_STATE Robot_state_temp = Robot_state;
-    xSemaphoreGive(Robot_state.xMutex_Robot);
-    snprintf(msg_point, sizeof(msg_point), "%d", Robot_state_temp.Chassis_point);
+    vPortEnterCritical();
+    int point_temp = mav_posture.point;
+    vPortExitCritical();
+    snprintf(msg_point, sizeof(msg_point), "%d", point_temp);
     JoystickSwitchMsg(ID_Point, msg_point, &msg_joystick_air_msg_point);
     vTaskDelay(2);
 }
