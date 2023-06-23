@@ -29,6 +29,7 @@
 CHASSIS_POSITION Chassis_Position;
 CHASSIS_CONTROL Chassis_Control;
 ROBOT_STATE Robot_state;
+SPEED_RATIO Speed_ratio;
 
 double vx_deadbanded = 0;
 double vy_deadbanded = 0;
@@ -87,7 +88,7 @@ void ChassisStateMachineTask(void const *argument)
                 SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, crl_speed.vw, &Chassis_Control); // 用摇杆控制底盘
                 vPortExitCritical();
                 break;
-        case ComputerControl:
+            case ComputerControl:
                 islocked = false;
                 SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position);      // 更新底盘位置
                 SetChassisControlPosition(control_temp.x_set, control_temp.y_set, control_temp.w_set, &Chassis_Control); // 上位机规划值作为伺服值
@@ -156,6 +157,14 @@ void ChassisSwitchState(CHASSIS_STATE target_chassis_state, ROBOT_STATE *current
     xSemaphoreTake(current_robot_state->xMutex_Robot, (TickType_t)10);
     current_robot_state->Chassis_state = target_chassis_state;
     xSemaphoreGive(current_robot_state->xMutex_Robot);
+}
+
+void SpeedSwitchRatio(double target_speed_ratio_linear, double target_speed_ratio_angular, SPEED_RATIO* Speed_Ratio)
+{
+    xSemaphoreTake(Speed_ratio.xMutex_speed_ratio, portMAX_DELAY);
+    Speed_Ratio->speed_ratio_angular = target_speed_ratio_angular;
+    Speed_Ratio->speed_ratio_linear = target_speed_ratio_linear;
+    xSemaphoreGive(Speed_ratio.xMutex_speed_ratio);
 }
 
 /**
@@ -229,9 +238,13 @@ CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position)
 
 void Joystick_Control()
 {
-    crl_speed.vx = ReadJoystickRight_x(&Msg_joystick_air);
-    crl_speed.vy = ReadJoystickRight_y(&Msg_joystick_air);
-    crl_speed.vw = ReadJoystickLeft_x(&Msg_joystick_air);
+    xSemaphoreTake(Speed_ratio.xMutex_speed_ratio, portMAX_DELAY);
+    double speed_ratio_linear_temp  = Speed_ratio.speed_ratio_linear;
+    double speed_ratio_angular_temp = Speed_ratio.speed_ratio_angular;
+    xSemaphoreGive(Speed_ratio.xMutex_speed_ratio);
+    crl_speed.vx = ReadJoystickRight_x(&Msg_joystick_air) * speed_ratio_linear_temp;
+    crl_speed.vy = ReadJoystickRight_y(&Msg_joystick_air) * speed_ratio_linear_temp;
+    crl_speed.vw = ReadJoystickLeft_x(&Msg_joystick_air) * speed_ratio_angular_temp;
 }
 
 /**

@@ -92,20 +92,20 @@ void ChassisInit()
 void PIDInit()
 {
     // 位置式pid参数设置
-    Chassis_Pid.Pid_pos_w.Kp    = 0.06;
-    Chassis_Pid.Pid_pos_w.Ki    = 0;
+    Chassis_Pid.Pid_pos_w.Kp    = 0.1;
+    Chassis_Pid.Pid_pos_w.Ki    = 0.0000001;
     Chassis_Pid.Pid_pos_w.Kd    = 0;
     Chassis_Pid.Pid_pos_w.limit = 1;
 
     Chassis_Pid.Pid_pos_x.Kp    = 5;
     Chassis_Pid.Pid_pos_x.Ki    = 0.0001;
     Chassis_Pid.Pid_pos_x.Kd    = 0;
-    Chassis_Pid.Pid_pos_x.limit = 1;
+    Chassis_Pid.Pid_pos_x.limit = 0.3;
 
     Chassis_Pid.Pid_pos_y.Kp    = 5;
     Chassis_Pid.Pid_pos_y.Ki    = 0.0001;
     Chassis_Pid.Pid_pos_y.Kd    = 0;
-    Chassis_Pid.Pid_pos_y.limit = 1;
+    Chassis_Pid.Pid_pos_y.limit = 0.3;
 }
 
 void DJIRemoteControl()
@@ -130,63 +130,58 @@ void DJIRemoteControl()
 
 void Automatic()
 {
-
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossLeft)) {
-        // Code for Btn_LeftCrossLeft
-        ChassisSwitchPoint(First_Point, &Robot_state);
+    // 切换高速低速
+    if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 0) {
+        SpeedSwitchRatio(0.3, 0.5, &Speed_ratio);
     }
 
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossRight)) {
-        // Code for Btn_LeftCrossRight
-        ChassisSwitchPoint(Second_Point, &Robot_state);
+    if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 1) {
+        SpeedSwitchRatio(1, 1.5, &Speed_ratio);
     }
 
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossMid)) {
-        // Code for Btn_LeftCrossMid
-        ChassisSwitchPoint(Third_Point, &Robot_state);
-    }
-
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossUp)) {
-        // Code for Btn_RightCrossUp
-        ChassisSwitchPoint(Fourth_Point, &Robot_state);
-    }
-
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossDown)) {
-        // Code for Btn_RightCrossDown
-        ChassisSwitchPoint(Fifth_Point, &Robot_state);
-    }
-
+    // 切换手动自动模式
     if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 0) {
-        ChassisSwitchState(Locked, &Robot_state);
+        ChassisSwitchState(ComputerControl, &Robot_state);
     }
 
     if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 1) {
-        if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn2)) {
-            ChassisSwitchState(RemoteControl, &Robot_state);
-        }
-        if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn3)) {
-            ChassisSwitchState(ComputerControl, &Robot_state);
-        }
+        ChassisSwitchState(RemoteControl, &Robot_state);
     }
 
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_JoystickL)) {
+    // 切换地盘点位
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn4)) {
         vPortEnterCritical();
         mav_posture.point = First_Point;
         vPortExitCritical();
     }
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_JoystickR)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn5)) {
         vPortEnterCritical();
         mav_posture.point = Second_Point;
         vPortExitCritical();
     }
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_KnobL)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossUp)) {
         vPortEnterCritical();
         mav_posture.point = Third_Point;
         vPortExitCritical();
     }
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_KnobR)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossLeft)) {
         vPortEnterCritical();
         mav_posture.point = Fourth_Point;
+        vPortExitCritical();
+    }
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossMid)) {
+        vPortEnterCritical();
+        mav_posture.point = Fifth_Point;
+        vPortExitCritical();
+    }
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossRight)) {
+        vPortEnterCritical();
+        mav_posture.point = Sixth_Point;
+        vPortExitCritical();
+    }
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossDown)) {
+        vPortEnterCritical();
+        mav_posture.point = Seventh_Point;
         vPortExitCritical();
     }
 }

@@ -36,10 +36,13 @@ CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position);
 
 mavlink_control_t FrameTransform(mavlink_control_t *control, mavlink_posture_t *posture);
 
+void SpeedSwitchRatio(double target_speed_ratio_linear, double target_speed_ratio_angular, SPEED_RATIO* Speed_Ratio);
+
 void Joystick_Control();
 
 extern ROBOT_STATE Robot_state;
 extern CHASSIS_POSITION Chassis_Position;
 extern CHASSIS_CONTROL Chassis_Control;
+extern SPEED_RATIO Speed_ratio;
 
 #endif

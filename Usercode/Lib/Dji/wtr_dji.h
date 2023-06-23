@@ -5,7 +5,6 @@
 
 #define LAST 0
 #define NOW  1
-
 typedef struct {
     float KP;        // PID参数P
     float KI;        // PID参数I
@@ -35,7 +34,6 @@ typedef struct {
         float rpm;              // 电机转子速度，单位 rpm
         float current;          // 电机转矩电流
     } FdbData;
-
     struct {
         float RotorAngle_all;          // 电机总角度 单位 度° 范围-inf~inf
         float RotorAngle_0_360_Log[2]; // NOW->电机当前位置0~360 LAST->电机上一次更新位置0~360

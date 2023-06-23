@@ -97,6 +97,14 @@ typedef enum {
     Right_switch
 } SWITCHS;
 
+typedef __IO struct 
+{
+    /* data */
+    double speed_ratio_linear;
+    double speed_ratio_angular;
+    SemaphoreHandle_t xMutex_speed_ratio;
+}SPEED_RATIO;
+
 typedef enum {
     Btn_LeftCrossUp     = 2,
     Btn_LeftCrossDown   = 1,
