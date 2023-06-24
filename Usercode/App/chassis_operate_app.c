@@ -74,6 +74,10 @@ void ChassisInit()
     PIDInit();
     Chassis_Pid.xMutex_pid = xSemaphoreCreateMutex();
 
+    Speed_ratio.speed_ratio_angular = 0.5;
+    Speed_ratio.speed_ratio_linear = 0.3;
+    Speed_ratio.xMutex_speed_ratio = xSemaphoreCreateMutex();
+
     Msg_joystick_air.xMutex_joystick_air                                   = xSemaphoreCreateMutex();
     msg_joystick_air_led.xMutex_joystick_air_led                           = xSemaphoreCreateMutex();
     msg_joystick_air_title_point.xMutex_joystick_air_dashboard_set_title   = xSemaphoreCreateMutex();
