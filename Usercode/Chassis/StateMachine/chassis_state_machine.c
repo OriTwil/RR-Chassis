@@ -30,9 +30,16 @@ CHASSIS_POSITION Chassis_Position;
 CHASSIS_CONTROL Chassis_Control;
 ROBOT_STATE Robot_state;
 SPEED_RATIO Speed_ratio;
+BAFFLE Baffle;
+CONTROL Control = {
+    .control_w          = 0,
+    .micro_adjustment_w = 0};
+
+FIRE_TARGET Fire_Target;
 
 double vx_deadbanded = 0;
 double vy_deadbanded = 0;
+double vw_deadband   = 0;
 bool islocked        = false;
 
 float pos_x_locked = 0;
@@ -83,15 +90,17 @@ void ChassisStateMachineTask(void const *argument)
                 // DJI_Control();
                 vPortEnterCritical();
                 DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 DJI遥控器摇杆
+                DeadBandOneDimensional((double)crl_speed.vw, &vw_deadband, 0.2);
                 // double vx_deadbanded = vx_deadbanded * cos(mav_posture.zangle * DEC) + vy_deadbanded * sin(mav_posture.zangle * DEC);
                 // double vy_deadbanded = -vx_deadbanded * sin(mav_posture.zangle * DEC) + vy_deadbanded * cos(mav_posture.zangle * DEC);
-                SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, crl_speed.vw, &Chassis_Control); // 用摇杆控制底盘
+                SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, vw_deadband, &Chassis_Control); // 用摇杆控制底盘
                 vPortExitCritical();
                 break;
-            case ComputerControl:
+            case AutoControl:
                 islocked = false;
-                SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position);      // 更新底盘位置
-                SetChassisControlPosition(control_temp.x_set, control_temp.y_set, control_temp.w_set, &Chassis_Control); // 上位机规划值作为伺服值
+                SetChassisPosition(posture_temp.pos_x, posture_temp.pos_y, posture_temp.zangle, &Chassis_Position); // 更新底盘位置
+                UpdateW();
+                SetChassisControlPosition(control_temp.x_set, control_temp.y_set, Control.control_w + Control.micro_adjustment_w, &Chassis_Control); // 上位机规划值作为伺服值
 
                 xSemaphoreTake(Chassis_Pid.xMutex_pid, (TickType_t)10);
                 control_temp.vx_set = control_temp.vx_set + PIDPosition(&Chassis_Pid.Pid_pos_x);
@@ -152,18 +161,28 @@ void ChassisSwitchPoint(CHASSIS_POINT target_chassis_point, ROBOT_STATE *current
  * @param target_chassis_state 目标状态(Locked RemoteControl ComputerControl)
  * @return {void}
  */
+
 void ChassisSwitchState(CHASSIS_STATE target_chassis_state, ROBOT_STATE *current_robot_state)
 {
-    xSemaphoreTake(current_robot_state->xMutex_Robot, (TickType_t)10);
+    xSemaphoreTake(current_robot_state->xMutex_Robot, portMAX_DELAY);
+
     current_robot_state->Chassis_state = target_chassis_state;
+
     xSemaphoreGive(current_robot_state->xMutex_Robot);
 }
 
-void SpeedSwitchRatio(double target_speed_ratio_linear, double target_speed_ratio_angular, SPEED_RATIO* Speed_Ratio)
+void FireSwitchTarget(FIRE_NUMBER fire_target, FIRE_TARGET *current_fire_target)
+{
+    xSemaphoreTake(current_fire_target->xMutex_target, (TickType_t)10);
+    current_fire_target->Fire_number = fire_target;
+    xSemaphoreGive(current_fire_target->xMutex_target);
+}
+
+void SpeedSwitchRatio(double target_speed_ratio_linear, double target_speed_ratio_angular, SPEED_RATIO *Speed_Ratio)
 {
     xSemaphoreTake(Speed_ratio.xMutex_speed_ratio, portMAX_DELAY);
     Speed_Ratio->speed_ratio_angular = target_speed_ratio_angular;
-    Speed_Ratio->speed_ratio_linear = target_speed_ratio_linear;
+    Speed_Ratio->speed_ratio_linear  = target_speed_ratio_linear;
     xSemaphoreGive(Speed_ratio.xMutex_speed_ratio);
 }
 
@@ -209,6 +228,27 @@ void SetChassisControlPosition(float x_control, float y_control, float w_control
     xSemaphoreGive(chassis_control->xMutex_control);
 }
 
+void SetBaffleRef(float target_baffle_ref, BAFFLE *Baffle_)
+{
+    xSemaphoreTake(Baffle_->xMutex_baffle, portMAX_DELAY);
+    Baffle_->position_servo_ref_baffle = target_baffle_ref;
+    xSemaphoreGive(Baffle_->xMutex_baffle);
+}
+
+void SetChassisW(float target_w, CONTROL *Control_)
+{
+    xSemaphoreTake(Control_->xMutex_w, portMAX_DELAY);
+    Control_->control_w = target_w;
+    xSemaphoreGive(Control_->xMutex_w);
+}
+
+void SetChassisAdjustmentW(float target_adjustment_w, CONTROL *Control_)
+{
+    xSemaphoreTake(Control_->xMutex_w, portMAX_DELAY);
+    Control_->micro_adjustment_w = target_adjustment_w;
+    xSemaphoreGive(Control_->xMutex_w);
+}
+
 ROBOT_STATE ReadRobotState(ROBOT_STATE *current_robot_state)
 {
     ROBOT_STATE robot_state_temp;
@@ -234,6 +274,20 @@ CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position)
     chassis_position_temp = *chassis_position;
     xSemaphoreGive(chassis_position->xMutex_position);
     return chassis_position_temp;
+}
+
+SPEED_RATIO ReadSpeedRatio(SPEED_RATIO *Speed_ratio_)
+{
+    xSemaphoreTake(Speed_ratio_->xMutex_speed_ratio, portMAX_DELAY);
+    return *Speed_ratio_;
+    xSemaphoreGive(Speed_ratio.xMutex_speed_ratio);
+}
+
+FIRE_NUMBER ReadFireNumber(FIRE_TARGET *current_fire_target)
+{
+    xSemaphoreTake(current_fire_target->xMutex_target, (TickType_t)10);
+    return current_fire_target->Fire_number;
+    xSemaphoreGive(current_fire_target->xMutex_target);
 }
 
 void Joystick_Control()
@@ -265,4 +319,83 @@ mavlink_control_t FrameTransform(mavlink_control_t *control, mavlink_posture_t *
     result.y_set  = control->y_set;
     vPortExitCritical();
     return result;
+}
+
+void UpdateW()
+{
+    vPortEnterCritical();
+    CHASSIS_POINT current_point = mav_posture.point;
+    vPortExitCritical();
+    FIRE_NUMBER current_target = ReadFireNumber(&Fire_Target);
+
+    switch (current_point) {
+
+        case Fifth_Point:
+            switch (current_target) {
+                case First_Target:
+                    SetChassisW(w_5_1, &Control);
+                    break;
+                case Second_Target:
+                    SetChassisW(w_5_2, &Control);
+                    break;
+                case Third_Target:
+                    SetChassisW(w_5_3, &Control);
+                    break;
+                case Fourth_Target:
+                    SetChassisW(w_5_4, &Control);
+                    break;
+                case Fifth_Target:
+                    SetChassisW(w_5_5, &Control);
+                    break;
+                case Sixth_Target:
+                    SetChassisW(w_5_6, &Control);
+                    break;
+                case Seventh_Target:
+                    SetChassisW(w_5_7, &Control);
+                    break;
+                case Eighth_Target:
+                    SetChassisW(w_5_8, &Control);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case Sixth_Point:
+            switch (current_target) {
+                case First_Target:
+                    SetChassisW(w_6_1, &Control);
+                    break;
+                case Fourth_Target:
+                    SetChassisW(w_6_4, &Control);
+                    break;
+                case Sixth_Target:
+                    SetChassisW(w_6_6, &Control);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        case Seventh_Point:
+            switch (current_target) {
+                case Second_Target:
+                    SetChassisW(w_7_2, &Control);
+                    break;
+                case Fifth_Target:
+                    SetChassisW(w_7_5, &Control);
+                    break;
+                case Eighth_Target:
+                    SetChassisW(w_7_8, &Control);
+                    break;
+                default:
+                    break;
+            }
+            break;
+        default:
+            break;
+    }
+
+    // 微调w
+    vPortEnterCritical();
+    SetChassisAdjustmentW(Msg_joystick_air.msg_joystick_air.knobs[0] / 20.0, &Control);
+    vPortExitCritical();
 }

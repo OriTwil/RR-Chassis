@@ -8,6 +8,7 @@ typedef enum {
 } PERCEPTION_STATE;
 
 typedef enum {
+    Zero_Point,
     First_Point,
     Second_Point,
     Third_Point,
@@ -23,8 +24,19 @@ typedef enum {
 typedef enum {
     Locked,
     RemoteControl,
-    ComputerControl
+    AutoControl
 } CHASSIS_STATE;
+
+typedef enum {
+    First_Target = 1,
+    Second_Target,
+    Third_Target,
+    Fourth_Target,
+    Fifth_Target,
+    Sixth_Target,
+    Seventh_Target,
+    Eighth_Target
+} FIRE_NUMBER;
 
 typedef __IO struct
 {
@@ -62,6 +74,19 @@ typedef __IO struct {
     CHASSIS_POINT Chassis_point;
 } ROBOT_STATE;
 
+typedef __IO struct
+{
+    /* data */
+    float position_servo_ref_baffle;
+    SemaphoreHandle_t xMutex_baffle;
+} BAFFLE;
+
+typedef __IO struct
+{
+    FIRE_NUMBER Fire_number;
+    SemaphoreHandle_t xMutex_target;
+}FIRE_TARGET;
+
 typedef struct
 {
     mavlink_joystick_air_t msg_joystick_air;
@@ -73,23 +98,23 @@ typedef struct
     SemaphoreHandle_t xMutex_joystick_air_led;
 } JOYSTICK_AIR_LED;
 
-typedef struct 
+typedef struct
 {
     mavlink_joystick_air_dashboard_set_title_t msg_joystick_air_dashboard_set_title;
     SemaphoreHandle_t xMutex_joystick_air_dashboard_set_title;
-}JOYSTICK_AIR_DASHBOARD_SET_TITLE;
+} JOYSTICK_AIR_DASHBOARD_SET_TITLE;
 
 typedef struct
 {
     mavlink_joystick_air_dashboard_set_msg_t msg_joystick_air_dashboard_set_msg;
     SemaphoreHandle_t xMutex_joystick_air_dashboard_set_msg;
-}JOYSTICK_AIR_DASHBOARD_SET_MSG;
+} JOYSTICK_AIR_DASHBOARD_SET_MSG;
 
 typedef struct
 {
     mavlink_joystick_air_dashboard_del_t msg_joystick_air_dashboard_del;
     SemaphoreHandle_t xMutex_joystick_air_dashboard_del;
-}JOYSTICK_AIR_DASHBOARD_DELETE;
+} JOYSTICK_AIR_DASHBOARD_DELETE;
 
 // joystick
 typedef enum {
@@ -97,13 +122,21 @@ typedef enum {
     Right_switch
 } SWITCHS;
 
-typedef __IO struct 
+typedef __IO struct
 {
     /* data */
     double speed_ratio_linear;
     double speed_ratio_angular;
     SemaphoreHandle_t xMutex_speed_ratio;
-}SPEED_RATIO;
+} SPEED_RATIO;
+
+typedef __IO struct
+{
+    /* data */
+    float control_w;
+    float micro_adjustment_w;
+    SemaphoreHandle_t xMutex_w;
+}CONTROL;
 
 typedef enum {
     Btn_LeftCrossUp     = 2,

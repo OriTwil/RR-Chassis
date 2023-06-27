@@ -83,10 +83,21 @@ void ChassisInit()
     msg_joystick_air_title_point.xMutex_joystick_air_dashboard_set_title   = xSemaphoreCreateMutex();
     msg_joystick_air_title_state.xMutex_joystick_air_dashboard_set_title   = xSemaphoreCreateMutex();
     msg_joystick_air_title_posture.xMutex_joystick_air_dashboard_set_title = xSemaphoreCreateMutex();
-    msg_joystick_air_msg_point.xMutex_joystick_air_dashboard_set_msg       = xSemaphoreCreateMutex();
-    msg_joystick_air_msg_state.xMutex_joystick_air_dashboard_set_msg       = xSemaphoreCreateMutex();
-    msg_joystick_air_msg_posture.xMutex_joystick_air_dashboard_set_msg     = xSemaphoreCreateMutex();
-    msg_joystick_air_delete.xMutex_joystick_air_dashboard_del              = xSemaphoreCreateMutex();
+
+    msg_joystick_air_msg_point.xMutex_joystick_air_dashboard_set_msg   = xSemaphoreCreateMutex();
+    msg_joystick_air_msg_state.xMutex_joystick_air_dashboard_set_msg   = xSemaphoreCreateMutex();
+    msg_joystick_air_msg_posture.xMutex_joystick_air_dashboard_set_msg = xSemaphoreCreateMutex();
+    msg_joystick_air_delete.xMutex_joystick_air_dashboard_del          = xSemaphoreCreateMutex();
+
+    Baffle.position_servo_ref_baffle = 0;
+    Baffle.xMutex_baffle             = xSemaphoreCreateMutex();
+
+    Control.control_w          = 0;
+    Control.micro_adjustment_w = 0;
+    Control.xMutex_w           = xSemaphoreCreateMutex();
+
+    Fire_Target.Fire_number = Fifth_Target;
+    Fire_Target.xMutex_target = xSemaphoreCreateMutex();
 }
 
 /**
@@ -99,7 +110,7 @@ void PIDInit()
     Chassis_Pid.Pid_pos_w.Kp    = 0.1;
     Chassis_Pid.Pid_pos_w.Ki    = 0.0000001;
     Chassis_Pid.Pid_pos_w.Kd    = 0;
-    Chassis_Pid.Pid_pos_w.limit = 1;
+    Chassis_Pid.Pid_pos_w.limit = 0.5;
 
     Chassis_Pid.Pid_pos_x.Kp    = 5;
     Chassis_Pid.Pid_pos_x.Ki    = 0.0001;
@@ -142,10 +153,10 @@ void Automatic()
     if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 1) {
         SpeedSwitchRatio(1, 1.5, &Speed_ratio);
     }
-
+    
     // 切换手动自动模式
     if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 0) {
-        ChassisSwitchState(ComputerControl, &Robot_state);
+        ChassisSwitchState(AutoControl, &Robot_state);
     }
 
     if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 1) {
@@ -163,26 +174,31 @@ void Automatic()
         mav_posture.point = Second_Point;
         vPortExitCritical();
     }
+
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossUp)) {
         vPortEnterCritical();
         mav_posture.point = Third_Point;
         vPortExitCritical();
     }
+
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossLeft)) {
         vPortEnterCritical();
         mav_posture.point = Fourth_Point;
         vPortExitCritical();
     }
+
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossMid)) {
         vPortEnterCritical();
         mav_posture.point = Fifth_Point;
         vPortExitCritical();
     }
+
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossRight)) {
         vPortEnterCritical();
         mav_posture.point = Sixth_Point;
         vPortExitCritical();
     }
+
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossDown)) {
         vPortEnterCritical();
         mav_posture.point = Seventh_Point;

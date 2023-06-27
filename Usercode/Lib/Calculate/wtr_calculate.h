@@ -86,4 +86,5 @@ void speedServo(float ref, DJI_t *motor);
 
 void DeadBand(double x, double y, double *new_x, double *new_y, double threshould);
 
+void DeadBandOneDimensional(double x, double *new_x, double threshould);
 #endif

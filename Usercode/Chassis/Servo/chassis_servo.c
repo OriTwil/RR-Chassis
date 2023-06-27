@@ -45,6 +45,7 @@ void ServoTask(void const *argument)
         xSemaphoreGive(Chassis_Control.xMutex_control);
 
         // 伺服控制
+        positionServo(Baffle.position_servo_ref_baffle, &hDJI[7]);
         speedServo(moter_speed[0], &hDJI[0]);
         speedServo(moter_speed[1], &hDJI[1]);
         speedServo(moter_speed[2], &hDJI[2]);
@@ -53,6 +54,11 @@ void ServoTask(void const *argument)
                              hDJI[1].speedPID.output,
                              hDJI[2].speedPID.output,
                              hDJI[3].speedPID.output);
+        CanTransmit_DJI_5678(&hcan1,
+                             hDJI[4].speedPID.output,
+                             hDJI[5].speedPID.output,
+                             hDJI[6].speedPID.output,
+                             hDJI[7].speedPID.output);
         vTaskDelayUntil(&PreviousWakeTime, 2);
     }
 }
@@ -78,7 +84,7 @@ void ServoTestTask(void const *argument)
  */
 void ServoTaskStart()
 {
-    osThreadDef(servo, ServoTask, osPriorityNormal, 0, 512);
+    osThreadDef(servo, ServoTask, osPriorityBelowNormal, 0, 512);
     osThreadCreate(osThread(servo), NULL);
 
     // osThreadDef(servo_test,ServoTestTask,osPriorityBelowNormal,0,512);
@@ -93,9 +99,10 @@ void MotorInit()
     hDJI[1].motorType = M3508; // 左前
     hDJI[2].motorType = M3508; // 左后
     hDJI[3].motorType = M3508; // 右后
-    hDJI[4].motorType = M3508;
+    hDJI[4].motorType = M3508; // 挡板
     hDJI[5].motorType = M3508;
     hDJI[6].motorType = M3508;
+    hDJI[7].motorType = M3508;
     DJI_Init(); // 大疆电机初始化
 }
 

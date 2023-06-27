@@ -79,4 +79,25 @@
 #define rotate_ratio 0.3615 // (Width + Length)/2
 #define wheel_rpm_ratio 2387.324 // 换算线速度到rpm
 
+// 挡板
+#define BAFFLE_UP -60
+
+// 偏航角度
+#define w_5_1 0
+#define w_5_2 0
+#define w_5_3 0
+#define w_5_4 0
+#define w_5_5 0
+#define w_5_6 0
+#define w_5_7 0
+#define w_5_8 0
+
+#define w_6_1 0
+#define w_6_4 0
+#define w_6_6 0
+
+#define w_7_2 0
+#define w_7_5 0
+#define w_7_8 0
+
 #endif

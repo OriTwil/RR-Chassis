@@ -99,6 +99,7 @@ void JoystickSwitchTitle(uint8_t id, char title[20], JOYSTICK_AIR_DASHBOARD_SET_
     xSemaphoreGive(Msg_joystick_air_title->xMutex_joystick_air_dashboard_set_title);
 
     mavlink_msg_joystick_air_dashboard_set_title_send_struct(MAVLINK_COMM_1, &Msg_joystick_air_title_temp.msg_joystick_air_dashboard_set_title);
+    vTaskDelay(26);
 }
 
 void JoystickSwitchMsg(uint8_t id, char message[20], JOYSTICK_AIR_DASHBOARD_SET_MSG *Msg_joystick_air_msg)
@@ -229,7 +230,7 @@ void MsgUpdatePosture()
     float posture_w = mav_posture.zangle;
     vPortExitCritical();
 
-    snprintf(msg_posture, sizeof(msg_posture), "x= %.2f", 1.0);
+    snprintf(msg_posture, sizeof(msg_posture), "x=%d y=%d w=%d", (int32_t)(posture_x * 10000), (int32_t)(posture_y * 10000), (int32_t)(posture_w * 10000));
     JoystickSwitchMsg(ID_Posture, msg_posture, &msg_joystick_air_msg_posture);
     vTaskDelay(2);
 }
@@ -247,9 +248,9 @@ void MsgUpdateState()
 
             snprintf(msg_state, sizeof(msg_state), "RemoteControl");
             break;
-        case ComputerControl:
+        case AutoControl:
 
-            snprintf(msg_state, sizeof(msg_state), "ComputerControl");
+            snprintf(msg_state, sizeof(msg_state), "AutoControl");
             break;
         default:
             snprintf(msg_state, sizeof(msg_state), "ERROR");

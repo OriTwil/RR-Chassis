@@ -47,4 +47,7 @@ extern uint8_t ch[1]; // 不确定是不是static
 void AS69_Decode();
 void DJI_Control();
 void OPS_Decode();
+void Update_X(float New_X);
+void Update_Y(float New_Y);
+void Update_A(float New_A);
 #endif

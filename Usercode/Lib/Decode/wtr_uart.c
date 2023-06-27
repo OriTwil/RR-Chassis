@@ -154,3 +154,67 @@ void OPS_Decode()
             break;
     }
 }
+
+void Struct(uint8_t strDestination[], char strSource[], int num)
+{
+    int i = 0, j = 0;
+
+    while (strDestination[i] != '\0') {
+        i++;
+    }
+
+    for (j = 0; j < num; j++) {
+        strDestination[i++] = strSource[j];
+    }
+}
+
+void Update_X(float New_X)
+{
+    uint8_t Update_X[8] = "ACTX";
+
+    static union
+    {
+        /* data */
+        float X;
+        char data[4];
+    }New_set;
+    
+    New_set.X = New_X;
+
+    Struct(Update_X,New_set.data,4);
+    HAL_UART_Transmit(&huart_OPS,Update_X,8,50);
+}
+
+void Update_Y(float New_Y)
+{
+    uint8_t Update_Y[8] = "ACTY";
+
+    static union
+    {
+        /* data */
+        float Y;
+        char data[4];
+    }New_set;
+    
+    New_set.Y = New_Y;
+
+    Struct(Update_Y,New_set.data,4);
+    HAL_UART_Transmit(&huart_OPS,Update_Y,8,50);
+}
+
+void Update_A(float New_A)
+{
+    uint8_t Update_A[8] = "ACTJ";
+
+    static union
+    {
+        /* data */
+        float A;
+        char data[4];
+    }New_set;
+    
+    New_set.A = New_A;
+
+    Struct(Update_A,New_set.data,4);
+    HAL_UART_Transmit(&huart_OPS,Update_A,8,50);
+}

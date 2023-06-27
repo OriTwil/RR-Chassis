@@ -22,6 +22,8 @@ void ChassisSwitchState(CHASSIS_STATE target_chassis_state, ROBOT_STATE *current
 
 void ChassisSwitchPoint(CHASSIS_POINT target_chassis_point, ROBOT_STATE *current_robot_state);
 
+void FireSwitchTarget(FIRE_NUMBER fire_target, FIRE_TARGET *current_fire_target);
+
 void SetChassisPosition(float position_x, float position_y, float position_w, CHASSIS_POSITION *chassis_position);
 
 void SetChassisControlVelocity(float vx_control, float vy_control, float vw_control, CHASSIS_CONTROL *chassis_control);
@@ -40,9 +42,24 @@ void SpeedSwitchRatio(double target_speed_ratio_linear, double target_speed_rati
 
 void Joystick_Control();
 
+void SetBaffleRef(float target_baffle_ref,BAFFLE *Baffle_);
+
+void SetChassisW(float target_w,CONTROL *Control_);
+
+void SetChassisAdjustmentW(float target_adjustment_w,CONTROL *Control_);
+
+FIRE_NUMBER ReadFireNumber(FIRE_TARGET *current_fire_target);
+
+SPEED_RATIO ReadSpeedRatio(SPEED_RATIO *Speed_ratio_);
+
+void UpdateW();
+
 extern ROBOT_STATE Robot_state;
 extern CHASSIS_POSITION Chassis_Position;
 extern CHASSIS_CONTROL Chassis_Control;
 extern SPEED_RATIO Speed_ratio;
+extern BAFFLE Baffle;
+extern CONTROL Control;
+extern FIRE_TARGET Fire_Target;
 
 #endif
