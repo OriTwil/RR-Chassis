@@ -33,16 +33,16 @@ void CommunicateTask(void const *argument)
         vPortExitCritical();
 
         mavlink_msg_joystick_air_send_struct(MAVLINK_COMM_2, &Msg_joystick_air.msg_joystick_air); // 板间通信
-        vTaskDelay(8);
+        vTaskDelay(10);
         // mavlink_msg_chassis_to_upper_send_struct(MAVLINK_COMM_2, &chassis_data_temp); // 板间通信
         mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &posture_temp);               // 定位信息发到上位机
-        vTaskDelay(8);
+        vTaskDelay(10);
     }
 }
 
 void CommunicateTaskStart()
 {
-    osThreadDef(communicate, CommunicateTask, osPriorityBelowNormal, 0, 512);
+    osThreadDef(communicate, CommunicateTask, osPriorityBelowNormal, 0, 1024);
     osThreadCreate(osThread(communicate), NULL);
 }
 

@@ -54,7 +54,7 @@ float pos_w_locked = 0;
 void ChassisStateMachineTask(void const *argument)
 {
     // 初始化
-    uint32_t PreviousWakeTime = osKernelSysTick();
+    // uint32_t PreviousWakeTime = osKernelSysTick();
     vTaskDelay(20);
     // 解算，速度伺服
     for (;;) {
@@ -89,7 +89,7 @@ void ChassisStateMachineTask(void const *argument)
                 Joystick_Control();
                 // DJI_Control();
                 vPortEnterCritical();
-                DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 DJI遥控器摇杆
+                DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 遥控器摇杆
                 DeadBandOneDimensional((double)crl_speed.vw, &vw_deadband, 0.2);
                 // double vx_deadbanded = vx_deadbanded * cos(mav_posture.zangle * DEC) + vy_deadbanded * sin(mav_posture.zangle * DEC);
                 // double vy_deadbanded = -vx_deadbanded * sin(mav_posture.zangle * DEC) + vy_deadbanded * cos(mav_posture.zangle * DEC);
@@ -105,7 +105,7 @@ void ChassisStateMachineTask(void const *argument)
                 xSemaphoreTake(Chassis_Pid.xMutex_pid, (TickType_t)10);
                 control_temp.vx_set = control_temp.vx_set + PIDPosition(&Chassis_Pid.Pid_pos_x);
                 control_temp.vy_set = control_temp.vy_set + PIDPosition(&Chassis_Pid.Pid_pos_y);
-                control_temp.vw_set = PIDPosition(&Chassis_Pid.Pid_pos_w);
+                control_temp.vw_set = PIDPosition_w(&Chassis_Pid.Pid_pos_w);
                 xSemaphoreGive(Chassis_Pid.xMutex_pid);
                 control_temp = FrameTransform(&control_temp, &mav_posture);
 
@@ -116,7 +116,8 @@ void ChassisStateMachineTask(void const *argument)
                 break;
         }
 
-        vTaskDelayUntil(&PreviousWakeTime, 5);
+        // vTaskDelayUntil(&PreviousWakeTime, 30);
+        vTaskDelay(50);
     }
 }
 
@@ -137,7 +138,7 @@ void ChassisStateTestTask(void const *argument)
  */
 void ChassisStateMachineTaskStart()
 {
-    osThreadDef(chassis, ChassisStateMachineTask, osPriorityNormal, 0, 512);
+    osThreadDef(chassis, ChassisStateMachineTask, osPriorityNormal, 0, 1024);
     osThreadCreate(osThread(chassis), NULL);
 
     // osThreadDef(chassis_test, ChassisStateTestTask, osPriorityNormal, 0, 2048);
@@ -164,7 +165,7 @@ void ChassisSwitchPoint(CHASSIS_POINT target_chassis_point, ROBOT_STATE *current
 
 void ChassisSwitchState(CHASSIS_STATE target_chassis_state, ROBOT_STATE *current_robot_state)
 {
-    xSemaphoreTake(current_robot_state->xMutex_Robot, portMAX_DELAY);
+    xSemaphoreTake(current_robot_state->xMutex_Robot, (TickType_t)10);
 
     current_robot_state->Chassis_state = target_chassis_state;
 
@@ -173,9 +174,9 @@ void ChassisSwitchState(CHASSIS_STATE target_chassis_state, ROBOT_STATE *current
 
 void FireSwitchTarget(FIRE_NUMBER fire_target, FIRE_TARGET *current_fire_target)
 {
-    xSemaphoreTake(current_fire_target->xMutex_target, (TickType_t)10);
+    // xSemaphoreTake(current_fire_target->xMutex_target, (TickType_t)10);
     current_fire_target->Fire_number = fire_target;
-    xSemaphoreGive(current_fire_target->xMutex_target);
+    // xSemaphoreGive(current_fire_target->xMutex_target);
 }
 
 void SpeedSwitchRatio(double target_speed_ratio_linear, double target_speed_ratio_angular, SPEED_RATIO *Speed_Ratio)
@@ -324,13 +325,13 @@ mavlink_control_t FrameTransform(mavlink_control_t *control, mavlink_posture_t *
 void UpdateW()
 {
     vPortEnterCritical();
-    CHASSIS_POINT current_point = mav_posture.point;
+    int32_t current_point = mav_posture.point;
     vPortExitCritical();
     FIRE_NUMBER current_target = ReadFireNumber(&Fire_Target);
 
     switch (current_point) {
 
-        case Fifth_Point:
+        case 5:
             switch (current_target) {
                 case First_Target:
                     SetChassisW(w_5_1, &Control);
@@ -360,7 +361,7 @@ void UpdateW()
                     break;
             }
             break;
-        case Sixth_Point:
+        case 6:
             switch (current_target) {
                 case First_Target:
                     SetChassisW(w_6_1, &Control);
@@ -375,7 +376,7 @@ void UpdateW()
                     break;
             }
             break;
-        case Seventh_Point:
+        case 7:
             switch (current_target) {
                 case Second_Target:
                     SetChassisW(w_7_2, &Control);

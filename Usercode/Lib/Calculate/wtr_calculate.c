@@ -159,6 +159,36 @@ float PIDPosition(__IO PID_Pos *p)
     return out;
 }
 
+/**
+ * @description: 位置式PID
+ * @param {PIDType} *p
+ * @return {*}
+ */
+float PIDPosition_w(__IO PID_Pos *p)
+{ 
+    float pe, ie, de;
+    float out = 0;
+
+    // 计算当前误差
+    p->e0 = p->target - p->feedback;
+    p->e0 = LoopSimplify(360.0,p->e0);
+    // 误差积分
+    p->eSum += p->e0;
+
+    // 误差微分
+    de = p->e0 - p->e1;
+
+    pe = p->e0;
+    ie = p->eSum;
+
+    p->e1 = p->e0;
+
+    out = pe * (p->Kp) + ie * (p->Ki) + de * (p->Kd);
+    // 输出限幅
+    out = range(out, -p->limit, p->limit);
+    return out;
+}
+
 
 //增量式PID算法
 void PID_Calc(PID_t *pid){
@@ -234,4 +264,26 @@ void DeadBandOneDimensional(double x, double *new_x, double threshould)
     }
 
     *new_x = x - threshould;
+}
+
+/**
+ * @brief 循环变量化简
+ *
+ * @param cycle 周期
+ * @param value
+ * @return double 化简后的值，在[- T / 2, T / 2] 之间
+ */
+double LoopSimplify(double cycle, double value)
+{
+    double mod_value = fmod(value, cycle);
+
+    if (mod_value > cycle / 2) {
+        mod_value -= cycle;
+    }
+
+    if (mod_value < -cycle / 2) {
+        mod_value += cycle;
+    }
+
+    return mod_value;
 }

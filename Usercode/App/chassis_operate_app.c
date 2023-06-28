@@ -17,6 +17,11 @@
 #include "chassis_config.h"
 #include "chassis_commen.h"
 #include "chassis_remote_control.h"
+
+#define LOW_SPEED_STATE  (ReadSpeedRatio(&Speed_ratio).speed_ratio_linear < 0.5)
+#define HIGH_SPEED_STATE (ReadSpeedRatio(&Speed_ratio).speed_ratio_linear >= 0.5)
+
+float test_ratio;
 /**
  * @description: 操作线程
  * @todo 根据各个传感器、遥控器等设计操作手操作流程
@@ -31,7 +36,7 @@ void StateManagemantTask(void const *argument)
         // DJI遥控器控制模式
         // DJIRemoteControl();
 
-        vTaskDelay(10);
+        vTaskDelay(100);
     }
 }
 
@@ -42,7 +47,7 @@ void StateManagemantTask(void const *argument)
 void StateManagemantTaskStart()
 {
 
-    osThreadDef(statemanagement, StateManagemantTask, osPriorityNormal, 0, 512);
+    osThreadDef(statemanagement, StateManagemantTask, osPriorityBelowNormal, 0, 2048);
     osThreadCreate(osThread(statemanagement), NULL);
 }
 
@@ -74,9 +79,9 @@ void ChassisInit()
     PIDInit();
     Chassis_Pid.xMutex_pid = xSemaphoreCreateMutex();
 
-    Speed_ratio.speed_ratio_angular = 0.5;
-    Speed_ratio.speed_ratio_linear = 0.3;
-    Speed_ratio.xMutex_speed_ratio = xSemaphoreCreateMutex();
+    Speed_ratio.speed_ratio_angular = 1.5;
+    Speed_ratio.speed_ratio_linear  = 1.0;
+    Speed_ratio.xMutex_speed_ratio  = xSemaphoreCreateMutex();
 
     Msg_joystick_air.xMutex_joystick_air                                   = xSemaphoreCreateMutex();
     msg_joystick_air_led.xMutex_joystick_air_led                           = xSemaphoreCreateMutex();
@@ -96,7 +101,7 @@ void ChassisInit()
     Control.micro_adjustment_w = 0;
     Control.xMutex_w           = xSemaphoreCreateMutex();
 
-    Fire_Target.Fire_number = Fifth_Target;
+    Fire_Target.Fire_number   = Fifth_Target;
     Fire_Target.xMutex_target = xSemaphoreCreateMutex();
 }
 
@@ -108,7 +113,7 @@ void PIDInit()
 {
     // 位置式pid参数设置
     Chassis_Pid.Pid_pos_w.Kp    = 0.1;
-    Chassis_Pid.Pid_pos_w.Ki    = 0.0000001;
+    Chassis_Pid.Pid_pos_w.Ki    = 0;
     Chassis_Pid.Pid_pos_w.Kd    = 0;
     Chassis_Pid.Pid_pos_w.limit = 0.5;
 
@@ -143,17 +148,87 @@ void DJIRemoteControl()
     ChassisSwitchState(RemoteControl, &Robot_state);
 }
 
+// void Automatic()
+// {
+//     // 切换高速低速
+//     if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 0) {
+//         SpeedSwitchRatio(0.3, 0.5, &Speed_ratio);
+//     }
+
+//     if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 1) {
+//         SpeedSwitchRatio(1, 1.5, &Speed_ratio);
+//     }
+
+//     // 切换手动自动模式
+//     if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 0) {
+//         ChassisSwitchState(AutoControl, &Robot_state);
+//     }
+
+//     if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 1) {
+//         ChassisSwitchState(RemoteControl, &Robot_state);
+//     }
+
+//     // 切换地盘点位
+//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn4)) {
+//         vPortEnterCritical();
+//         mav_posture.point = First_Point;
+//         vPortExitCritical();
+//     }
+//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn5)) {
+//         vPortEnterCritical();
+//         mav_posture.point = Second_Point;
+//         vPortExitCritical();
+//     }
+
+//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossUp)) {
+//         vPortEnterCritical();
+//         mav_posture.point = Third_Point;
+//         vPortExitCritical();
+//     }
+
+//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossLeft)) {
+//         vPortEnterCritical();
+//         mav_posture.point = Fourth_Point;
+//         vPortExitCritical();
+//     }
+
+//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossMid)) {
+//         vPortEnterCritical();
+//         mav_posture.point = Fifth_Point;
+//         vPortExitCritical();
+//     }
+
+//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossRight)) {
+//         vPortEnterCritical();
+//         mav_posture.point = Sixth_Point;
+//         vPortExitCritical();
+//     }
+
+//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossDown)) {
+//         vPortEnterCritical();
+//         mav_posture.point = Seventh_Point;
+//         vPortExitCritical();
+//     }
+// }
+
+// todo 写一个从地图坐标系到底盘坐标系的转换函数
+
 void Automatic()
-{
-    // 切换高速低速
-    if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 0) {
+{   
+    // test_ratio = ReadSpeedRatio(&Speed_ratio).speed_ratio_linear;
+
+    // // 切换高速低速
+    // if (ReadJoystickButtons(&Msg_joystick_air, Btn_JoystickR)) {
+    //     SpeedSwitchRatio(1.0, 1.5, &Speed_ratio);
+    //     vTaskDelay(1000);
+    // }
+
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_JoystickR)) {
+        /* code */
         SpeedSwitchRatio(0.3, 0.5, &Speed_ratio);
+        vTaskDelay(1000);
     }
 
-    if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 1) {
-        SpeedSwitchRatio(1, 1.5, &Speed_ratio);
-    }
-    
     // 切换手动自动模式
     if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 0) {
         ChassisSwitchState(AutoControl, &Robot_state);
@@ -163,47 +238,107 @@ void Automatic()
         ChassisSwitchState(RemoteControl, &Robot_state);
     }
 
-    // 切换地盘点位
+    // 重定位
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn3)) {
+        // HAL_UART_Transmit(&huart_OPS, "ACT0", 4, 50);
+        Update_X(1750.0);
+        vTaskDelay(10);
+        Update_Y(5750.0);
+        vTaskDelay(10);
+        Update_A(90.0);
+        vTaskDelay(10);
+
+        vPortEnterCritical();
+        control.x_set = 1.75;
+        control.y_set = 5.75;
+        vPortExitCritical();
+
+        SetBaffleRef(1, &Baffle);
+        // vTaskDelay(100);
+    }
+
+    // 切换点位
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn4)) {
         vPortEnterCritical();
         mav_posture.point = First_Point;
         vPortExitCritical();
+        SetChassisW(90.0, &Control);
+        // vTaskDelay(2000);
+        SetBaffleRef(BAFFLE_UP, &Baffle);
     }
+
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn5)) {
         vPortEnterCritical();
         mav_posture.point = Second_Point;
         vPortExitCritical();
+        SetChassisW(180.0, &Control);
     }
 
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossUp)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_RightCrossUp)) {
         vPortEnterCritical();
         mav_posture.point = Third_Point;
         vPortExitCritical();
+        SetChassisW(180.0, &Control);
     }
 
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossLeft)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_RightCrossLeft)) {
         vPortEnterCritical();
         mav_posture.point = Fourth_Point;
         vPortExitCritical();
+        SetChassisW(180.0, &Control);
     }
 
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossMid)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_RightCrossMid)) {
         vPortEnterCritical();
         mav_posture.point = Fifth_Point;
         vPortExitCritical();
+        SetChassisW(0.0, &Control);
     }
 
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossRight)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_RightCrossRight)) {
         vPortEnterCritical();
         mav_posture.point = Sixth_Point;
         vPortExitCritical();
+        SetChassisW(90.0, &Control);
     }
 
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossDown)) {
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_RightCrossDown)) {
         vPortEnterCritical();
         mav_posture.point = Seventh_Point;
         vPortExitCritical();
+        SetChassisW(90.0, &Control);
+    }
+
+    // 切换目标柱子
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossUp)) {
+        FireSwitchTarget(First_Target, &Fire_Target);
+    }
+
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossRight)) {
+        FireSwitchTarget(Second_Target, &Fire_Target);
+    }
+
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossMid)) {
+        FireSwitchTarget(Third_Target, &Fire_Target);
+    }
+
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossLeft)) {
+        FireSwitchTarget(Fourth_Target, &Fire_Target);
+    }
+
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossDown)) {
+        FireSwitchTarget(Fifth_Target, &Fire_Target);
+    }
+
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn0)) {
+        FireSwitchTarget(Sixth_Target, &Fire_Target);
+    }
+
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn1)) {
+        FireSwitchTarget(Seventh_Target, &Fire_Target);
+    }
+
+    if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn2)) {
+        FireSwitchTarget(Eighth_Target, &Fire_Target);
     }
 }
-
-// todo 写一个从地图坐标系到底盘坐标系的转换函数

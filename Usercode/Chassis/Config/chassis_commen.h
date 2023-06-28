@@ -70,8 +70,8 @@ typedef __IO struct
 typedef __IO struct {
     PERCEPTION_STATE Perception_state;
     CHASSIS_STATE Chassis_state;
-    SemaphoreHandle_t xMutex_Robot;
     CHASSIS_POINT Chassis_point;
+    SemaphoreHandle_t xMutex_Robot;
 } ROBOT_STATE;
 
 typedef __IO struct

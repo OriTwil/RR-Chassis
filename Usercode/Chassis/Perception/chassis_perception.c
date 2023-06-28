@@ -40,7 +40,7 @@ void ChassisPerceptionTask(void const *argument)
 
 void PerceptionTaskStart()
 {
-    osThreadDef(perception, ChassisPerceptionTask, osPriorityNormal, 0, 512);
+    osThreadDef(perception, ChassisPerceptionTask, osPriorityNormal, 0, 1024);
     osThreadCreate(osThread(perception), NULL);
 }
 

@@ -80,6 +80,8 @@ void PIDIncremental(PID_Incremwntal *vPID, float processValue);
 
 float PIDPosition(__IO PID_Pos *p);
 
+float PIDPosition_w(__IO PID_Pos *p);
+
 void positionServo(float ref, DJI_t *motor);
 
 void speedServo(float ref, DJI_t *motor);
@@ -87,4 +89,6 @@ void speedServo(float ref, DJI_t *motor);
 void DeadBand(double x, double y, double *new_x, double *new_y, double threshould);
 
 void DeadBandOneDimensional(double x, double *new_x, double threshould);
+
+double LoopSimplify(double cycle, double value);
 #endif

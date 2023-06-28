@@ -29,13 +29,16 @@ void ServoTask(void const *argument)
                      Chassis_Control.Chassis_Control_w,
                      &Chassis_Pid);
         xSemaphoreGive(Chassis_Control.xMutex_control);
+
         // 更新PID的反馈值
         xSemaphoreTake(Chassis_Position.xMutex_position, (TickType_t)10);
+        // Chassis_Position.Chassis_Position_w = LoopSimplify(360.0,Chassis_Control.Chassis_Control_w - Chassis_Position.Chassis_Position_w) + Chassis_Control.Chassis_Control_w;
         SetPIDFeedback(Chassis_Position.Chassis_Position_x,
                        Chassis_Position.Chassis_Position_y,
-                       Chassis_Position.Chassis_Position_w,
+                       Chassis_Position.Chassis_Position_w ,
                        &Chassis_Pid);
         xSemaphoreGive(Chassis_Position.xMutex_position);
+
         // 麦轮解算
         xSemaphoreTake(Chassis_Control.xMutex_control, (TickType_t)10);
         CalculateFourMecanumWheels(moter_speed,
@@ -84,7 +87,7 @@ void ServoTestTask(void const *argument)
  */
 void ServoTaskStart()
 {
-    osThreadDef(servo, ServoTask, osPriorityBelowNormal, 0, 512);
+    osThreadDef(servo, ServoTask, osPriorityBelowNormal, 0, 1024);
     osThreadCreate(osThread(servo), NULL);
 
     // osThreadDef(servo_test,ServoTestTask,osPriorityBelowNormal,0,512);

@@ -62,7 +62,7 @@ void RemoteControlInit()
 
 void RemoteControlStart()
 {
-    osThreadDef(RemoteControl, RemoteControlTask, osPriorityNormal, 0, 512);
+    osThreadDef(RemoteControl, RemoteControlTask, osPriorityNormal, 0, 1024);
     osThreadCreate(osThread(RemoteControl), NULL);
 }
 
@@ -230,17 +230,18 @@ void MsgUpdatePosture()
     float posture_w = mav_posture.zangle;
     vPortExitCritical();
 
-    snprintf(msg_posture, sizeof(msg_posture), "x=%d y=%d w=%d", (int32_t)(posture_x * 10000), (int32_t)(posture_y * 10000), (int32_t)(posture_w * 10000));
+    snprintf(msg_posture, sizeof(msg_posture), "x=%ld y=%ld w=%ld", (int32_t)(posture_x * 10000), (int32_t)(posture_y * 10000), (int32_t)(posture_w * 10000));
     JoystickSwitchMsg(ID_Posture, msg_posture, &msg_joystick_air_msg_posture);
     vTaskDelay(2);
 }
 
 void MsgUpdateState()
 {
-    xSemaphoreTake(Robot_state.xMutex_Robot, portMAX_DELAY);
-    ROBOT_STATE Robot_state_temp = Robot_state;
-    xSemaphoreGive(Robot_state.xMutex_Robot);
-    switch (Robot_state_temp.Chassis_state) {
+    // xSemaphoreTake(Robot_state.xMutex_Robot, (TickType_t)10);
+    // ROBOT_STATE Robot_state_temp = Robot_state;
+    // xSemaphoreGive(Robot_state.xMutex_Robot);
+
+    switch (Robot_state.Chassis_state) {
         case Locked:
             snprintf(msg_state, sizeof(msg_state), "Locked");
             break;
