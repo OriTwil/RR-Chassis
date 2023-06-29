@@ -215,18 +215,11 @@ void DJIRemoteControl()
 
 void Automatic()
 {   
-    // test_ratio = ReadSpeedRatio(&Speed_ratio).speed_ratio_linear;
 
-    // // 切换高速低速
-    // if (ReadJoystickButtons(&Msg_joystick_air, Btn_JoystickR)) {
-    //     SpeedSwitchRatio(1.0, 1.5, &Speed_ratio);
-    //     vTaskDelay(1000);
-    // }
-
-    if (ReadJoystickButtons(&Msg_joystick_air, Btn_JoystickR)) {
-        /* code */
+    if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 1) {
+        SpeedSwitchRatio(1.0, 1.5, &Speed_ratio);
+    } else if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 0) {
         SpeedSwitchRatio(0.3, 0.5, &Speed_ratio);
-        vTaskDelay(1000);
     }
 
     // 切换手动自动模式
