@@ -241,16 +241,16 @@ void Automatic()
     // 重定位
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn3)) {
         // HAL_UART_Transmit(&huart_OPS, "ACT0", 4, 50);
-        Update_X(1750.0);
+        Update_X(1740.0);
         vTaskDelay(10);
-        Update_Y(5750.0);
+        Update_Y(5755.0);
         vTaskDelay(10);
         Update_A(90.0);
         vTaskDelay(10);
 
         vPortEnterCritical();
-        control.x_set = 1.75;
-        control.y_set = 5.75;
+        control.x_set = 1.74;
+        control.y_set = 5.755;
         vPortExitCritical();
 
         SetBaffleRef(1, &Baffle);
