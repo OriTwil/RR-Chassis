@@ -55,7 +55,7 @@ void CommunicateInit()
     control.x_set  = 0;
     control.y_set  = 0;
 
-    mav_posture.point  = 0.0;
+    mav_posture.point  = 0;
     mav_posture.pos_x  = 0.0;
     mav_posture.pos_y  = 0.0;
     mav_posture.zangle = 0.0;

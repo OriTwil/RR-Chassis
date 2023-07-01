@@ -5,38 +5,50 @@
 #include "wtr_uart.h"
 #include "chassis_communicate.h"
 #include "chassis_state_machine.h"
+#include "wtr_callback.h"
 
 JOYSTICK_AIR Msg_joystick_air;
 JOYSTICK_AIR_LED msg_joystick_air_led;
+
 JOYSTICK_AIR_DASHBOARD_SET_TITLE msg_joystick_air_title_point;
 JOYSTICK_AIR_DASHBOARD_SET_TITLE msg_joystick_air_title_state;
 JOYSTICK_AIR_DASHBOARD_SET_TITLE msg_joystick_air_title_posture;
+JOYSTICK_AIR_DASHBOARD_SET_TITLE msg_joystick_air_title_knob_r;
+
 JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_point;
 JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_state;
 JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_posture;
+JOYSTICK_AIR_DASHBOARD_SET_MSG msg_joystick_air_msg_knob_r;
+
 JOYSTICK_AIR_DASHBOARD_DELETE msg_joystick_air_delete;
 
 char title_point[20]   = "point";
 char title_state[20]   = "state";
 char title_posture[20] = "posture";
+char title_knob_r[20]  = "mic_adjust_v";
 char msg_point[20]     = "no_msg";
 char msg_state[20]     = "no_msg";
 char msg_posture[20]   = "no_msg";
+char msg_knob_r[20]    = "no_msg";
+
+float last_control_vw = 0;
 #define ID_Point   6
 #define ID_State   8
 #define ID_Posture 16
+#define ID_Knob_R  3
 
 void RemoteControlTask(void const *argument)
 {
     uint32_t PreviousWakeTime = xTaskGetTickCount();
     uint32_t counter          = 0;
+    JoystickSwitchLED(200, 200, 200, 0.05, 1000, &msg_joystick_air_led);
 
     while (1) {
-        if (counter % 50 == 0) {
+        if (counter++ % 10 == 0) {
             TitleInit();
+            LedUpdate();
             counter = 0;
         }
-        counter++;
 
         // 底盘位置
         MsgUpdatePoint();
@@ -44,10 +56,13 @@ void RemoteControlTask(void const *argument)
         MsgUpdateState();
         // 位置
         MsgUpdatePosture();
+        // 射速微调
+        MsgUpdateKnobR();
 
         RemoteControlSendMsg(&msg_joystick_air_msg_point);
         RemoteControlSendMsg(&msg_joystick_air_msg_state);
         RemoteControlSendMsg(&msg_joystick_air_msg_posture);
+        RemoteControlSendMsg(&msg_joystick_air_msg_knob_r);
         vTaskDelayUntil(&PreviousWakeTime, 100);
     }
 }
@@ -88,6 +103,7 @@ void JoystickSwitchLED(float r, float g, float b, float lightness, uint16_t dura
     xSemaphoreGive(Msg_joystick_air_led->xMutex_joystick_air_led);
 
     mavlink_msg_joystick_air_led_send_struct(MAVLINK_COMM_1, &msg_joystick_send_temp.msg_joystick_air_led);
+    vTaskDelay(2);
 }
 
 void JoystickSwitchTitle(uint8_t id, char title[20], JOYSTICK_AIR_DASHBOARD_SET_TITLE *Msg_joystick_air_title)
@@ -171,7 +187,7 @@ float ReadJoystickRight_y(JOYSTICK_AIR *msg_joystick_air_)
     return msg_joystick_air_temp.joystickR[1];
 }
 
-int16_t ReadJoystickKnobsLeft_x(JOYSTICK_AIR *msg_joystick_air_)
+int16_t ReadJoystickKnobsLeft(JOYSTICK_AIR *msg_joystick_air_)
 {
     xSemaphoreTake(msg_joystick_air_->xMutex_joystick_air, portMAX_DELAY);
     vPortEnterCritical();
@@ -182,7 +198,7 @@ int16_t ReadJoystickKnobsLeft_x(JOYSTICK_AIR *msg_joystick_air_)
     return msg_joystick_air_temp.knobs[0];
 }
 
-int16_t ReadJoystickKnobsLeft_y(JOYSTICK_AIR *msg_joystick_air_)
+int16_t ReadJoystickKnobsRight(JOYSTICK_AIR *msg_joystick_air_)
 {
     xSemaphoreTake(msg_joystick_air_->xMutex_joystick_air, portMAX_DELAY);
     vPortEnterCritical();
@@ -210,6 +226,7 @@ void TitleInit()
     JoystickSwitchTitle(ID_Point, title_point, &msg_joystick_air_title_point);
     JoystickSwitchTitle(ID_State, title_state, &msg_joystick_air_title_state);
     JoystickSwitchTitle(ID_Posture, title_posture, &msg_joystick_air_title_posture);
+    JoystickSwitchTitle(ID_Knob_R, title_knob_r, &msg_joystick_air_title_knob_r);
 }
 
 void MsgUpdatePoint()
@@ -232,6 +249,14 @@ void MsgUpdatePosture()
 
     snprintf(msg_posture, sizeof(msg_posture), "x=%ld y=%ld w=%ld", (int32_t)(posture_x * 10000), (int32_t)(posture_y * 10000), (int32_t)(posture_w * 10000));
     JoystickSwitchMsg(ID_Posture, msg_posture, &msg_joystick_air_msg_posture);
+    vTaskDelay(2);
+}
+
+void MsgUpdateKnobR()
+{
+    int16_t knob_right_temp = ReadJoystickKnobsRight(&Msg_joystick_air);
+    snprintf(msg_knob_r, sizeof(msg_knob_r), "mic_adj = %d", knob_right_temp);
+    JoystickSwitchMsg(ID_Knob_R, msg_knob_r, &msg_joystick_air_msg_knob_r);
     vTaskDelay(2);
 }
 
@@ -259,4 +284,30 @@ void MsgUpdateState()
     }
     JoystickSwitchMsg(ID_State, msg_state, &msg_joystick_air_msg_state);
     vTaskDelay(2);
+}
+
+void LedUpdate()
+{
+    float control_vw_temp = control.vw_set;
+
+    // if (last_control_vw == 0 && control_vw_temp > 0) {
+    //     JoystickSwitchLED(1, 1, 255, 0.1, 1500, &msg_joystick_air_led);
+    // } else if (last_control_vw != control_vw_temp) {
+    //     JoystickSwitchLED(1, 255, 1, 0.1, 500, &msg_joystick_air_led);
+    // }
+    if(control_vw_temp > 9)
+    {
+        JoystickSwitchLED(1, 255, 1, 0.05, 1000, &msg_joystick_air_led);
+    }
+    // else if (control_vw_temp > 4)
+    // {
+    //     JoystickSwitchLED(1, 1, 255, 0.05, 1000, &msg_joystick_air_led);
+    // }
+
+    // last_control_vw = control_vw_temp; 
+    if(led_count > 25)
+    {
+        led_count = 0;
+        JoystickSwitchLED(1, 1, 255, 0.05, 1000, &msg_joystick_air_led);
+    }
 }

@@ -14,12 +14,18 @@
 #include "chassis_remote_control.h"
 
 int16_t crldata[4] = {0};
+int led_count = 0;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
     // 上位机消息
     if (huart->Instance == UART_Computer) {
         wtrMavlink_UARTRxCpltCallback(huart, MAVLINK_COMM_0); // 进入mavlink回调
+        led_count++;
+        if(led_count > 10000)
+        {
+            led_count = 0;//保护
+        }
     }
     // 定位模块消息
     if (huart->Instance == UART_OPS) // 底盘定位系统的decode

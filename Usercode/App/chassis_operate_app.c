@@ -57,7 +57,7 @@ void StateManagemantTaskStart()
  */
 void ChassisInit()
 {
-    Robot_state.Chassis_point    = First_Point;
+    Robot_state.Chassis_point    = Zero_Point;
     Robot_state.Chassis_state    = RemoteControl;
     Robot_state.Perception_state = Receive;
     Robot_state.xMutex_Robot     = xSemaphoreCreateMutex();
@@ -88,11 +88,13 @@ void ChassisInit()
     msg_joystick_air_title_point.xMutex_joystick_air_dashboard_set_title   = xSemaphoreCreateMutex();
     msg_joystick_air_title_state.xMutex_joystick_air_dashboard_set_title   = xSemaphoreCreateMutex();
     msg_joystick_air_title_posture.xMutex_joystick_air_dashboard_set_title = xSemaphoreCreateMutex();
+    msg_joystick_air_title_knob_r.xMutex_joystick_air_dashboard_set_title = xSemaphoreCreateMutex();
 
     msg_joystick_air_msg_point.xMutex_joystick_air_dashboard_set_msg   = xSemaphoreCreateMutex();
     msg_joystick_air_msg_state.xMutex_joystick_air_dashboard_set_msg   = xSemaphoreCreateMutex();
     msg_joystick_air_msg_posture.xMutex_joystick_air_dashboard_set_msg = xSemaphoreCreateMutex();
     msg_joystick_air_delete.xMutex_joystick_air_dashboard_del          = xSemaphoreCreateMutex();
+    msg_joystick_air_msg_knob_r.xMutex_joystick_air_dashboard_set_msg = xSemaphoreCreateMutex();
 
     Baffle.position_servo_ref_baffle = 0;
     Baffle.xMutex_baffle             = xSemaphoreCreateMutex();
@@ -103,6 +105,8 @@ void ChassisInit()
 
     Fire_Target.Fire_number   = Fifth_Target;
     Fire_Target.xMutex_target = xSemaphoreCreateMutex();
+
+
 }
 
 /**
@@ -115,17 +119,17 @@ void PIDInit()
     Chassis_Pid.Pid_pos_w.Kp    = 0.1;
     Chassis_Pid.Pid_pos_w.Ki    = 0;
     Chassis_Pid.Pid_pos_w.Kd    = 0;
-    Chassis_Pid.Pid_pos_w.limit = 0.5;
+    Chassis_Pid.Pid_pos_w.limit = 1;
 
     Chassis_Pid.Pid_pos_x.Kp    = 5;
     Chassis_Pid.Pid_pos_x.Ki    = 0.0001;
     Chassis_Pid.Pid_pos_x.Kd    = 0;
-    Chassis_Pid.Pid_pos_x.limit = 0.3;
+    Chassis_Pid.Pid_pos_x.limit = 0.5;
 
     Chassis_Pid.Pid_pos_y.Kp    = 5;
     Chassis_Pid.Pid_pos_y.Ki    = 0.0001;
     Chassis_Pid.Pid_pos_y.Kd    = 0;
-    Chassis_Pid.Pid_pos_y.limit = 0.3;
+    Chassis_Pid.Pid_pos_y.limit = 0.5;
 }
 
 void DJIRemoteControl()
@@ -264,6 +268,7 @@ void Automatic()
         vPortEnterCritical();
         mav_posture.point = Second_Point;
         vPortExitCritical();
+        vTaskDelay(1500);
         SetChassisW(180.0, &Control);
     }
 

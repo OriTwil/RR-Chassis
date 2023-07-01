@@ -24,6 +24,7 @@
 #include "wtr_mavlink.h"
 
 extern int16_t crldata[4];
+extern int led_count;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart);
 

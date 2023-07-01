@@ -151,6 +151,16 @@ float PIDPosition(__IO PID_Pos *p)
     pe = p->e0;
     ie = p->eSum;
 
+    // 积分限幅
+    if(ie * (p->Ki) > 0.2)
+    {
+        ie = 0.4 / (p->Ki);
+    }
+    else if(ie * (p->Ki) < -0.2)
+    {
+        ie = (-0.4) / (p->Ki);
+    }
+
     p->e1 = p->e0;
 
     out = pe * (p->Kp) + ie * (p->Ki) + de * (p->Kd);
