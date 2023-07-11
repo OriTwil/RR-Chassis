@@ -2,10 +2,11 @@
  * @OriTwil
  * @Date: 2023-05-11 16:08:17
  * @LastEditors: szf
- * @Description: 操作线程
+ * @Description: 操作手操作线程
  * @FilePath: \RR-Upper-Structure-A\UserCode\user_src\chassis_operate_app.c
  * @WeChat:szf13373959031
  */
+
 #include "chassis_operate_app.h"
 #include "chassis_communicate.h"
 #include "chassis_state_machine.h"
@@ -130,6 +131,10 @@ void PIDInit()
     Chassis_Pid.Pid_pos_y.limit = 0.5;
 }
 
+/**
+ * @description: DJI遥控器控制
+ * @return {void}
+ */
 void DJIRemoteControl()
 {
     vPortEnterCritical();
@@ -150,71 +155,11 @@ void DJIRemoteControl()
     ChassisSwitchState(RemoteControl, &Robot_state);
 }
 
-// void Automatic()
-// {
-//     // 切换高速低速
-//     if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 0) {
-//         SpeedSwitchRatio(0.3, 0.5, &Speed_ratio);
-//     }
 
-//     if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 1) {
-//         SpeedSwitchRatio(1, 1.5, &Speed_ratio);
-//     }
-
-//     // 切换手动自动模式
-//     if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 0) {
-//         ChassisSwitchState(AutoControl, &Robot_state);
-//     }
-
-//     if (ReadJoystickSwitchs(&Msg_joystick_air, Left_switch) == 1) {
-//         ChassisSwitchState(RemoteControl, &Robot_state);
-//     }
-
-//     // 切换地盘点位
-//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn4)) {
-//         vPortEnterCritical();
-//         mav_posture.point = First_Point;
-//         vPortExitCritical();
-//     }
-//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_Btn5)) {
-//         vPortEnterCritical();
-//         mav_posture.point = Second_Point;
-//         vPortExitCritical();
-//     }
-
-//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossUp)) {
-//         vPortEnterCritical();
-//         mav_posture.point = Third_Point;
-//         vPortExitCritical();
-//     }
-
-//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossLeft)) {
-//         vPortEnterCritical();
-//         mav_posture.point = Fourth_Point;
-//         vPortExitCritical();
-//     }
-
-//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossMid)) {
-//         vPortEnterCritical();
-//         mav_posture.point = Fifth_Point;
-//         vPortExitCritical();
-//     }
-
-//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossRight)) {
-//         vPortEnterCritical();
-//         mav_posture.point = Sixth_Point;
-//         vPortExitCritical();
-//     }
-
-//     if (ReadJoystickButtons(&Msg_joystick_air, Btn_LeftCrossDown)) {
-//         vPortEnterCritical();
-//         mav_posture.point = Seventh_Point;
-//         vPortExitCritical();
-//     }
-// }
-
-// todo 写一个从地图坐标系到底盘坐标系的转换函数
-
+/**
+ * @description: 自制遥控器操作
+ * @return {void}
+ */
 void Automatic()
 {
 

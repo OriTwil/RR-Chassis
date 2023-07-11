@@ -1,6 +1,7 @@
 /**
  * @author OriTwil
- * @brief 伺服控制底盘
+ * @brief 伺服控制线程
+ * @note 伺服频率不能太低，一般周期2ms
  * @version 1.0
  * @date 2023-5-18
  *

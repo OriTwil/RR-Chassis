@@ -3,7 +3,7 @@
  * @Date: 2023-02-23 19:13:13
  * @LastEditTime: 2023-05-13 19:54:06
  * @LastEditors: szf
- * @Description: 
+ * @Description: 定位感知线程(没用上)
  * @FilePath: \RR-Chassis\Usercode\user_src\chassis_perception.c
  * @WeChat:szf13373959031
  */
@@ -16,7 +16,7 @@ uint32_t test_pos[6] = {0};
 ROBOT_STATE Robot_state_temp;
 
 /**
- * @description: 定位系统
+ * @description: 定位
  * @author: szf
  * @date:
  * @return {void}

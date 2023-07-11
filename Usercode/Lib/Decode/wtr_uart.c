@@ -3,7 +3,7 @@
  * @Date: 2022-10-13 23:33:37
  * @LastEditTime: 2023-05-13 14:55:49
  * @LastEditors: szf
- * @Description: 封装WTR曾经用过的解码函数，作为技术积累
+ * @Description: 封装WTR曾经用过的解码函数
  * @FilePath: \RR-Chassis\Usercode\user_src\wtr_uart.c
  * @WeChat:szf13373959031
  */

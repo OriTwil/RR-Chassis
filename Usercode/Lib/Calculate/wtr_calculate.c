@@ -170,7 +170,7 @@ float PIDPosition(__IO PID_Pos *p)
 }
 
 /**
- * @description: 位置式PID
+ * @description: 位置式PID(以小于180度方向转动)
  * @param {PIDType} *p
  * @return {*}
  */
@@ -246,7 +246,7 @@ void speedServo(float ref, DJI_t * motor){
 }
 
 /**
- * @brief 死区
+ * @brief 死区(二维)
  *
  */
 void DeadBand(double x, double y, double *new_x, double *new_y, double threshould)
@@ -266,6 +266,10 @@ void DeadBand(double x, double y, double *new_x, double *new_y, double threshoul
     *new_y = y * k;
 }
 
+/**
+ * @brief 死区(一维)
+ *
+ */
 void DeadBandOneDimensional(double x, double *new_x, double threshould)
 {
 

@@ -1,3 +1,9 @@
+/*** 
+ * @Author: OriTwil
+ * @Description: 数据结构文件
+ * @FilePath: \ER\Usercode\user_inc\useful_constant.h
+ * @@WeChat:szf13373959031
+ */
 #ifndef __COMMEN_H__
 #define __COMMEN_H__
 

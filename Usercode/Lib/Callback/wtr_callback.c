@@ -71,7 +71,6 @@ void wtrMavlink_MsgRxCpltCallback(mavlink_message_t *msg)
     }
 }
 
-int test_count = 0;
 /**
  * @description:外部中断回调函数
  * @author: szf

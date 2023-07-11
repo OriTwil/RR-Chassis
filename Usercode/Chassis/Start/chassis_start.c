@@ -43,8 +43,8 @@ void StartDefaultTask(void const *argument)
     RemoteControlInit();
     vTaskDelay(100);
 
-    taskENTER_CRITICAL();
     /*开启线程*/
+    taskENTER_CRITICAL();
     ChassisStateMachineTaskStart(); // 底盘状态机
     CommunicateTaskStart();         // 通信线程
     ServoTaskStart();               // 伺服线程

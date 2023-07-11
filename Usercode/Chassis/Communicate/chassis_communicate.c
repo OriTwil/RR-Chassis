@@ -29,14 +29,14 @@ void CommunicateTask(void const *argument)
         vPortEnterCritical();
         posture_temp          = mav_posture;  // 定位数据拷贝
         chassis_data_temp     = chassis_data; // 板间通信数据拷贝
-        msg_joystick_air_temp = Msg_joystick_air.msg_joystick_air;
+        msg_joystick_air_temp = Msg_joystick_air.msg_joystick_air; // 遥控器数据拷贝
         vPortExitCritical();
 
         mavlink_msg_joystick_air_send_struct(MAVLINK_COMM_2, &Msg_joystick_air.msg_joystick_air); // 板间通信
         vTaskDelay(10);
         // mavlink_msg_chassis_to_upper_send_struct(MAVLINK_COMM_2, &chassis_data_temp); // 板间通信
         mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &posture_temp);               // 定位信息发到上位机
-        vTaskDelay(10);
+        vTaskDelay(10); // 通信线程的频率不能太高
     }
 }
 
@@ -60,7 +60,6 @@ void CommunicateInit()
     mav_posture.pos_y  = 0.0;
     mav_posture.zangle = 0.0;
 
-    // WTR_MAVLink_Init(huart, chan);
     wtrMavlink_BindChannel(&huart_Computer, MAVLINK_COMM_0);         // 上位机MAVLINK初始化
     wtrMavlink_BindChannel(&huart_Chassis_to_Upper, MAVLINK_COMM_2); // 板间通信MAVLINK初始化
 

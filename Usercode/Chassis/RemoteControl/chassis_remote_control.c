@@ -1,3 +1,9 @@
+ /* @file chassis_communicate.c
+ * @author OriTwil
+ * @brief 遥控器库函数&给遥控器发dashboard
+ * @date 2023-5-18
+ *
+ */
 #include "chassis_remote_control.h"
 #include "chassis_commen.h"
 #include "chassis_config.h"

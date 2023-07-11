@@ -3,7 +3,7 @@
  * @Date: 2023-02-23 19:01:45
  * @LastEditTime: 2023-05-13 20:38:42
  * @LastEditors: szf
- * @Description: 全向轮底盘
+ * @Description: 底盘状态机
  * @FilePath: \RR-Chassis\Usercode\user_src\chassis_control_ow.c
  * @WeChat:szf13373959031
  */
@@ -122,7 +122,6 @@ void ChassisStateMachineTask(void const *argument)
                 break;
         }
 
-        // vTaskDelayUntil(&PreviousWakeTime, 30);
         vTaskDelay(50);
     }
 }
@@ -195,7 +194,6 @@ void SpeedSwitchRatio(double target_speed_ratio_linear, double target_speed_rati
 
 /**
  * @description: 更新底盘位置
- * @param position_ 底盘位置信息
  * @return {void}
  */
 void SetChassisPosition(float position_x, float position_y, float position_w, CHASSIS_POSITION *chassis_position)
@@ -235,6 +233,10 @@ void SetChassisControlPosition(float x_control, float y_control, float w_control
     xSemaphoreGive(chassis_control->xMutex_control);
 }
 
+/**
+ * @description: 控制挡板抬起/放下
+ * @return {void}
+ */
 void SetBaffleRef(float target_baffle_ref, BAFFLE *Baffle_)
 {
     xSemaphoreTake(Baffle_->xMutex_baffle, portMAX_DELAY);
@@ -242,6 +244,10 @@ void SetBaffleRef(float target_baffle_ref, BAFFLE *Baffle_)
     xSemaphoreGive(Baffle_->xMutex_baffle);
 }
 
+/**
+ * @description: 设置偏航角度
+ * @return {void}
+ */
 void SetChassisW(float target_w, CONTROL *Control_)
 {
     xSemaphoreTake(Control_->xMutex_w, portMAX_DELAY);
@@ -249,6 +255,10 @@ void SetChassisW(float target_w, CONTROL *Control_)
     xSemaphoreGive(Control_->xMutex_w);
 }
 
+/**
+ * @description: 设置偏航角微调值
+ * @return {void}
+ */
 void SetChassisAdjustmentW(float target_adjustment_w, CONTROL *Control_)
 {
     xSemaphoreTake(Control_->xMutex_w, portMAX_DELAY);
@@ -256,6 +266,10 @@ void SetChassisAdjustmentW(float target_adjustment_w, CONTROL *Control_)
     xSemaphoreGive(Control_->xMutex_w);
 }
 
+/**
+ * @description: 读取底盘状态
+ * @return {void}
+ */
 ROBOT_STATE ReadRobotState(ROBOT_STATE *current_robot_state)
 {
     ROBOT_STATE robot_state_temp;
@@ -265,6 +279,10 @@ ROBOT_STATE ReadRobotState(ROBOT_STATE *current_robot_state)
     return robot_state_temp;
 }
 
+/**
+ * @description: 读取底盘控制值
+ * @return {void}
+ */
 CHASSIS_CONTROL ReadChassisControl(CHASSIS_CONTROL *chassis_control)
 {
     CHASSIS_CONTROL chassis_control_temp;
@@ -274,6 +292,10 @@ CHASSIS_CONTROL ReadChassisControl(CHASSIS_CONTROL *chassis_control)
     return chassis_control_temp;
 }
 
+/**
+ * @description: 读取底盘位置坐标
+ * @return {void}
+ */
 CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position)
 {
     CHASSIS_POSITION chassis_position_temp;
@@ -283,6 +305,10 @@ CHASSIS_POSITION ReadChassisPosition(CHASSIS_POSITION *chassis_position)
     return chassis_position_temp;
 }
 
+/**
+ * @description: 读取当前速度挡位
+ * @return {void}
+ */
 SPEED_RATIO ReadSpeedRatio(SPEED_RATIO *Speed_ratio_)
 {
     xSemaphoreTake(Speed_ratio_->xMutex_speed_ratio, portMAX_DELAY);
@@ -290,6 +316,10 @@ SPEED_RATIO ReadSpeedRatio(SPEED_RATIO *Speed_ratio_)
     xSemaphoreGive(Speed_ratio.xMutex_speed_ratio);
 }
 
+/**
+ * @description: 读取当前射环目标
+ * @return {void}
+ */
 FIRE_NUMBER ReadFireNumber(FIRE_TARGET *current_fire_target)
 {
     xSemaphoreTake(current_fire_target->xMutex_target, (TickType_t)10);
@@ -297,6 +327,10 @@ FIRE_NUMBER ReadFireNumber(FIRE_TARGET *current_fire_target)
     xSemaphoreGive(current_fire_target->xMutex_target);
 }
 
+/**
+ * @description: 使用自制遥控器控制
+ * @return {void}
+ */
 void Joystick_Control()
 {
     crl_speed.vx = ReadJoystickRight_x(&Msg_joystick_air);
@@ -308,7 +342,6 @@ void Joystick_Control()
  * @description: 速度方向转换
  * @param
  * @return
- * @bug 转换方程还不确定
  */
 mavlink_control_t FrameTransform(mavlink_control_t *control, mavlink_posture_t *posture)
 {
@@ -324,6 +357,10 @@ mavlink_control_t FrameTransform(mavlink_control_t *control, mavlink_posture_t *
     return result;
 }
 
+/**
+ * @description: 根据点位和目标柱子更新底盘偏航位置
+ * @return {void}
+ */
 void UpdateW()
 {
     vPortEnterCritical();
