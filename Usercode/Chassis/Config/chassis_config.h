@@ -83,14 +83,14 @@
 #define BAFFLE_UP -60
 
 // 偏航角度
-#define w_5_1 18.2017
-#define w_5_2 -18.2017
+#define w_5_1 19.6041
+#define w_5_2 -19.6041
 #define w_5_3 0
-#define w_5_4 47.8449
-#define w_5_5 -47.8449
-#define w_5_6 104.9748
+#define w_5_4 51.0725
+#define w_5_5 -51.0725
+#define w_5_6 105.7086
 #define w_5_7 180
-#define w_5_8 -101.4568
+#define w_5_8 -105.7086
 
 #define w_6_1 0
 #define w_6_4 0

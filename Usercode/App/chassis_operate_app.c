@@ -88,13 +88,13 @@ void ChassisInit()
     msg_joystick_air_title_point.xMutex_joystick_air_dashboard_set_title   = xSemaphoreCreateMutex();
     msg_joystick_air_title_state.xMutex_joystick_air_dashboard_set_title   = xSemaphoreCreateMutex();
     msg_joystick_air_title_posture.xMutex_joystick_air_dashboard_set_title = xSemaphoreCreateMutex();
-    msg_joystick_air_title_knob_r.xMutex_joystick_air_dashboard_set_title = xSemaphoreCreateMutex();
+    msg_joystick_air_title_knob_r.xMutex_joystick_air_dashboard_set_title  = xSemaphoreCreateMutex();
 
     msg_joystick_air_msg_point.xMutex_joystick_air_dashboard_set_msg   = xSemaphoreCreateMutex();
     msg_joystick_air_msg_state.xMutex_joystick_air_dashboard_set_msg   = xSemaphoreCreateMutex();
     msg_joystick_air_msg_posture.xMutex_joystick_air_dashboard_set_msg = xSemaphoreCreateMutex();
     msg_joystick_air_delete.xMutex_joystick_air_dashboard_del          = xSemaphoreCreateMutex();
-    msg_joystick_air_msg_knob_r.xMutex_joystick_air_dashboard_set_msg = xSemaphoreCreateMutex();
+    msg_joystick_air_msg_knob_r.xMutex_joystick_air_dashboard_set_msg  = xSemaphoreCreateMutex();
 
     Baffle.position_servo_ref_baffle = 0;
     Baffle.xMutex_baffle             = xSemaphoreCreateMutex();
@@ -105,8 +105,6 @@ void ChassisInit()
 
     Fire_Target.Fire_number   = Fifth_Target;
     Fire_Target.xMutex_target = xSemaphoreCreateMutex();
-
-
 }
 
 /**
@@ -119,7 +117,7 @@ void PIDInit()
     Chassis_Pid.Pid_pos_w.Kp    = 0.1;
     Chassis_Pid.Pid_pos_w.Ki    = 0;
     Chassis_Pid.Pid_pos_w.Kd    = 0;
-    Chassis_Pid.Pid_pos_w.limit = 1;
+    Chassis_Pid.Pid_pos_w.limit = 1.2;
 
     Chassis_Pid.Pid_pos_x.Kp    = 5;
     Chassis_Pid.Pid_pos_x.Ki    = 0.0001;
@@ -218,10 +216,10 @@ void DJIRemoteControl()
 // todo 写一个从地图坐标系到底盘坐标系的转换函数
 
 void Automatic()
-{   
+{
 
     if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 1) {
-        SpeedSwitchRatio(1.0, 1.5, &Speed_ratio);
+        SpeedSwitchRatio(1.6, 1.0, &Speed_ratio);
     } else if (ReadJoystickSwitchs(&Msg_joystick_air, Right_switch) == 0) {
         SpeedSwitchRatio(0.3, 0.5, &Speed_ratio);
     }
@@ -246,8 +244,9 @@ void Automatic()
         vTaskDelay(10);
 
         vPortEnterCritical();
-        control.x_set = 1.74;
-        control.y_set = 5.755;
+        mav_posture.point = Eighth_Point;
+        control.x_set     = 1.74;
+        control.y_set     = 5.755;
         vPortExitCritical();
 
         SetBaffleRef(1, &Baffle);
@@ -259,8 +258,8 @@ void Automatic()
         vPortEnterCritical();
         mav_posture.point = First_Point;
         vPortExitCritical();
+        vTaskDelay(1500);
         SetChassisW(90.0, &Control);
-        // vTaskDelay(2000);
         SetBaffleRef(BAFFLE_UP, &Baffle);
     }
 
@@ -273,30 +272,38 @@ void Automatic()
     }
 
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_RightCrossUp)) {
+        // SetChassisW(180.0, &Control);
+        // vTaskDelay(2000);
+        FireSwitchTarget(Seventh_Target, &Fire_Target);
+        vTaskDelay(1500);
         vPortEnterCritical();
         mav_posture.point = Third_Point;
         vPortExitCritical();
-        SetChassisW(180.0, &Control);
     }
 
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_RightCrossLeft)) {
+        // SetChassisW(180.0, &Control);
+        // vTaskDelay(2000);
+        FireSwitchTarget(Seventh_Target, &Fire_Target);
+        vTaskDelay(1500);
         vPortEnterCritical();
         mav_posture.point = Fourth_Point;
         vPortExitCritical();
-        SetChassisW(180.0, &Control);
     }
 
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_RightCrossMid)) {
         vPortEnterCritical();
         mav_posture.point = Fifth_Point;
         vPortExitCritical();
-        SetChassisW(0.0, &Control);
+        // vTaskDelay(1000);
+        // SetChassisW(0.0, &Control);
     }
 
     if (ReadJoystickButtons(&Msg_joystick_air, Btn_RightCrossRight)) {
         vPortEnterCritical();
         mav_posture.point = Sixth_Point;
         vPortExitCritical();
+        SetBaffleRef(BAFFLE_UP, &Baffle);
         SetChassisW(90.0, &Control);
     }
 
@@ -304,6 +311,7 @@ void Automatic()
         vPortEnterCritical();
         mav_posture.point = Seventh_Point;
         vPortExitCritical();
+        SetBaffleRef(BAFFLE_UP, &Baffle);
         SetChassisW(90.0, &Control);
     }
 

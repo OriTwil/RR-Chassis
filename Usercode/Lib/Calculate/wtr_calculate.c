@@ -268,12 +268,16 @@ void DeadBand(double x, double y, double *new_x, double *new_y, double threshoul
 
 void DeadBandOneDimensional(double x, double *new_x, double threshould)
 {
-    if (fabs(x) < threshould) {
+
+    double difference_x = fabs(x) - threshould;
+    
+    if (difference_x < 0) {
         *new_x = 0;
         return;
     }
 
-    *new_x = x - threshould;
+    double k = difference_x / fabs(x);
+    *new_x   = k * x;
 }
 
 /**

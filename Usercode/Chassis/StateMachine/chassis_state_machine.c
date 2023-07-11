@@ -89,12 +89,18 @@ void ChassisStateMachineTask(void const *argument)
                 Joystick_Control();
                 // DJI_Control();
                 vPortEnterCritical();
-                DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 遥控器摇杆
-                DeadBandOneDimensional((double)crl_speed.vw, &vw_deadband, 0.2);
+                xSemaphoreTake(Speed_ratio.xMutex_speed_ratio, portMAX_DELAY);
+                double speed_ratio_linear_temp  = Speed_ratio.speed_ratio_linear;
+                double speed_ratio_angular_temp = Speed_ratio.speed_ratio_angular;
+                xSemaphoreGive(Speed_ratio.xMutex_speed_ratio);
+                // DeadBand((double)crl_speed.vx, (double)crl_speed.vy, &vx_deadbanded, &vy_deadbanded, 0.1); // 死区控制 遥控器摇杆
+                DeadBandOneDimensional((double)crl_speed.vx, &vx_deadbanded, 0.25);
+                DeadBandOneDimensional((double)crl_speed.vy, &vy_deadbanded, 0.25);
+                DeadBandOneDimensional((double)crl_speed.vw, &vw_deadband, 0.1);
                 // double vx_deadbanded = vx_deadbanded * cos(mav_posture.zangle * DEC) + vy_deadbanded * sin(mav_posture.zangle * DEC);
                 // double vy_deadbanded = -vx_deadbanded * sin(mav_posture.zangle * DEC) + vy_deadbanded * cos(mav_posture.zangle * DEC);
-                SetChassisControlVelocity(vx_deadbanded, vy_deadbanded, vw_deadband, &Chassis_Control); // 用摇杆控制底盘
                 vPortExitCritical();
+                SetChassisControlVelocity(vx_deadbanded * speed_ratio_linear_temp, vy_deadbanded * speed_ratio_linear_temp, vw_deadband * speed_ratio_angular_temp, &Chassis_Control); // 用摇杆控制底盘
                 break;
             case AutoControl:
                 islocked = false;
@@ -293,13 +299,9 @@ FIRE_NUMBER ReadFireNumber(FIRE_TARGET *current_fire_target)
 
 void Joystick_Control()
 {
-    xSemaphoreTake(Speed_ratio.xMutex_speed_ratio, portMAX_DELAY);
-    double speed_ratio_linear_temp  = Speed_ratio.speed_ratio_linear;
-    double speed_ratio_angular_temp = Speed_ratio.speed_ratio_angular;
-    xSemaphoreGive(Speed_ratio.xMutex_speed_ratio);
-    crl_speed.vx = ReadJoystickRight_x(&Msg_joystick_air) * speed_ratio_linear_temp;
-    crl_speed.vy = ReadJoystickRight_y(&Msg_joystick_air) * speed_ratio_linear_temp;
-    crl_speed.vw = ReadJoystickLeft_x(&Msg_joystick_air) * speed_ratio_angular_temp;
+    crl_speed.vx = ReadJoystickRight_x(&Msg_joystick_air);
+    crl_speed.vy = ReadJoystickRight_y(&Msg_joystick_air);
+    crl_speed.vw = ReadJoystickLeft_x(&Msg_joystick_air);
 }
 
 /**

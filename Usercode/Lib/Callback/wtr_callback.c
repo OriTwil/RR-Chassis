@@ -15,6 +15,7 @@
 
 int16_t crldata[4] = {0};
 int led_count = 0;
+int led_ops_count = 0;
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
@@ -31,6 +32,11 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
     if (huart->Instance == UART_OPS) // 底盘定位系统的decode
     {
         OPS_Decode();
+        led_ops_count++;
+        if(led_ops_count > 10000)
+        {
+            led_ops_count = 0;//保护
+        }
         // mavlink_msg_posture_send_struct(MAVLINK_COMM_0, &mav_posture);
     }
     if (huart->Instance == UART_AS69) {

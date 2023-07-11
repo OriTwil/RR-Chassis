@@ -297,7 +297,7 @@ void LedUpdate()
     // }
     if(control_vw_temp > 9)
     {
-        JoystickSwitchLED(1, 255, 1, 0.05, 1000, &msg_joystick_air_led);
+        JoystickSwitchLED(1, 150, 1, 0.05, 1000, &msg_joystick_air_led);
     }
     // else if (control_vw_temp > 4)
     // {
@@ -305,9 +305,15 @@ void LedUpdate()
     // }
 
     // last_control_vw = control_vw_temp; 
-    if(led_count > 25)
+    else if(led_count > 25)
     {
         led_count = 0;
-        JoystickSwitchLED(1, 1, 255, 0.05, 1000, &msg_joystick_air_led);
+        JoystickSwitchLED(1, 1, 150, 0.05, 1000, &msg_joystick_air_led);
+    }
+
+    if(led_ops_count > 100)
+    {
+        led_ops_count = 0;
+        JoystickSwitchLED(150, 1, 1, 0.05, 1000, &msg_joystick_air_led);
     }
 }
